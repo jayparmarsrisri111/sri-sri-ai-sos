@@ -756,6 +756,40 @@ if (dashLangSelect) {
     });
 }
 
+const seedDemoCaseBtn = document.getElementById('seedDemoCaseBtn');
+if (seedDemoCaseBtn) {
+    seedDemoCaseBtn.addEventListener('click', async () => {
+        const originalText = seedDemoCaseBtn.innerText;
+        seedDemoCaseBtn.innerText = "⏳ જનરેટ થઈ રહ્યું છે...";
+        seedDemoCaseBtn.disabled = true;
+        try {
+            const res = await fetch('/api/admin/seed_dynamic_demo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_name: "પ્રિયા શર્મા (Live SOS Test)",
+                    phone_number: "+91 98765 43210",
+                    frames_count: 5,
+                    audio_count: 3
+                })
+            });
+            const data = await res.json();
+            if (data && data.incident_id) {
+                await loadIncidentList(data.incident_id);
+                alert(`✅ ૧-સેકન્ડ લાઈવ કેસ સફળતાપૂર્વક તૈયાર થયો!\nઇન્સિડન્ટ ID: ${data.incident_id}\n\n• કેમેરા ફ્રેમ્સ: ${data.frames_created} (દર 1 સેકન્ડે HUD વિઝ્યુઅલ કેપ્ચર)\n• ઓડિયો ક્લિપ્સ: ${data.audio_created} (૧-સેકન્ડ ક્રિટિકલ ડિસ્ટ્રેસ ઓડિયો)\n• જીપીએસ લોકેશન: અમદાવાદ (C.G. Road)\n• પોલીસ CAD: ERSS 112 ડિસ્પેચ સફળ`);
+            } else {
+                alert("કેસ જનરેટ કરવામાં સમસ્યા આવી.");
+            }
+        } catch (err) {
+            console.error("Error generating demo case:", err);
+            alert("ભૂલ: " + err.message);
+        } finally {
+            seedDemoCaseBtn.innerText = originalText;
+            seedDemoCaseBtn.disabled = false;
+        }
+    });
+}
+
 // Init
 window.addEventListener('DOMContentLoaded', () => {
     initMap();
@@ -765,3 +799,4 @@ window.addEventListener('DOMContentLoaded', () => {
         dashLangSelect.value = currentLang;
     }
 });
+

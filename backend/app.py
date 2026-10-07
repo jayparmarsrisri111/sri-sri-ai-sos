@@ -1,9 +1,14 @@
 import os
 import json
 import asyncio
+import io
+import wave
+import struct
+import math
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from datetime import datetime
+from PIL import Image, ImageDraw
 
 from fastapi import FastAPI, UploadFile, File, Form, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
@@ -796,3 +801,148 @@ async def websocket_tactical_global(websocket: WebSocket):
         ws_manager.disconnect(websocket)
     except Exception:
         ws_manager.disconnect(websocket)
+
+# =========================================================================
+# 🎬 DYNAMIC 1-SECOND AUDIO & VIDEO EVIDENCE SEED ENGINE
+# =========================================================================
+
+def _create_synthetic_1sec_audio(freq=880, duration_sec=1.0, sample_rate=8000) -> bytes:
+    """Generates genuine playable 1-second WAV audio bytes with distress frequency."""
+    buf = io.BytesIO()
+    with wave.open(buf, 'wb') as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(sample_rate)
+        total_frames = int(sample_rate * duration_sec)
+        frames = bytearray()
+        for i in range(total_frames):
+            val = int(32767 * 0.4 * math.sin(2 * math.pi * freq * (i / sample_rate)))
+            frames.extend(struct.pack('<h', val))
+        w.writeframes(frames)
+    return buf.getvalue()
+
+def _create_synthetic_1sec_frame(seq: int, victim_name: str, phone: str, lat: float, lng: float) -> bytes:
+    """Generates a genuine tactical HUD camera frame with sequence, GPS watermark and facial target lock."""
+    img = Image.new('RGB', (480, 360), color=(15, 23, 42))
+    d = ImageDraw.Draw(img)
+    # Tactical grid
+    for y in range(40, 360, 40):
+        d.line([(0, y), (480, y)], fill=(30, 41, 59), width=1)
+    for x in range(40, 480, 40):
+        d.line([(x, 0), (x, 360)], fill=(30, 41, 59), width=1)
+    
+    # Top HUD
+    d.rectangle([(0, 0), (480, 34)], fill=(30, 41, 59))
+    d.text((12, 10), "SRI SRI ❤️ AI SOS - 1-SEC EVIDENCE BURST", fill=(239, 68, 68))
+    d.text((345, 10), f"FRAME #{seq} (+{seq}s)", fill=(56, 189, 248))
+    
+    # Target Box
+    cx, cy = 240, 180
+    d.rectangle([(cx - 55, cy - 55), (cx + 55, cy + 55)], outline=(34, 197, 94), width=2)
+    d.text((cx - 50, cy - 50), "TARGET LOCK", fill=(134, 239, 172))
+    d.text((cx - 50, cy + 38), "FACE VERIFIED 98%", fill=(134, 239, 172))
+    
+    # Watermark Footer
+    d.rectangle([(0, 305), (480, 360)], fill=(15, 23, 42))
+    d.text((12, 312), f"VICTIM: {victim_name} ({phone})", fill=(241, 245, 249))
+    d.text((12, 332), f"GPS: {lat:.5f}, {lng:.5f} | SPEED: 2.3 km/h | 1-SEC CLOUD PUSH", fill=(148, 163, 184))
+    d.text((345, 332), "SHA-256 HASHED", fill=(34, 197, 94))
+    
+    buf = io.BytesIO()
+    img.save(buf, format='JPEG', quality=85)
+    return buf.getvalue()
+
+@app.post("/api/admin/seed_dynamic_demo")
+async def seed_dynamic_demo_case(
+    user_name: Optional[str] = Form("પ્રિયા શર્મા (Priya Sharma)"),
+    phone_number: Optional[str] = Form("+91 98980 55443"),
+    contacts: Optional[str] = Form("+91 98250 11223 (વાલી / પિતા), 112 (પોલીસ કંટ્રોલ રૂમ)")
+):
+    """
+    Seeds a rich, realistic, dynamic demonstration emergency case with:
+    - 5 sequential 1-second burst camera frames
+    - 3 sequential 1-second acoustic audio clips
+    - Live GPS coordinates along Law Garden / CG Road, Ahmedabad
+    - SHA-256 blockchain chain of custody log
+    - ERSS 112 CAD Police patrol unit dispatch
+    """
+    emergency_contacts = [c.strip() for c in contacts.split(",") if c.strip()]
+    metadata = evidence_mgr.create_incident(
+        user_name=user_name,
+        phone_number=phone_number,
+        emergency_contacts=emergency_contacts
+    )
+    inc_id = metadata["incident_id"]
+
+    base_lat = 23.0245
+    base_lng = 72.5580
+
+    # 1. Generate 5 sequential 1-second burst photo frames
+    for s in range(1, 6):
+        cur_lat = round(base_lat + (s * 0.0003), 6)
+        cur_lng = round(base_lng + (s * 0.0002), 6)
+        frame_bytes = _create_synthetic_1sec_frame(s, user_name, phone_number, cur_lat, cur_lng)
+        gps_data = {"lat": cur_lat, "lng": cur_lng, "accuracy": 6.0, "speed": 2.3}
+        chunk = evidence_mgr.save_chunk(
+            incident_id=inc_id,
+            chunk_type="photo",
+            data_bytes=frame_bytes,
+            file_ext="jpg",
+            gps=gps_data,
+            camera_facing="environment",
+            seq=s
+        )
+        metadata["location_history"].append({
+            "timestamp": datetime.utcnow().isoformat(),
+            "lat": cur_lat,
+            "lng": cur_lng,
+            "accuracy": 6.0,
+            "speed": 2.3
+        })
+        metadata["last_location"] = {"lat": cur_lat, "lng": cur_lng, "accuracy": 6.0}
+
+    # 2. Generate 3 sequential 1-second audio clips
+    for a in range(1, 4):
+        audio_bytes = _create_synthetic_1sec_audio(freq=880 + (a * 120), duration_sec=1.0)
+        evidence_mgr.save_chunk(
+            incident_id=inc_id,
+            chunk_type="audio",
+            data_bytes=audio_bytes,
+            file_ext="wav",
+            gps={"lat": base_lat, "lng": base_lng},
+            seq=5 + a
+        )
+
+    # 3. Save updated metadata
+    inc_dir = evidence_mgr.get_incident_dir(inc_id)
+    with open(inc_dir / "metadata.json", "w", encoding="utf-8") as f:
+        json.dump(metadata, f, indent=2)
+
+    # 4. Trigger ERSS 112 dispatch simulation
+    await dispatch_police_erss(inc_id, priority="CRITICAL")
+
+    # 5. Broadcast new incident to dashboard
+    await ws_manager.broadcast_to_incident("TACTICAL_GLOBAL", {
+        "event": "INCIDENT_STARTED",
+        "incident": metadata
+    })
+
+    return {
+        "status": "ok",
+        "incident_id": inc_id,
+        "user_name": user_name,
+        "total_chunks": 8,
+        "frames_created": 5,
+        "audio_created": 3,
+        "message": "ડાયનેમિક ૧-સેકન્ડ લાઇવ કેસ ડેટા સફળતાપૂર્વક જનરેટ થયો!"
+    }
+
+@app.on_event("startup")
+async def seed_initial_demo_if_empty():
+    try:
+        incidents = evidence_mgr.list_incidents()
+        if len(incidents) == 0:
+            await seed_dynamic_demo_case()
+    except Exception as e:
+        print(f"Startup initial seed note: {e}")
+
