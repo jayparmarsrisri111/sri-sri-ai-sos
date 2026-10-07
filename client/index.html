@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sri Sri ❤️SOS AI - Digital Blackbox & Girls Safety</title>
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/images/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/static/images/icon-512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#ef4444">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SriSri SOS">
+    <link rel="stylesheet" href="/static/css/sos.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Noto+Sans+Gujarati:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="mobile-container" id="appContainer">
+        <!-- Top Status Bar -->
+        <header class="app-header">
+            <div class="brand">
+                <img src="/static/images/logo.svg" alt="Sri Sri ❤️SOS AI" class="brand-logo-img">
+                <div class="brand-titles">
+                    <span class="brand-name"><span class="brand-title-badge"><span class="brand-sri">SRI SRI</span> <span class="heart-text">❤️</span> <span class="brand-ai-sos"><span class="brand-ai-chip">AI</span><span class="brand-sos-text">SOS</span></span></span></span>
+                    <span class="brand-tagline" data-i18n="tagline">ટેમ્પર-પ્રૂફ ડિજિટલ બ્લેકબોક્સ</span>
+                </div>
+            </div>
+            <div class="header-controls">
+                <!-- Multilingual Selector for ALL World Languages -->
+                <div class="lang-selector-box">
+                    <select class="lang-select-box" id="clientLangSelect">
+                        <option value="gu">ગુજરાતી (Gujarati)</option>
+                        <option value="en">English (Global)</option>
+                        <option value="hi">हिंदी (Hindi)</option>
+                        <option value="es">Español (Spanish)</option>
+                        <option value="fr">Français (French)</option>
+                        <option value="ar">العربية (Arabic)</option>
+                        <option value="zh">中文 (Chinese)</option>
+                        <option value="ru">Русский (Russian)</option>
+                        <option value="de">Deutsch (German)</option>
+                        <option value="mr">मराठी (Marathi)</option>
+                        <option value="ta">தமிழ் (Tamil)</option>
+                    </select>
+                </div>
+                <div class="cloud-badge" id="cloudStatus">
+                    <span class="badge-dot"></span>
+                    <span id="cloudStatusText" data-i18n="cloudReady">ક્લાઉડ તૈયાર છે</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Universal App Switcher (Admin & User Multi-App Navigation) -->
+        <div class="mobile-app-switcher">
+            <a href="/" class="m-switch-btn active" title="Mobile SOS">📱 <span data-i18n="navMobileSos">મોબાઈલ SOS</span></a>
+            <a href="/dashboard" class="m-switch-btn" title="Police Cockpit">🚔 <span data-i18n="navPoliceCockpit">કંટ્રોલ રૂમ</span></a>
+            <a href="/admin" class="m-switch-btn" title="Admin Master Portal">⚙️ <span data-i18n="navAdminMaster">એડમિન પેનલ</span></a>
+        </div>
+
+        <!-- 🛡️ Sentinel Status Bar (Solves Disadvantages 1, 2, 3, 6, 7) -->
+        <div class="sentinel-chips-bar" id="sentinelChipsBar">
+            <span class="chip-badge active-green" id="wakeLockBadge" title="Wake Lock Keeps Screen Active">
+                ⚡ વેક-લૉક સક્રિય (સ્ક્રીન ઑન)
+            </span>
+            <span class="chip-badge active-purple" id="hardwareKeyBadge" title="Headset / Volume Key SOS Trigger Armed">
+                🎧 ઇયરફોન/વોલ્યુમ બટન સક્રિય
+            </span>
+            <span class="chip-badge" id="superEarBadge" title="Super-Ear Mic Boost on Pocket Occlusion">
+                🦻 સુપર-ઇયર માઇક સ્ટેન્ડબાય
+            </span>
+            <button class="chip-btn-install hidden" id="pwaInstallBtn" title="Install Native App on Phone">
+                📲 એપ ઇન્સ્ટોલ કરો
+            </button>
+        </div>
+
+        <!-- Offline Network Alert & Emergency SMS Fallback (Solves Disadvantage: No Internet) -->
+        <div class="offline-banner hidden" id="offlineBanner">
+            <div class="offline-content">
+                <span class="offline-icon">📶⚠️</span>
+                <div>
+                    <strong>ઓફલાઇન મોડ: ઇન્ટરનેટ કનેક્શન નથી!</strong>
+                    <p>તમામ પુરાવા એન્ક્રિપ્ટેડ એજ સ્ટોરેજમાં સુરક્ષિત છે. નેટવર્ક આવતાં જ ઓટો-અપલોડ થશે.</p>
+                </div>
+            </div>
+            <a href="#" class="btn-offline-sms" id="offlineSmsBtn">
+                📲 1-ક્લિક ઇમરજન્સી SMS મોકલો (ઇન્ટરનેટ વગર)
+            </a>
+        </div>
+
+        <!-- Main Screen -->
+        <main class="main-content" id="normalView">
+            <!-- Victim Setup Card -->
+            <div class="card setup-card" id="userCard">
+                <div class="card-header">
+                    <h3 data-i18n="profileTitle">યુઝર પ્રોફાઇલ (ઇમરજન્સી વિગતો)</h3>
+                    <button class="btn-text" id="toggleEditBtn" data-i18n="btnEdit">સુધારો</button>
+                </div>
+                <div class="user-details" id="userDisplay">
+                    <p><strong data-i18n="lblFullName">નામ:</strong> <span id="dispName">Pooja Patel</span></p>
+                    <p><strong data-i18n="lblPhone">મોબાઇલ:</strong> <span id="dispPhone">+91 98765 43210</span></p>
+                    <p><strong data-i18n="lblEmergencyContacts">ગાર્ડિયન / પોલીસ સંપર્ક:</strong> <span id="dispContacts">+91 98980 12345, 112 (પોલીસ)</span></p>
+                </div>
+                <div class="edit-inputs hidden" id="editForm">
+                    <input type="text" id="inputName" placeholder="તમારું પૂરું નામ" value="Pooja Patel">
+                    <input type="tel" id="inputPhone" placeholder="તમારો ફોન નંબર" value="+91 98765 43210">
+                    <input type="text" id="inputContacts" placeholder="ઇમરજન્સી સંપર્ક (અલ્પવિરામથી)" value="+91 98980 12345, 112">
+                    <button class="btn-primary-sm" id="saveProfileBtn" data-i18n="btnSave">સેવ કરો</button>
+                </div>
+            </div>
+
+            <!-- GPS Live Card -->
+            <div class="card gps-card">
+                <div class="gps-info">
+                    <span class="gps-icon">📍</span>
+                    <div>
+                        <div class="gps-title" data-i18n="gpsTitle">લાઈવ જીપીએસ લોકેશન</div>
+                        <div class="gps-coords" id="coordsText" data-i18n="gpsFetching">GPS મેળવી રહ્યું છે...</div>
+                    </div>
+                </div>
+                <div class="gps-accuracy" id="accuracyBadge">-- m ચોકસાઈ</div>
+            </div>
+
+            <!-- Big SOS Trigger Area -->
+            <div class="sos-trigger-container">
+                <button class="sos-btn" id="sosBtn">
+                    <div class="sos-ring pulse-ring"></div>
+                    <div class="sos-core">
+                        <span class="sos-text" data-i18n="sosText">SOS</span>
+                        <span class="sos-subtext" data-i18n="sosSubtext">એક ટચ ઇમરજન્સી</span>
+                    </div>
+                </button>
+                <p class="sos-instruction" data-i18n="sosInstruction">મુશ્કેલીના સમયે મોટું લાલ બટન દબાવો અથવા ફોનને 3 વખત હલાવો</p>
+            </div>
+
+            <!-- 🌸 GIRLS SAFETY & SAFE EXIT TOOLKIT 🌸 -->
+            <div class="card girls-safety-card">
+                <div class="card-header">
+                    <h3 data-i18n="girlsToolkitTitle">🌸 ગર્લ્સ સેફ્ટી & સેફ એક્ઝિટ ટૂલકીટ</h3>
+                    <span class="shield-tag" data-i18n="womenSafetyTag">WOMEN SAFETY</span>
+                </div>
+
+                <!-- 1. Fake Call Safe Exit -->
+                <div class="feature-row">
+                    <div class="feature-icon">📞</div>
+                    <div class="feature-info">
+                        <strong data-i18n="fakeCallTitle">સેફ એક્ઝિટ (ફેક ઇનકમિંગ કોલ)</strong>
+                        <p data-i18n="fakeCallDesc">અસહજ કે શંકાસ્પદ જગ્યાએથી બહાર નીકળવા પપ્પા કે ભાઈનો નકલી કોલ મેળવો.</p>
+                    </div>
+                </div>
+                <div class="fake-call-controls">
+                    <div class="caller-select-row">
+                        <label for="callerType" data-i18n="lblCaller">કોલર:</label>
+                        <select id="callerType">
+                            <option value="Papa (પપ્પા)">👨 પપ્પા (Papa)</option>
+                            <option value="Mom (મમ્મી)">👩 મમ્મી (Mom)</option>
+                            <option value="Brother (ભાઈ)">👦 ભાઈ (Brother)</option>
+                            <option value="Police Inspector">👮 પોલીસ ઇન્સ્પેક્ટર</option>
+                        </select>
+                    </div>
+                    <div class="timer-btns-row">
+                        <button class="btn-tool" id="fakeCallNowBtn" data-i18n="btnCallNow">હમણાં જ કોલ કરો</button>
+                        <button class="btn-tool-outline" id="fakeCall5sBtn" data-i18n="btnCall5s">૫ સેકન્ડ પછી કોલ</button>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- 2. AI Voice & Scream Detector -->
+                <div class="feature-row">
+                    <div class="feature-icon">🎙️</div>
+                    <div class="feature-info">
+                        <strong data-i18n="voiceScreamTitle">AI વોઈસ & ચીસ ડિટેક્ટર (હેન્ડ્સ-ફ્રી)</strong>
+                        <p data-i18n="voiceScreamDesc">ફોન અડ્યા વગર "Help", "Bachao" કે જોરથી ચીસ પાડતાં આપમેળે SOS ચાલુ થશે.</p>
+                    </div>
+                    <div class="toggle-wrapper">
+                        <label class="switch">
+                            <input type="checkbox" id="voiceListenToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="mic-status-bar hidden" id="micStatusBar">
+                    <span class="mic-pulse"></span>
+                    <span id="voiceStatusText" data-i18n="voiceListening">AI સાંભળી રહ્યું છે ("Help" કે "બચાવો" બોલો)...</span>
+                    <div class="audio-level-meter">
+                        <div class="audio-level-bar" id="audioLevelBar"></div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- 3. Safe Journey / Cab Timer -->
+                <div class="feature-row">
+                    <div class="feature-icon">⏱️</div>
+                    <div class="feature-info">
+                        <strong data-i18n="cabTimerTitle">સેફ કેબ / ટ્રાવેલ ટાઈમર</strong>
+                        <p data-i18n="cabTimerDesc">રિક્ષા/કેબમાં બેસતી વખતે ટાઈમર સેટ કરો. સમયસર ના પહોંચો તો વાલીને ઓટો-SOS જશે.</p>
+                    </div>
+                </div>
+                <div class="journey-controls" id="journeySetup">
+                    <div class="timer-select-group">
+                        <button class="btn-chip active" data-mins="5">૫ મિનિટ</button>
+                        <button class="btn-chip" data-mins="10">૧૦ મિનિટ</button>
+                        <button class="btn-chip" data-mins="15">૧૫ મિનિટ</button>
+                        <button class="btn-chip" data-mins="30">૩૦ મિનિટ</button>
+                    </div>
+                    <button class="btn-primary-sm full-width" id="startJourneyBtn" data-i18n="btnStartJourney">સેફ ટ્રાવેલ ટ્રેકિંગ શરૂ કરો</button>
+                </div>
+                <div class="journey-active-box hidden" id="journeyActiveBox">
+                    <div class="journey-countdown">
+                        <span class="countdown-label" data-i18n="lblRemainingTime">બાકી સમય:</span>
+                        <span class="countdown-time" id="countdownDisplay">05:00</span>
+                    </div>
+                    <button class="btn-safe-arrive" id="safeArrivedBtn" data-i18n="btnSafeArrived">✅ હું સુરક્ષિત પહોંચી ગઈ છું</button>
+                </div>
+
+                <hr class="divider">
+
+                <!-- 4. Quick Emergency Helplines -->
+                <div class="helpline-bar">
+                    <a href="tel:181" class="helpline-btn btn-abhayam" data-i18n="helplineAbhayam">
+                        📞 181 (અભયમ મહિલા હેલ્પલાઇન)
+                    </a>
+                    <a href="tel:112" class="helpline-btn btn-police" data-i18n="helplinePolice">
+                        🚨 112 (પોલીસ)
+                    </a>
+                </div>
+
+                <!-- 5. WhatsApp Live Location Link -->
+                <div class="whatsapp-share-box">
+                    <button class="btn-whatsapp" id="whatsappShareBtn" data-i18n="btnWhatsappShare">
+                        💬 વાલીને WhatsApp પર લાઈવ ટ્રેકિંગ લિંક મોકલો
+                    </button>
+                </div>
+            </div>
+
+            <!-- 🛣️ AI SAFE ROUTE & STREET SAFETY AUDIT CARD 🛣️ -->
+            <div class="card safe-route-card" id="safeRouteCard">
+                <div class="card-header">
+                    <h3 data-i18n="safeRouteTitle">🛣️ AI સેફ રૂટ & સ્ટ્રીટ સેફ્ટી ઓડિટ</h3>
+                    <span class="shield-tag" style="background:#059669; color:#fff;" data-i18n="safeNavTag">SAFE TRAVEL</span>
+                </div>
+                <p class="section-subtitle" data-i18n="safeRouteDesc">
+                    તમારા ગંતવ્ય સ્થાન સુધીનો રસ્તો કેટલો સુરક્ષિત છે? લાઈટ (Lux), વિસ્તાર સુરક્ષા, પોલીસ ચોકી અને રોડ પ્રકારનું ઓટોમેટિક ઓડિટ.
+                </p>
+
+                <!-- Destination Search & Quick Presets -->
+                <div class="route-input-group">
+                    <div class="route-input-wrapper">
+                        <span class="route-input-icon">📍</span>
+                        <input type="text" id="routeDestinationInput" class="route-input-field" placeholder="ક્યાં જવું છે? કોઈપણ સરનામું/વિસ્તાર લખો" value="Navrangpura (નવરંગપુરા)" autocomplete="off">
+                        <button type="button" id="btnClearDest" class="route-input-clear hidden" title="Clear">✕</button>
+                    </div>
+                    <!-- Live Dynamic Suggestions Dropdown -->
+                    <div id="routeSearchSuggestions" class="route-suggestions-dropdown hidden"></div>
+
+                    <div class="route-quick-chips">
+                        <button class="route-chip active" data-dest="Navrangpura (નવરંગપુરા)" data-i18n="chipNavrang">📍 નવરંગપુરા</button>
+                        <button class="route-chip" data-dest="Home (ઘર)" id="chipHomeBtn" data-i18n="chipHome">🏠 ઘર</button>
+                        <button class="route-chip" data-dest="Office (ઓફિસ)" id="chipOfficeBtn" data-i18n="chipOffice">🏢 ઓફિસ</button>
+                        <button class="route-chip" data-dest="Hostel / PG (હોસ્ટેલ)" data-i18n="chipHostel">🏢 હોસ્ટેલ/PG</button>
+                        <button class="route-chip" data-dest="Railway Station (રેલવે સ્ટેશન)" data-i18n="chipStation">🚆 સ્ટેશન</button>
+                        <button class="route-chip" data-dest="College (કોલેજ)" data-i18n="chipCollege">🎓 કોલેજ</button>
+                        <button class="route-chip chip-manage-btn" id="btnOpenManagePlaces" title="ઘર/ઓફિસ લોકેશન સેવ કરો">⚙️ સેવ લોકેશન્સ</button>
+                    </div>
+
+                    <!-- Dynamic Route Origin/Destination Live Info Banner -->
+                    <div id="routeLiveOriginBanner" class="route-live-banner">
+                        <span class="rl-icon">📍</span>
+                        <span class="rl-text" id="routeLiveOriginText">શરૂઆત: તમારું લાઈવ GPS લોકેશન ➔ ગંતવ્ય: નવરંગપુરા</span>
+                    </div>
+
+                    <button class="btn-primary-sm full-width" id="btnAuditRoute" style="margin-top:6px;" data-i18n="btnAuditRoute">
+                        🔍 સેફ રૂટ સ્કેન & ઓડિટ કરો
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div id="routeAuditLoading" class="route-loading hidden">
+                    <div class="route-spinner"></div>
+                    <span data-i18n="routeScanningText">AI સેફ્ટી રડાર શેરીની લાઈટ્સ, સીસીટીવી અને પોલીસ ચોકીઓ સ્કેન કરી રહ્યું છે...</span>
+                </div>
+
+                <!-- Mini Route Map View -->
+                <div id="safeRouteMapContainer" class="route-map-box">
+                    <div id="miniRouteMap" style="height: 190px; width: 100%; border-radius: 12px;"></div>
+                    <div class="route-map-legend">
+                        <span class="legend-item"><span class="legend-color-safe"></span> <span data-i18n="legendSafe">સેફ કોરિડોર (લીલો)</span></span>
+                        <span class="legend-item"><span class="legend-color-risk"></span> <span data-i18n="legendRisk">અંધારી ગલી (લાલ)</span></span>
+                        <span class="legend-item">👮 <span data-i18n="legendPolice">પોલીસ</span> / 🏥 <span data-i18n="legendHaven">સેફ સ્પોટ</span></span>
+                    </div>
+                </div>
+
+                <!-- Route Comparison Cards -->
+                <div class="route-cards-container" id="routeCardsContainer">
+                    <!-- 🟢 Recommended Safe Corridor -->
+                    <div class="route-card route-card-safe active" id="cardSafeRoute">
+                        <div class="route-card-head">
+                            <div class="route-badge-safe" id="safeRouteTitle" data-i18n="safeRouteBadge">🟢 ભલામણ કરેલ સેફ રૂટ</div>
+                            <div class="route-score-pill score-high">
+                                <span class="score-num" id="safeScoreNum">૯૬</span>
+                                <span class="score-unit" data-i18n="unitSafetyScore">/૧૦૦ સેફ્ટી સ્કોર</span>
+                            </div>
+                        </div>
+                        <div class="route-meta-row">
+                            <span id="safeTimeMeta">⏱️ ૧૮ મિનિટ (ચાલતા) / ૬ મિનિટ (કેબ)</span>
+                            <span id="safeDistMeta">📏 ૧.૮ કિમી</span>
+                        </div>
+
+                        <!-- Deep Safety Metrics Grid -->
+                        <div class="safety-metrics-grid">
+                            <div class="metric-box">
+                                <div class="metric-icon">💡</div>
+                                <div class="metric-title" data-i18n="metricLightTitle">સ્ટ્રીટ લાઈટ (LIGHT)</div>
+                                <div class="metric-val text-success" id="metricLightVal">૧૦૦% પ્રકાશિત (૯૫ Lux)</div>
+                                <div class="metric-sub" id="metricLightSub" data-i18n="metricLightSub">અંધારી ગલીઓ મુક્ત</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-icon">🏘️</div>
+                                <div class="metric-title" data-i18n="metricAreaTitle">વિસ્તાર (AREA)</div>
+                                <div class="metric-val text-success" id="metricAreaVal">વેપારી & ભીડવાળો</div>
+                                <div class="metric-sub" id="metricAreaSub" data-i18n="metricAreaSub">24x7 ખુલ્લી દુકાનો/હોસ્પિટલ</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-icon">🛣️</div>
+                                <div class="metric-title" data-i18n="metricRoadTitle">રસ્તો (ROAD TYPE)</div>
+                                <div class="metric-val text-success" id="metricRoadVal">૪-લેન પહોળો માર્ગ</div>
+                                <div class="metric-sub" id="metricRoadSub" data-i18n="metricRoadSub">ખુલ્લો ફૂટપાથ & વાહનો</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-icon">👮</div>
+                                <div class="metric-title" data-i18n="metricPoliceTitle">પોલીસ & સીસીટીવી</div>
+                                <div class="metric-val text-success" id="metricPoliceVal">૧૮૦m PCR / ૯૨% CCTV</div>
+                                <div class="metric-sub" id="metricPoliceSub" data-i18n="metricPoliceSub">પિંક બૂથ & ફાર્મસી કવર્ડ</div>
+                            </div>
+                        </div>
+
+                        <div class="route-actions-row">
+                            <button class="btn-start-nav" id="btnStartSafeNav" data-i18n="btnStartSafeNav">
+                                🚀 સેફ રૂટ પર લાઈવ એસ્કોર્ટ નેવિગેશન શરૂ કરો
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 🔴 Direct Risky Shortcut (Warning) -->
+                    <div class="route-card route-card-risky" id="cardRiskyRoute">
+                        <div class="route-card-head">
+                            <div class="route-badge-risky" id="riskyRouteTitle" data-i18n="riskyRouteBadge">🔴 જોખમી શોર્ટકટ (સાવચેતી)</div>
+                            <div class="route-score-pill score-low">
+                                <span class="score-num" id="riskyScoreNum">૩૮</span>
+                                <span class="score-unit" data-i18n="unitRiskScore">/૧૦૦ જોખમ સ્કોર</span>
+                            </div>
+                        </div>
+                        <div class="route-meta-row">
+                            <span id="riskyTimeMeta">⏱️ ૧૩ મિનિટ (૫ મિનિટ વહેલું)</span>
+                            <span id="riskyDistMeta">📏 ૧.૩ કિમી</span>
+                        </div>
+                        <div class="safety-warning-banner">
+                            <span class="warn-icon">⚠️</span>
+                            <div>
+                                <strong id="riskyWarnTitle" data-i18n="riskyWarnTitle">ગંભીર જોખમ: ૨ અંધારાવાળી અવાવરૂ ગલીઓ!</strong>
+                                <p id="riskyWarnDesc" data-i18n="riskyWarnDesc">માત્ર ૧૮ Lux લાઈટ, કોઈ સીસીટીવી નથી, બંધ ગોડાઉનની નિર્જન શેરી. રાત્રે આ શોર્ટકટ બિલકુલ ન લો.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Active Navigation Escort Panel (Shown when user is travelling) -->
+                <div id="liveNavEscortPanel" class="live-nav-panel hidden">
+                    <div class="nav-status-header">
+                        <span class="nav-pulse"></span>
+                        <div>
+                            <strong data-i18n="navActiveTitle">🟢 લાઈવ AI સેફ નેવિગેશન એસ્કોર્ટ સક્રિય છે</strong>
+                            <p id="navActiveDesc" data-i18n="navActiveDesc">સેફ કોરિડોર પર GPS મોનિટરિંગ અને એન્ટી-ડિવીએશન રડાર ચાલુ છે.</p>
+                        </div>
+                    </div>
+                    <div id="navDeviationAlert" class="nav-deviation-alert hidden" data-i18n="navDeviationAlert">
+                        ⚠️ ચેતવણી: તમે નિર્જન અંધારી ગલી તરફ વળી રહ્યા છો! મુખ્ય પ્રકાશિત રસ્તે પાછા વળો!
+                    </div>
+                    <div class="nav-controls-row">
+                        <button class="btn-safe-arrive full-width" id="btnEndSafeNav" data-i18n="btnEndSafeNav">
+                            ✅ સુરક્ષિત પહોંચી ગઈ (યાત્રા પૂર્ણ)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Transmission Card (Appears during SOS) -->
+            <div class="card transmission-card hidden" id="transmissionCard">
+                <div class="trans-header">
+                    <div class="recording-indicator">
+                        <span class="red-pulse"></span>
+                        <strong data-i18n="transActiveTitle">બ્લેકબોક્સ મોડ એક્ટિવ (લાઈવ અપલોડ ચાલુ)</strong>
+                    </div>
+                    <span class="incident-badge" id="incidentIdBadge">SOS-XXXX</span>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-number" id="photoCount">0</span>
+                        <span class="stat-label" data-i18n="statPhotos">ફોટો અપલોડ</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number" id="audioCount">0</span>
+                        <span class="stat-label" data-i18n="statAudio">ઓડિયો ક્લિપ</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number" id="hashCount">0</span>
+                        <span class="stat-label" data-i18n="statCrypto">ક્રિપ્ટો બ્લોક્સ</span>
+                    </div>
+                </div>
+
+                <div class="tamper-guarantee" data-i18n="tamperGuarantee">
+                    🔒 <strong>છેલ્લી સેકન્ડની ગેરંટી:</strong> જો ફોન હવે તૂટી જશે કે સ્વિચ ઓફ થશે તો પણ અત્યાર સુધીના તમામ ફોટા, અવાજ અને લોકેશન પોલીસ સર્વર પર સુરક્ષિત છે!
+                </div>
+
+                <!-- Live AI Vision HUD Preview -->
+                <div class="camera-preview-row">
+                    <div class="ai-hud-container">
+                        <video id="cameraVideo" autoplay playsinline muted></video>
+                        <canvas id="captureCanvas" style="display:none;"></canvas>
+                        <div class="ai-hud-overlay">
+                            <div class="hud-top-bar">
+                                <span class="hud-badge red">AI SENTINEL ACTIVE</span>
+                                <span class="hud-badge blue" id="hudFaceCount">SCANNING</span>
+                                <span class="hud-occlusion-tag hidden" id="hudOcclusionTag">🎧 POCKET: MIC +350%</span>
+                                <span class="hud-saver-tag" id="hudSaverTag">📉 DELTA COMPRESSION</span>
+                            </div>
+                            <div class="hud-center-reticle">
+                                <div class="reticle-box"></div>
+                            </div>
+                            <div class="hud-bottom-bar">
+                                <span id="hudThreatText">THREAT: 15% (MONITORED)</span>
+                                <span id="hudSnatchText">FALL SENSOR: ARMED</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions-row">
+                    <button class="btn-stealth" id="stealthModeBtn" data-i18n="btnStealth">
+                        🕵️ સ્ટીલ્થ મોડ
+                    </button>
+                    <button class="btn-calc-cloak" id="calcCloakBtn" data-i18n="btnCalculator">
+                        🔢 કેલ્ક્યુલેટર કવર
+                    </button>
+                    <button class="btn-cancel" id="stopSosBtn" data-i18n="btnStopSos">
+                        🛑 SOS બંધ કરો
+                    </button>
+                </div>
+
+                <div class="dashboard-link-box">
+                    <a href="/dashboard" target="_blank" class="dashboard-link">
+                        🖥️ વાલી / પોલીસ કંટ્રોલ રૂમ ડેશબોર્ડ ખોલો ↗
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <!-- ⏱️ 5-SECOND GRACE CANCELLATION MODAL (Solves Disadvantage: Accidental Button Click) -->
+        <div class="grace-modal-overlay hidden" id="graceModal">
+            <div class="grace-modal-card">
+                <div class="grace-pulse">🚨</div>
+                <h3 data-i18n="graceTitle">ઇમરજન્સી શરૂ થઈ રહી છે!</h3>
+                <p data-i18n="graceSubtitle">જો ભૂલથી દબાયું હોય તો રદ કરવા માટે ટેપ કરો:</p>
+                <div class="grace-countdown-circle">
+                    <span id="graceSecondsText">5</span>
+                </div>
+                <button class="btn-grace-abort" id="graceAbortBtn" data-i18n="btnGraceCancel">🛑 રદ કરો (હું સુરક્ષિત છું)</button>
+            </div>
+        </div>
+
+        <!-- 🔐 DURESS & SECURITY PIN MODAL (Solves Disadvantage: Attacker Coercing Cancellation) -->
+        <div class="pin-modal-overlay hidden" id="pinModal">
+            <div class="pin-modal-card">
+                <h3 data-i18n="pinModalTitle">સુરક્ષા PIN દાખલ કરો</h3>
+                <p data-i18n="pinDesc">સામાન્ય કેન્સલ માટે ૧૨૩૪. (જો હુમલાખોર દબાણ કરતો હોય તો ૯૯૯૯ દાખલ કરો)</p>
+                <div class="pin-input-group">
+                    <input type="password" id="sosPinInput" maxlength="4" placeholder="••••" autocomplete="off">
+                </div>
+                <div class="pin-actions">
+                    <button class="btn-pin-cancel" id="closePinModalBtn" data-i18n="btnCancel">પાછા જાઓ</button>
+                    <button class="btn-pin-submit" id="submitPinBtn" data-i18n="btnConfirmPin">કન્ફર્મ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔢 WORKING CALCULATOR CLOAK (Solves Disadvantage: Stalker Looking at Screen) -->
+        <div class="calc-overlay hidden" id="calcOverlay">
+            <div class="calculator-app">
+                <div class="calc-top">
+                    <span>Calculator</span>
+                    <button class="btn-calc-exit" id="exitCalcBtn">✕</button>
+                </div>
+                <div class="calc-screen" id="calcScreen">0</div>
+                <div class="calc-grid">
+                    <button class="calc-btn op" data-val="C">C</button>
+                    <button class="calc-btn op" data-val="DEL">⌫</button>
+                    <button class="calc-btn op" data-val="%">%</button>
+                    <button class="calc-btn op" data-val="/">÷</button>
+                    <button class="calc-btn" data-val="7">7</button>
+                    <button class="calc-btn" data-val="8">8</button>
+                    <button class="calc-btn" data-val="9">9</button>
+                    <button class="calc-btn op" data-val="*">×</button>
+                    <button class="calc-btn" data-val="4">4</button>
+                    <button class="calc-btn" data-val="5">5</button>
+                    <button class="calc-btn" data-val="6">6</button>
+                    <button class="calc-btn op" data-val="-">-</button>
+                    <button class="calc-btn" data-val="1">1</button>
+                    <button class="calc-btn" data-val="2">2</button>
+                    <button class="calc-btn" data-val="3">3</button>
+                    <button class="calc-btn op" data-val="+">+</button>
+                    <button class="calc-btn span-two" data-val="0">0</button>
+                    <button class="calc-btn" data-val=".">.</button>
+                    <button class="calc-btn op equals" data-val="=">=</button>
+                </div>
+                <div class="calc-covert-note">🔒 ગુપ્ત કેમેરા & ઓડિયો સ્ટ્રીમ બેકગ્રાઉન્ડમાં ચાલુ છે</div>
+            </div>
+        </div>
+
+        <!-- Stealth View (Black screen to fool attacker) -->
+        <div class="stealth-overlay hidden" id="stealthOverlay">
+            <div class="fake-lockscreen">
+                <div class="fake-time" id="fakeClock">19:45</div>
+                <div class="fake-date">શનિવાર, ઓક્ટોબર 3</div>
+                <div class="fake-battery" id="fakeBattery">🔋 68%</div>
+                <div class="stealth-tip">
+                    (સ્ક્રીન પર 3 વાર ઝડપથી ટેપ કરવાથી સ્ટીલ્થ મોડ બંધ થશે)
+                </div>
+            </div>
+        </div>
+
+        <!-- 📞 REALISTIC FAKE CALL OVERLAY (SAFE EXIT) -->
+        <div class="fake-call-overlay hidden" id="fakeCallOverlay">
+            <!-- 1. Incoming Call Screen -->
+            <div class="incoming-call-screen" id="incomingCallView">
+                <div class="caller-profile">
+                    <div class="caller-avatar" id="callAvatar">👨</div>
+                    <h2 class="caller-name-display" id="callNameDisplay">Papa (પપ્પા)</h2>
+                    <span class="call-type">ઇનકમિંગ વોઈસ કોલ...</span>
+                </div>
+
+                <div class="call-actions-row">
+                    <div class="call-btn-col">
+                        <button class="btn-call-circle btn-decline" id="declineCallBtn">✕</button>
+                        <span>કટ કરો</span>
+                    </div>
+                    <div class="call-btn-col">
+                        <button class="btn-call-circle btn-accept" id="acceptCallBtn">
+                            <span class="call-ring-wave"></span>
+                            📞
+                        </button>
+                        <span>ઉપાડો</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Active Call Screen (Talking) -->
+            <div class="active-call-screen hidden" id="activeCallView">
+                <div class="caller-profile">
+                    <div class="caller-avatar small" id="activeCallAvatar">👨</div>
+                    <h2 class="caller-name-display" id="activeCallNameDisplay">Papa (પપ્પા)</h2>
+                    <span class="call-timer" id="activeCallTimer">00:00</span>
+                </div>
+
+                <div class="active-call-dialogue">
+                    <div class="dialogue-bubble" id="activeCallDialogueText">
+                        💬 <i>"હા બેટા, ક્યાં પહોંચી? હું બહાર જ ગાડી લઈને ઊભો છું, જલ્દી બહાર આવ."</i>
+                    </div>
+                    <div class="ai-interactive-tip">
+                        🎙️ <b>ઇન્ટરેક્ટિવ AI મોડ:</b> તમે ફોન પર બોલો — AI સામેથી વાસ્તવિક જવાબ આપશે!
+                    </div>
+                </div>
+
+                <div class="call-actions-row single">
+                    <button class="btn-call-circle btn-decline" id="endActiveCallBtn">✕</button>
+                    <span>કોલ પૂરો કરો</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🛡️ PERMISSION RECOVERY WIZARD (Solves Disadvantage 7: Permission Barrier) -->
+        <div class="permission-recovery-overlay hidden" id="permissionRecoveryModal">
+            <div class="permission-modal-card">
+                <div class="perm-header">
+                    <span class="perm-header-icon">🛡️⚠️</span>
+                    <div>
+                        <h3>કેમેરા / માઇક પરમિશન સેટિંગ્સ</h3>
+                        <small style="color:#94a3b8;">ઝડપી ૧-ક્લિક પુનઃપ્રાપ્તિ ગાઇડ</small>
+                    </div>
+                </div>
+
+                <div class="perm-reassure-box">
+                    <strong>✅ ચિંતા કરશો નહીં — SOS સંપૂર્ણ ચાલુ છે!</strong>
+                    <p>કેમેરા બ્લોક હોવા છતાં, તમારું GPS લોકેશન, ઇમ્પેક્ટ મોશન અને સાયલન્ટ પોલીસ એલર્ટ્સ ૧૦૦% કામ કરી રહ્યા છે.</p>
+                </div>
+
+                <div class="perm-steps-list">
+                    <div class="perm-step-item">
+                        <span class="step-badge">૧</span>
+                        <div>બ્રાઉઝરના ટોપ સરનામા બાર (Address Bar) માં ડાબી બાજુ રહેલા <b>🔒 (લૉક)</b> અથવા <b>⚙️ (સેટિંગ્સ)</b> આઇકન પર ક્લિક કરો.</div>
+                    </div>
+                    <div class="perm-step-item">
+                        <span class="step-badge">૨</span>
+                        <div><b>Camera (કેમેરા)</b> અને <b>Microphone (માઇક્રોફોન)</b> ની સામે <b>"Allow" (મંજૂરી આપો)</b> પસંદ કરો.</div>
+                    </div>
+                    <div class="perm-step-item">
+                        <span class="step-badge">૩</span>
+                        <div>નીચે આપેલા લીલા બટન પર ક્લિક કરો જેથી કેમેરા લાઇવ થઈ જશે.</div>
+                    </div>
+                </div>
+
+                <div class="perm-actions">
+                    <button class="btn-perm-retry" id="permRetryBtn">🔄 પરમિશન રીસેટ & ફરી ચાલુ કરો</button>
+                    <button class="btn-perm-dismiss" id="permDismissBtn">સેન્સર મોડમાં ચાલુ રાખો</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🏠 🏢 MANAGE SAVED PLACES MODAL (Home & Office Custom Map Location) -->
+        <div class="places-modal-overlay hidden" id="modalManagePlaces">
+            <div class="places-modal-card">
+                <div class="places-modal-head">
+                    <div class="head-left">
+                        <span class="p-head-icon">🏠📍</span>
+                        <div>
+                            <h3>તમારા સેવ કરેલા સ્થાનો (Saved Places)</h3>
+                            <small style="color:#94a3b8;">ઘર (Home) અને ઓફિસ (Office) નું લોકેશન સેટ કરો</small>
+                        </div>
+                    </div>
+                    <button class="btn-close-places" id="btnClosePlacesModal" title="Close">✕</button>
+                </div>
+
+                <div class="places-modal-body">
+                    <!-- Home Section -->
+                    <div class="place-item-card">
+                        <div class="place-head">
+                            <span class="p-icon">🏠</span>
+                            <div class="p-meta">
+                                <strong>મારું ઘર (Home)</strong>
+                                <span class="p-addr" id="dispSavedHomeAddr">23.0310, 72.5780 (સેવ કરેલ)</span>
+                            </div>
+                        </div>
+                        <div class="place-actions">
+                            <button class="btn-place-action primary" id="btnSaveCurrentGpsHome">
+                                📌 વર્તમાન લાઈવ GPS ને 'ઘર' બનાવો
+                            </button>
+                            <div class="place-input-row">
+                                <input type="text" id="inputCustomHomeAddr" class="place-input" placeholder="અથવા ઘરનું સરનામું/વિસ્તાર લખો...">
+                                <button class="btn-place-save" id="btnSaveCustomHome">સેવ કરો</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Office Section -->
+                    <div class="place-item-card">
+                        <div class="place-head">
+                            <span class="p-icon">🏢</span>
+                            <div class="p-meta">
+                                <strong>મારી ઓફિસ (Office)</strong>
+                                <span class="p-addr" id="dispSavedOfficeAddr">23.0350, 72.5550 (સેવ કરેલ)</span>
+                            </div>
+                        </div>
+                        <div class="place-actions">
+                            <button class="btn-place-action primary" id="btnSaveCurrentGpsOffice">
+                                📌 વર્તમાન લાઈવ GPS ને 'ઓફિસ' બનાવો
+                            </button>
+                            <div class="place-input-row">
+                                <input type="text" id="inputCustomOfficeAddr" class="place-input" placeholder="અથવા ઓફિસનું સરનામું/વિસ્તાર લખો...">
+                                <button class="btn-place-save" id="btnSaveCustomOffice">સેવ કરો</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="places-tip-box">
+                        💡 <b>કેવી રીતે કામ કરે છે:</b> જ્યારે તમે બહાર હોવ અને <b>'🏠 ઘર'</b> પર ક્લિક કરશો, ત્યારે સિસ્ટમ તમારા <b>વર્તમાન લાઈવ GPS</b> થી તમારા સેવ કરેલા ઘર સુધીનો ૧૦૦% સચોટ સુરક્ષિત રસ્તો ગણીને બતાવશે!
+                    </div>
+                </div>
+
+                <div class="places-modal-foot">
+                    <button class="btn-primary-sm full-width" id="btnDonePlaces">✅ પૂર્ણ થયું (Done)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/sos.js"></script>
+</body>
+</html>

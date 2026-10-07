@@ -1,0 +1,34 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large binary files & tools
+cloudflared.exe
+*.exe
+
+# SSL certificates and private keys
+storage/ssl/
+storage/ssl_test/
+*.pem
+*.key
+*.crt
+
+# Test incidents & runtime data
+storage/incidents/*
+!storage/incidents/.gitkeep
+storage/live_url.txt
+storage/validation_report.json
+
+# Environments and configs
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

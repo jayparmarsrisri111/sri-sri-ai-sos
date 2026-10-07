@@ -1,0 +1,34 @@
+{
+  "system_name": "Sri Sri \u2764\ufe0fSOS AI",
+  "default_language": "gu",
+  "emergency_numbers": {
+    "police": "112",
+    "women_helpline_abhayam": "181",
+    "women_cell_national": "1091",
+    "ambulance": "108",
+    "custom_control_room": "+91 98765 00112"
+  },
+  "ai_sensitivity": {
+    "scream_decibel_threshold": 82.0,
+    "dark_alley_lux_threshold": 45.0,
+    "motion_blur_threshold": 120.0,
+    "face_proximity_alert_ratio": 0.18,
+    "snatch_freefall_gravity": 3.2,
+    "snatch_impact_accel": 28.0
+  },
+  "security": {
+    "normal_cancel_pin": "1234",
+    "duress_coercion_pin": "9999",
+    "grace_countdown_seconds": 5,
+    "offline_buffer_max_chunks": 500,
+    "low_battery_throttle_percent": 10
+  },
+  "features_enabled": {
+    "offline_indexeddb_vault": true,
+    "duress_silent_alarm": true,
+    "stealth_calculator_disguise": true,
+    "battery_final_breath_beacon": true,
+    "grace_cancel_countdown": true,
+    "autonomous_bns_efir": true
+  }
+}

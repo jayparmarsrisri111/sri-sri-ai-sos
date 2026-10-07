@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>પોલીસ & વાલી કંટ્રોલ રૂમ - Sri Sri ❤️SOS AI Live Command</title>
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/images/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/static/images/icon-512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Noto+Sans+Gujarati:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Top Tactical Navigation -->
+        <header class="tactical-navbar">
+            <div class="nav-left">
+                <img src="/static/images/logo.svg" alt="Sri Sri ❤️SOS AI" class="nav-logo-img">
+                <div>
+                    <div class="nav-badge" data-i18n="dashBadge">POLICE & GUARDIAN EMERGENCY COMMAND</div>
+                    <h1 class="nav-title"><span class="brand-title-badge"><span class="brand-sri">SRI SRI</span> <span class="heart-text">❤️</span> <span class="brand-ai-sos"><span class="brand-ai-chip">AI</span><span class="brand-sos-text">SOS</span></span></span><span class="nav-title-sub" data-i18n="dashTitleSub">: Live Tactical Evidence & Tracking</span></h1>
+                </div>
+            </div>
+            <div class="nav-right">
+                <!-- Universal App Switcher for Admin & Police -->
+                <div class="dash-app-switcher">
+                    <a href="/" target="_blank" class="dash-switch-btn" title="Open Mobile SOS App">📱 <span data-i18n="navMobileSos">મોબાઈલ SOS</span></a>
+                    <a href="/dashboard" class="dash-switch-btn active" title="Police Cockpit">🚔 <span data-i18n="navPoliceCockpit">કંટ્રોલ રૂમ</span></a>
+                    <a href="/admin" class="dash-switch-btn" title="Admin Master Portal">⚙️ <span data-i18n="navAdminMaster">એડમિન પેનલ</span></a>
+                </div>
+
+                <!-- Multilingual Selector for ALL World Languages -->
+                <div class="lang-selector-box">
+                    <span class="globe-icon">🌐</span>
+                    <select class="lang-select-box" id="dashLangSelect">
+                        <option value="gu">ગુજરાતી (Gujarati)</option>
+                        <option value="en">English (Global)</option>
+                        <option value="hi">हिंदी (Hindi)</option>
+                        <option value="es">Español (Spanish)</option>
+                        <option value="fr">Français (French)</option>
+                        <option value="ar">العربية (Arabic)</option>
+                        <option value="zh">中文 (Chinese)</option>
+                        <option value="ru">Русский (Russian)</option>
+                        <option value="de">Deutsch (German)</option>
+                        <option value="mr">मराठी (Marathi)</option>
+                        <option value="ta">தமிழ் (Tamil)</option>
+                    </select>
+                </div>
+                <div class="live-status-pill">
+                    <span class="live-blip"></span>
+                    <span id="wsStatusText" data-i18n="wsConnected">લાઈવ કનેક્ટેડ</span>
+                </div>
+                <div class="incident-selector-wrapper">
+                    <label for="incidentSelect" data-i18n="lblIncidentSelect">કેસ / ઇન્સિડન્ટ:</label>
+                    <select id="incidentSelect">
+                        <option value="" data-i18n="optLoading">લોડ કરી રહ્યું છે...</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <!-- Incident Metadata Strip -->
+        <section class="incident-strip">
+            <div class="strip-item">
+                <span class="strip-label" data-i18n="stripIncidentId">ઇન્સિડન્ટ ID:</span>
+                <span class="strip-val" id="stripIncId">લોડિંગ...</span>
+            </div>
+            <div class="strip-item">
+                <span class="strip-label" data-i18n="stripVictimName">ભોગ બનનારનું નામ:</span>
+                <span class="strip-val" id="stripName">--</span>
+            </div>
+            <div class="strip-item">
+                <span class="strip-label" data-i18n="stripPhone">ફોન નંબર:</span>
+                <span class="strip-val" id="stripPhone">--</span>
+            </div>
+            <div class="strip-item">
+                <span class="strip-label" data-i18n="stripStartTime">શરૂઆત સમય:</span>
+                <span class="strip-val" id="stripTime">--</span>
+            </div>
+            <div class="strip-item">
+                <span class="strip-label" data-i18n="stripStatus">સ્થિતિ:</span>
+                <span class="status-tag status-active" id="stripStatus">ACTIVE</span>
+            </div>
+            <div class="strip-item buttons-group">
+                <button class="btn-action btn-fir" id="openFirBtn" data-i18n="btnAutoFir">
+                    🚨 ઓટોમેટિક AI FIR જનરેટર
+                </button>
+                <button class="btn-action" style="background: #2563eb; color: #fff;" id="dispatchErssBtn" data-i18n="btnDispatchErss">
+                    🚔 ERSS 112 CAD ડિસ્પેચ
+                </button>
+                <button class="btn-action" style="background: #059669; color: #fff;" id="toggleSafeCorridorBtn" data-i18n="btnToggleSafeCorridor">
+                    🛣️ સેફ કોરિડોર & લાઈટિંગ
+                </button>
+                <a href="/api/emergency/cap-feed" target="_blank" class="btn-action" style="background: #0f766e; color: #fff; text-decoration: none; display: inline-flex; align-items: center;" id="viewCapFeedBtn" data-i18n="btnViewCapFeed">
+                    📡 CAP 1.2 ફીડ
+                </a>
+                <button class="btn-action btn-verify" id="verifyIntegrityBtn" data-i18n="btnVerifyCrypto">
+                    🛡️ ક્રિપ્ટો વેરિફિકેશન
+                </button>
+                <button class="btn-action btn-pdf" id="downloadPdfBtn" data-i18n="btnPdfDossier">
+                    📄 પોલીસ ડોસિયર (PDF)
+                </button>
+            </div>
+        </section>
+
+        <!-- 🛣️ SAFE JOURNEY DEVIATION & ANOMALY ALERT -->
+        <div class="deadman-alert hidden" id="corridorDeviationAlert" style="border-color: #10b981; background: rgba(16, 185, 129, 0.15);">
+            <div class="deadman-content">
+                <span class="deadman-icon" style="font-size:30px;">🛣️⚠️</span>
+                <div>
+                    <strong style="color: #6ee7b7; font-size: 15px;" id="corridorAlertTitle" data-i18n="corridorAlertTitle">સેફ કોરિડોર ડિવીએશન એલર્ટ (મહિલા મુસાફરી રડાર)</strong>
+                    <p id="corridorAlertDesc" style="color: #d1fae5;" data-i18n="corridorAlertDesc">મહિલા મુખ્ય પ્રકાશિત રસ્તેથી ભટકીને અવાવરૂ/અંધારાવાળા વિસ્તાર તરફ ગઈ છે!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🚔 ERSS 112 POLICE CAD DISPATCH ALERT -->
+        <div class="deadman-alert hidden" id="cadDispatchAlert" style="border-color: #3b82f6; background: rgba(59, 130, 246, 0.15);">
+            <div class="deadman-content">
+                <span class="deadman-icon" style="font-size:30px;">🚔🚨</span>
+                <div>
+                    <strong style="color: #93c5fd; font-size: 15px;" id="cadTitle" data-i18n="cadTitle">ERSS 112 પોલીસ વાન ડિસ્પેચ થઈ ગઈ છે!</strong>
+                    <p id="cadDesc" style="color: #dbeafe;" data-i18n="cadDesc">પેટ્રોલિંગ ટીમ ઘટનાસ્થળે રવાના થયેલ છે. ETA: 3 મિનિટ.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🚨 DEAD-MAN'S CLOUD BREACH ALERT (IF PHONE DESTROYED) -->
+        <div class="deadman-alert hidden" id="deadmanAlert">
+            <div class="deadman-content">
+                <span class="deadman-icon">🚨</span>
+                <div>
+                    <strong data-i18n="deadmanTitle">ચેતવણી: ડિવાઇસ કનેક્શન તૂટી ગયું / ફોન સ્વિચ ઓફ કે નષ્ટ થયો!</strong>
+                    <p id="deadmanDesc" data-i18n="deadmanDesc">છેલ્લી સેકન્ડ સુધીના તમામ પુરાવા ક્રિપ્ટોગ્રાફિકલી લૉક થઈ ચૂક્યા છે. તાત્કાલિક પોલીસ રિસ્પોન્સ જરૂરી છે.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🚨 DURESS & COERCION HOSTAGE ALERT -->
+        <div class="deadman-alert hidden" id="duressAlert" style="border-color: #f59e0b; background: rgba(245, 158, 11, 0.15);">
+            <div class="deadman-content">
+                <span class="deadman-icon" style="font-size:32px;">⚠️🚨</span>
+                <div>
+                    <strong style="color: #fbbf24; font-size: 16px;" data-i18n="duressTitle">ગંભીર ચેતવણી: વિક્ટિમે ૯૯૯૯ ડ્યુરેસ પિન દાખલ કર્યો છે! (HOSTAGE COERCION PROTOCOL ENGAGED)</strong>
+                    <p id="duressDesc" style="color: #fef3c7;" data-i18n="duressDesc">હુમલાખોરે બળજબરીથી કેન્સલ કરાવ્યું છે. હુમલાખોરને કેન્સલ દેખાય છે, પરંતુ ગુપ્ત કેમેરા અને ટ્રેકિંગ 100% થ્રેટ સાથે ચાલુ છે! તાત્કાલિક કમાન્ડો/પોલીસ મોકલો!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔋 BATTERY CRITICAL ALERT -->
+        <div class="deadman-alert hidden" id="batteryAlert" style="border-color: #f97316; background: rgba(249, 115, 22, 0.15);">
+            <div class="deadman-content">
+                <span class="deadman-icon" style="font-size:30px;">🔋⚠️</span>
+                <div>
+                    <strong style="color: #fdba74;" data-i18n="batteryTitle">ચેતવણી: વિક્ટિમના ફોનની બેટરી ક્રિટિકલ (&lt; 15%) છે!</strong>
+                    <p id="batteryDesc" style="color: #ffedd5;" data-i18n="batteryDesc">ફોન બંધ થતાં પહેલાં છેલ્લા શ્વાસના જીપીએસ કોઓર્ડિનેટ્સ લોક કરવામાં આવ્યા છે.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🧠 HIGH-POWER AI THREAT RADAR COCKPIT -->
+        <section class="ai-threat-cockpit">
+            <!-- Left: Threat Meter -->
+            <div class="threat-gauge-card">
+                <div class="gauge-header">
+                    <span class="ai-chip" data-i18n="threatRadar">NEURAL AI THREAT RADAR</span>
+                    <span class="threat-level-tag level-safe" id="threatLevelTag">MONITORED SAFE 🟢</span>
+                </div>
+                <div class="gauge-body">
+                    <div class="threat-score-circle" id="threatScoreCircle">
+                        <span class="threat-score-num" id="threatScoreNum">15</span>
+                        <span class="threat-score-label" data-i18n="threatScoreLabel">THREAT INDEX</span>
+                    </div>
+                    <div class="threat-breakdown">
+                        <div class="metric-row">
+                            <span data-i18n="lblVisualThreat">👁️ શંકાસ્પદ વ્યક્તિ નિકટતા:</span>
+                            <strong id="aiVisualThreat">કોઈ ખતરો નથી</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span data-i18n="lblAudioThreat">🎙️ અવાજ / ચીસ તીવ્રતા:</span>
+                            <strong id="aiAudioThreat">સામાન્ય વાતાવરણ</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span data-i18n="lblMotionThreat">🏃 ઝપાઝપી / કેમેરા જટર:</span>
+                            <strong id="aiMotionThreat">સ્થિર કેપ્ચર</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span data-i18n="lblSpeedThreat">🚗 મુસાફરી ગતિ (GPS):</span>
+                            <strong id="aiSpeedThreat">0.0 km/h</strong>
+                        </div>
+                        <div class="metric-row">
+                            <span data-i18n="lblPocketOcclusion">🦻 ખિસ્સામાં/પર્સમાં ઓક્લુઝન:</span>
+                            <strong id="aiPocketOcclusion">સામાન્ય કેપ્ચર (કેમેરા ઓપન)</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Suspect Profile & Police Brief -->
+            <div class="ai-profiler-card">
+                <div class="profiler-header">
+                    <h4 data-i18n="profilerTitle">🕵️ ઓટોનોમસ AI શકમંદ પ્રોફાઇલર & ક્રાઇમ સીન એનાલિસિસ</h4>
+                    <span class="live-ai-badge">LIVE REASONING</span>
+                </div>
+                <div class="profiler-content">
+                    <div class="suspect-tag-box">
+                        <strong data-i18n="lblSuspectProfile">શકમંદ વર્ણન (Visual AI):</strong>
+                        <p id="aiSuspectProfile">કેમેરા ફીડ સ્કેન થઈ રહી છે... કોઈપણ શંકાસ્પદ ચહેરો કે ગતિવિધિ પકડાતાં અહીં વિગતો દેખાશે.</p>
+                    </div>
+                    <div class="police-brief-box">
+                        <strong data-i18n="lblPoliceBrief">પોલીસ કંટ્રોલ રૂમ ટેક્ટિકલ બ્રીફ:</strong>
+                        <p id="aiPoliceBrief">પીડિતાનું ડિવાઇસ લાઈવ બ્લેકબોક્સ મોનિટરિંગ હેઠળ છે. હજુ સુધી કોઈ ગંભીર હુમલાના સંકેતો મળ્યા નથી.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Integrity Result Banner -->
+        <div class="integrity-banner hidden" id="integrityBanner">
+            <div class="banner-content">
+                <span class="banner-icon">✅</span>
+                <div>
+                    <strong id="integrityTitle" data-i18n="integrityTitle">100% ડિજિટલ પુરાવા પ્રમાણિત (Tamper-Proof)</strong>
+                    <p id="integrityDesc" data-i18n="integrityDesc">દરેક ફોટો અને ઓડિયો બ્લોક ક્રિપ્ટોગ્રાફિક SHA-256 સાંકળથી સુરક્ષિત છે. કોઈ પણ પુરાવા સાથે છેડછાડ થયેલ નથી.</p>
+                </div>
+            </div>
+            <button class="banner-close" id="closeBannerBtn">✕</button>
+        </div>
+
+        <!-- Main Tactical Grid -->
+        <main class="tactical-grid">
+            <!-- Left Column: Live GPS Tracking Map -->
+            <div class="grid-card map-card">
+                <div class="card-title-bar">
+                    <h3 data-i18n="mapTitle">📍 રીયલ-ટાઇમ જીપીએસ ટ્રેકિંગ મેપ</h3>
+                    <div class="map-stats">
+                        <span id="coordDisplay">અક્ષાંશ, રેખાંશ: શોધાય છે...</span>
+                    </div>
+                </div>
+                <div id="leafletMap" class="map-view"></div>
+                <div class="map-footer">
+                    <span class="tip-dot"></span>
+                    <span data-i18n="mapFooter">ફોન બંધ થયા પહેલાનું છેલ્લું ચોક્કસ લોકેશન લાલ પિન પર દર્શાવેલ છે.</span>
+                </div>
+            </div>
+
+            <!-- Right Column: Multi-Modal Evidence Feed -->
+            <div class="grid-card evidence-card">
+                <div class="card-title-bar">
+                    <h3 data-i18n="photoStreamTitle">📸 લાઈવ ફોટો સ્ટ્રીમ (દર 1 સેકન્ડે કેમેરા સ્નેપશોટ)</h3>
+                    <span class="photo-counter-badge" id="photoBadge">0 ફોટો</span>
+                </div>
+                <div class="photo-feed-container" id="photoFeed">
+                    <div class="empty-state" id="photoEmptyState">
+                        <p data-i18n="photoEmptyDesc">હજુ સુધી કોઈ ફોટો મળ્યો નથી. જ્યારે પીડિતા SOS દબાવશે ત્યારે ફોટા અહીં રીયલ-ટાઈમમાં દેખાશે.</p>
+                    </div>
+                </div>
+
+                <div class="audio-section">
+                    <div class="card-title-bar sub-bar">
+                        <h3 data-i18n="audioStreamTitle">🎙️ લાઈવ ઓડિયો રેકોર્ડિંગ્સ</h3>
+                        <span class="audio-counter-badge" id="audioBadge">0 ઓડિયો ક્લિપ</span>
+                    </div>
+                    <div class="audio-list" id="audioList">
+                        <div class="empty-audio" id="audioEmptyState" data-i18n="audioEmptyDesc">કોઈ ઓડિયો ક્લિપ પ્રાપ્ત થઈ નથી.</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Audit Log: Tamper-Proof Chain of Custody -->
+        <section class="audit-section">
+            <div class="card-title-bar">
+                <h3 data-i18n="auditTitle">🔗 ડિજિટલ ચેઇન ઓફ કસ્ટડી (Cryptographic SHA-256 Ledger)</h3>
+                <span class="badge-legal" data-i18n="auditLegal">કોર્ટ / પોલીસ માન્ય ડિજિટલ રજિસ્ટર</span>
+            </div>
+            <div class="table-responsive">
+                <table class="audit-table">
+                    <thead>
+                        <tr>
+                            <th data-i18n="thSeq">સિક્વન્સ #</th>
+                            <th data-i18n="thType">પ્રકાર</th>
+                            <th data-i18n="thTimestamp">UTC ટાઈમસ્ટેમ્પ</th>
+                            <th data-i18n="thGps">GPS કોઓર્ડિનેટ્સ</th>
+                            <th data-i18n="thPayloadHash">પેલોડ SHA-256 હેશ</th>
+                            <th data-i18n="thChainHash">ચેઇન હેશ (Prev + Current)</th>
+                            <th data-i18n="thStatus">સ્થિતિ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody">
+                        <tr>
+                            <td colspan="7" class="text-center" data-i18n="ledgerLoading">લેજર લોડ થઈ રહ્યું છે...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- 📄 AUTONOMOUS AI POLICE FIR MODAL -->
+    <div class="fir-modal-overlay hidden" id="firModalOverlay">
+        <div class="fir-modal-card">
+            <div class="fir-modal-header">
+                <h3 data-i18n="firModalTitle">🚨 ઓટોનોમસ AI પોલીસ FIR & ઇન્વેસ્ટિગેશન રિપોર્ટ</h3>
+                <button class="fir-close-btn" id="closeFirBtn">✕</button>
+            </div>
+            <div class="fir-modal-body">
+                <div class="fir-paper" id="firPaperContent">
+                    <div class="fir-official-header">
+                        <h4>GOVERNMENT OF GUJARAT / POLICE DEPARTMENT</h4>
+                        <h5>FIRST INFORMATION REPORT (E-FIR RECORD UNDER BNS / IT ACT 65B)</h5>
+                        <div class="fir-meta-row">
+                            <span><b>FIR No:</b> <span id="firNumber">GJ-POL-2026-XXXX</span></span>
+                            <span><b>તારીખ & સમય:</b> <span id="firDateTime">--</span></span>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="fir-section">
+                        <h6>૧. ભોગ બનનાર વ્યક્તિની વિગતો (Victim Information):</h6>
+                        <p><b>નામ:</b> <span id="firVictimName">--</span> | <b>સંપર્ક:</b> <span id="firVictimPhone">--</span></p>
+                        <p><b>ઘટના સ્થળ (GPS):</b> <span id="firVictimCoords">--</span></p>
+                    </div>
+                    <div class="fir-section">
+                        <h6>૨. આર્ટિફિશિયલ ઇન્ટેલિજન્સ ફોરેન્સિક પુરાવા (AI Forensic Findings):</h6>
+                        <p><b>ખતરાનું સ્તર (Threat Level):</b> <span id="firThreatLevel">CRITICAL AMBUSH</span></p>
+                        <p><b>શકમંદ વર્ણન (Visual AI):</b> <span id="firSuspectProfile">--</span></p>
+                        <p><b>અવાજ વિશ્લેષણ (Acoustic AI):</b> <span id="firAcousticSummary">ચીસ અને હુમલાખોરનો આક્રમક અવાજ ડિટેક્ટ થયો.</span></p>
+                        <p><b>વાહનની ગતિ / મુસાફરી ટ્રેજેક્ટરી:</b> <span id="firSpeedTrajectory">--</span></p>
+                    </div>
+                    <div class="fir-section">
+                        <h6>૩. ડિજિટલ પુરાવા ચેઇન ઓફ કસ્ટડી (Cryptographic Custody):</h6>
+                        <p><b>કુલ પુરાવા બ્લોક્સ:</b> <span id="firTotalChunks">--</span> (ફોટા + ઓડિયો ક્લિપ્સ)</p>
+                        <p><b>ડિજિટલ ક્રિપ્ટો હેશ:</b> <code id="firChainHash">--</code></p>
+                    </div>
+                    <div class="fir-section">
+                        <h6>૪. તાત્કાલિક પોલીસ કાર્યવાહી નિર્દેશ:</h6>
+                        <p id="firActionDirectives">નજીકની PCR વાન અને મહિલા સુરક્ષા પેટ્રોલિંગ સ્ક્વોડને આપેલા GPS લોકેશન પર તાત્કાલિક રવાના કરો.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="fir-modal-footer">
+                <button class="btn-action btn-verify" id="printFirBtn" data-i18n="btnPrintFir">🖨️ FIR પ્રિન્ટ / સેવ કરો</button>
+                <button class="btn-action btn-pdf" id="copyFirBtn" data-i18n="btnCopyFir">📋 ટેક્સ્ટ કોપી કરો</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

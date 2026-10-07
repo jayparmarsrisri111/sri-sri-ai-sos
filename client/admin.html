@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Sri ❤️SOS AI - Admin Master Data & Control Suite</title>
+    <link rel="icon" type="image/svg+xml" href="/static/images/logo.svg">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/images/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/static/images/icon-512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+    <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Noto+Sans+Gujarati:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Universal Master Navigation Across All 3 Apps -->
+        <div class="universal-top-nav">
+            <div class="top-nav-brand">
+                <img src="/static/images/logo.svg" alt="Sri Sri ❤️SOS AI" class="top-nav-logo">
+                <span class="top-nav-title"><span class="brand-title-badge"><span class="brand-sri">SRI SRI</span> <span class="heart-text">❤️</span> <span class="brand-ai-sos"><span class="brand-ai-chip">AI</span><span class="brand-sos-text">SOS</span></span></span> <span class="top-nav-sub">Unified Platform</span></span>
+            </div>
+            <div class="app-switcher-tabs">
+                <a href="/" target="_blank" class="app-switch-link" title="Open Mobile Client App">
+                    <span class="switch-icon">📱</span>
+                    <span data-i18n="navMobileSos">મોબાઈલ SOS એપ</span>
+                </a>
+                <a href="/dashboard" class="app-switch-link" title="Open Police Tactical Cockpit">
+                    <span class="switch-icon">🚔</span>
+                    <span data-i18n="navPoliceCockpit">પોલીસ કંટ્રોલ રૂમ</span>
+                </a>
+                <a href="/admin" class="app-switch-link active" title="Admin Master Portal">
+                    <span class="switch-icon">⚙️</span>
+                    <span data-i18n="navAdminMaster">એડમિન માસ્ટર પોર્ટલ</span>
+                </a>
+            </div>
+            <!-- All World Languages Selector + Google Translate -->
+            <div class="world-lang-picker">
+                <span class="globe-icon">🌐</span>
+                <select class="lang-select-box" id="adminLangSelect">
+                    <option value="gu">ગુજરાતી (Gujarati)</option>
+                    <option value="en">English (Global)</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="es">Español (Spanish)</option>
+                    <option value="fr">Français (French)</option>
+                    <option value="ar">العربية (Arabic)</option>
+                    <option value="zh">中文 (Chinese)</option>
+                    <option value="ru">Русский (Russian)</option>
+                    <option value="de">Deutsch (German)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                    <option value="ta">தமிழ் (Tamil)</option>
+                </select>
+                <!-- Google Translate auto bridge for all remaining 100+ languages -->
+                <div id="google_translate_element"></div>
+            </div>
+        </div>
+
+        <!-- System Status Bar -->
+        <div class="status-summary-bar">
+            <div class="stat-card">
+                <span class="stat-icon">📁</span>
+                <div>
+                    <div class="stat-val" id="statTotalIncidents">--</div>
+                    <div class="stat-lbl" data-i18n="lblTotalIncidents">કુલ કેસ / ઇન્સિડન્ટ્સ</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🚨</span>
+                <div>
+                    <div class="stat-val active-val" id="statActiveIncidents">--</div>
+                    <div class="stat-lbl" data-i18n="lblActiveIncidents">લાઈવ સક્રિય ઇન્સિડન્ટ્સ</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">📸</span>
+                <div>
+                    <div class="stat-val" id="statTotalPhotos">--</div>
+                    <div class="stat-lbl" data-i18n="lblTotalPhotos">સંગ્રહિત પુરાવા ફ્રેમ્સ</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">💾</span>
+                <div>
+                    <div class="stat-val" id="statStorageMb">-- MB</div>
+                    <div class="stat-lbl" data-i18n="lblStorageMb">ડિસ્ક સ્ટોરેજ વપરાશ</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">⚡</span>
+                <div>
+                    <div class="stat-val" id="statWsConns">--</div>
+                    <div class="stat-lbl" data-i18n="lblWsConns">સક્રિય લાઈવ સોકેટ્સ</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="admin-tabs">
+            <button class="tab-btn active" data-tab="tabIncidents" data-i18n="tabIncidents">🗂️ ઇન્સિડન્ટ લેજર & પુરાવા આર્કાઇવ</button>
+            <button class="tab-btn" data-tab="tabSimulator" data-i18n="tabSimulator">🎮 લાઈવ સિમ્યુલેશન & કંટ્રોલ સ્યુટ</button>
+            <button class="tab-btn" data-tab="tabDispatch" data-i18n="tabDispatch">🏛️ માસ્ટર ડિસ્પેચ યુનિટ્સ & હેલ્પલાઇન</button>
+            <button class="tab-btn" data-tab="tabAiSensitivity" data-i18n="tabAiSensitivity">🧠 AI સેન્સિટિવિટી & સુરક્ષા પ્રોટોકોલ</button>
+            <button class="tab-btn" data-tab="tabDiagnostics" data-i18n="tabDiagnostics">📊 સિસ્ટમ ડાયગ્નોસ્ટિક્સ & સર્વર હેલ્થ</button>
+        </nav>
+
+        <!-- Tab 1: Incidents & Forensic Vault -->
+        <section class="tab-pane active" id="tabIncidents">
+            <div class="pane-header">
+                <div>
+                    <h3 data-i18n="adminRegisterTitle">ડિજિટલ બ્લેકબોક્સ ઇન્સિડન્ટ્સ રજિસ્ટર</h3>
+                    <p data-i18n="adminRegisterDesc">તમામ ઈમર્જન્સી કૉલ્સ, એન્ક્રિપ્ટેડ પુરાવા અને SHA-256 ક્રિપ્ટોગ્રાફિક ચેઇન-ઓફ-કસ્ટડી રેકોર્ડ્સ.</p>
+                </div>
+                <button class="btn-refresh" id="refreshIncidentsBtn" data-i18n="btnRefresh">🔄 રિફ્રેશ કરો</button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th data-i18n="thAdminId">ઇન્સિડન્ટ ID</th>
+                            <th data-i18n="thAdminVictim">ભોગ બનનાર</th>
+                            <th data-i18n="thAdminPhone">મોબાઇલ</th>
+                            <th data-i18n="thAdminTime">તારીખ & સમય</th>
+                            <th data-i18n="thAdminStatus">સ્થિતિ</th>
+                            <th data-i18n="thAdminMedia">ફોટા / ઓડિયો</th>
+                            <th data-i18n="thAdminCrypto">ક્રિપ્ટો હેશ સ્થિતિ</th>
+                            <th data-i18n="thAdminActions">ક્રિયાઓ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="incidentsTableBody">
+                        <tr>
+                            <td colspan="8" class="text-center" data-i18n="incidentsLoading">ઇન્સિડન્ટ્સ લોડ થઈ રહ્યા છે...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Tab 2: Live Simulator & Testing Suite (Allows Admin to test entire project) -->
+        <section class="tab-pane" id="tabSimulator">
+            <div class="pane-header">
+                <div>
+                    <h3 data-i18n="simCenterTitle">🎮 ઓટોનોમસ ઈમર્જન્સી સિમ્યુલેશન & ટેસ્ટિંગ સેન્ટર</h3>
+                    <p data-i18n="simCenterDesc">આ પેનલ દ્વારા એડમિન વાસ્તવિક ફોન વિના આખા પ્રોજેક્ટની તમામ ઈમર્જન્સી સ્થિતિઓ લાઈવ ટેસ્ટ કરી શકે છે.</p>
+                </div>
+                <div class="sim-badge-row">
+                    <span class="badge-active" id="simActiveBadge" data-i18n="simReady">સિમ્યુલેટર તૈયાર છે</span>
+                </div>
+            </div>
+
+            <div class="sim-grid">
+                <!-- Action 1: Trigger Test SOS -->
+                <div class="sim-card">
+                    <div class="sim-icon">🚨</div>
+                    <h4 data-i18n="simAction1Title">૧. લાઈવ ટેસ્ટ SOS શરૂ કરો</h4>
+                    <p data-i18n="simAction1Desc">સર્વર પર નવો ટેસ્ટ કેસ શરૂ કરે છે અને પોલીસ કંટ્રોલ રૂમમાં તાત્કાલિક સાયરન મોકલે છે.</p>
+                    <button class="btn-sim btn-sim-red" id="simStartSosBtn" data-i18n="btnSimStart">🔴 સિમ્યુલેટ SOS શરૂ કરો</button>
+                </div>
+
+                <!-- Action 2: Upload Frame -->
+                <div class="sim-card">
+                    <div class="sim-icon">📸</div>
+                    <h4 data-i18n="simAction2Title">૨. સિમ્યુલેટેડ કેમેરા ફ્રેમ અપલોડ</h4>
+                    <p data-i18n="simAction2Desc">સર્વર પર AI ફેસ ડિટેક્શન અને ડેસિબલ એનાલિસિસ સાથે લાઇવ ફ્રેમ ઇન્જેક્ટ કરો.</p>
+                    <button class="btn-sim btn-sim-blue" id="simUploadFrameBtn" data-i18n="btnSimFrame">📸 લાઇવ ફ્રેમ પુશ કરો</button>
+                </div>
+
+                <!-- Action 3: Smashed Phone (Dead-Man) -->
+                <div class="sim-card">
+                    <div class="sim-icon">💥</div>
+                    <h4 data-i18n="simAction3Title">૩. ડેડ-મેન સ્વીચ (ફોન તૂટ્યો/નષ્ટ થયો)</h4>
+                    <p data-i18n="simAction3Desc">હુમલાખોરે ફોન તોડી નાખ્યો કે સ્વિચ ઓફ કર્યો તેવો તાત્કાલિક હાઈ-પ્રાયોરિટી બ્રીચ એલર્ટ મોકલો.</p>
+                    <button class="btn-sim btn-sim-orange" id="simDeadManBtn" data-i18n="btnSimDeadman">💥 ફોન સ્મેશ્ડ એલર્ટ ટ્રિગર</button>
+                </div>
+
+                <!-- Action 4: Duress Hostage PIN -->
+                <div class="sim-card">
+                    <div class="sim-icon">🥷</div>
+                    <h4 data-i18n="simAction4Title">૪. ડ્યુરેસ કોર્સિયન પિન (૯૯૯૯ બંધક એલર્ટ)</h4>
+                    <p data-i18n="simAction4Desc">પીડિતાને બળજબરીથી SOS બંધ કરાવવામાં આવ્યું તેવો ગુપ્ત હોસ્ટેજ એલર્ટ પોલીસને મોકલો.</p>
+                    <button class="btn-sim btn-sim-purple" id="simDuressBtn" data-i18n="btnSimDuress">🥷 ૯૯૯૯ બંધક એલર્ટ ટ્રિગર</button>
+                </div>
+
+                <!-- Action 5: Battery Critical -->
+                <div class="sim-card">
+                    <div class="sim-icon">🔋</div>
+                    <h4 data-i18n="simAction5Title">૫. બેટરી ક્રિટિકલ (૮%) લાસ્ટ-બ્રેથ</h4>
+                    <p data-i18n="simAction5Desc">ફોન બંધ થતાં પહેલાં છેલ્લા શ્વાસના જીપીએસ કોઓર્ડિનેટ્સ પોલીસ સર્વર પર લૉક કરો.</p>
+                    <button class="btn-sim btn-sim-yellow" id="simBatteryBtn" data-i18n="btnSimBattery">🔋 ૮% બેટરી એલર્ટ મોકલો</button>
+                </div>
+
+                <!-- Action 6: Generate FIR -->
+                <div class="sim-card">
+                    <div class="sim-icon">⚖️</div>
+                    <h4 data-i18n="simAction6Title">૬. ઓટોમેટિક BNS E-FIR પ્રિવ્યૂ</h4>
+                    <p data-i18n="simAction6Desc">નવી ભારતીય ન્યાય સંહિતા કલમો અને કાનૂની સર્ટિફિકેટ સાથે ડિજિટલ FIR તાત્કાલિક જુઓ.</p>
+                    <a href="/dashboard" class="btn-sim btn-sim-cyan" data-i18n="btnSimViewFir">📄 કંટ્રોલ રૂમમાં FIR જુઓ ↗</a>
+                </div>
+            </div>
+
+            <!-- Live Multi-View Embed Links -->
+            <div class="multi-app-preview-box">
+                <h4 data-i18n="previewLinksTitle">🔗 એડમિન ડાયરેક્ટ એપ એક્સેસ લિંક્સ & પ્રોટોકોલ ગેટવે:</h4>
+                <div class="preview-links-row">
+                    <a href="/" target="_blank" class="preview-btn" data-i18n="previewBtnMobile">📱 મોબાઈલ SOS યુઝર એપ ખોલો (નવા ટેબમાં) ↗</a>
+                    <a href="/dashboard" target="_blank" class="preview-btn btn-dash" data-i18n="previewBtnPolice">🚔 પોલીસ & વાલી કંટ્રોલ રૂમ ખોલો (નવા ટેબમાં) ↗</a>
+                    <a href="/api/emergency/cap-feed" target="_blank" class="preview-btn" style="background:#0f766e; border-color:#14b8a6;" data-i18n="previewBtnCap">📡 CAP 1.2 સરકારી ફીડ (ITU-T X.1303) ↗</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 3: Master Dispatch Units -->
+        <section class="tab-pane" id="tabDispatch">
+            <div class="pane-header">
+                <div>
+                    <h3 data-i18n="dispatchPaneTitle">માસ્ટર ઇમરજન્સી હેલ્પલાઇન્સ & ડિસ્પેચ યુનિટ્સ મેનેજમેન્ટ</h3>
+                    <p data-i18n="dispatchPaneDesc">પોલીસ કંટ્રોલ રૂમ, અભયમ 181, એમ્બ્યુલન્સ 108 અને પેટ્રોલિંગ વાન નંબર્સ કન્ફિગર કરો.</p>
+                </div>
+                <button class="btn-primary" id="saveDispatchBtn" data-i18n="btnSaveDispatch">💾 ફેરફારો સેવ કરો</button>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-card">
+                    <h4 data-i18n="cardPoliceTitle">🚔 પોલીસ કંટ્રોલ રૂમ (Police 112)</h4>
+                    <div class="form-group">
+                        <label data-i18n="lblPoliceNum">પોલીસ ઇમરજન્સી નંબર:</label>
+                        <input type="text" id="cfgPoliceNum" value="112">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="lblCustomControl">કસ્ટમ સિટી કંટ્રોલ રૂમ:</label>
+                        <input type="text" id="cfgCustomControlRoom" value="+91 98765 00112">
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <h4 data-i18n="cardWomenTitle">🌸 મહિલા સુરક્ષા હેલ્પલાઇન (Women Helpline)</h4>
+                    <div class="form-group">
+                        <label data-i18n="lblAbhayamNum">અભયમ મહિલા હેલ્પલાઇન:</label>
+                        <input type="text" id="cfgAbhayamNum" value="181">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="lblNationalWomen">રાષ્ટ્રીય મહિલા હેલ્પલાઇન:</label>
+                        <input type="text" id="cfgNationalWomenNum" value="1091">
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <h4 data-i18n="cardAmbulanceTitle">🚑 ઇમરજન્સી મેડિકલ સર્વિસ (Ambulance)</h4>
+                    <div class="form-group">
+                        <label data-i18n="lblAmbulanceNum">એમ્બ્યુલન્સ નંબર:</label>
+                        <input type="text" id="cfgAmbulanceNum" value="108">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 4: AI Sensitivity & Protocol -->
+        <section class="tab-pane" id="tabAiSensitivity">
+            <div class="pane-header">
+                <div>
+                    <h3 data-i18n="sensitivityPaneTitle">AI મલ્ટી-મોડલ એન્જિન & સુરક્ષા પ્રોટોકોલ ટ્યુનિંગ</h3>
+                    <p data-i18n="sensitivityPaneDesc">ઓડિયો ડેસિબલ થ્રેશોલ્ડ, કેમેરા બ્લર સંવેદનશીલતા અને ડ્યુરેસ પિન કોડ્સ એડજસ્ટ કરો.</p>
+                </div>
+                <button class="btn-primary" id="saveSensitivityBtn" data-i18n="btnSaveSensitivity">💾 કન્ફિગરેશન સેવ કરો</button>
+            </div>
+
+            <div class="form-grid">
+                <!-- AI Vision & Audio -->
+                <div class="form-card">
+                    <h4 data-i18n="cardAudioVisionTitle">🎙️ ઓડિયો & અવાજ AI</h4>
+                    <div class="form-group">
+                        <label data-i18n="lblScreamDb">ચીસ ડેસિબલ સ્પાઇક થ્રેશોલ્ડ (dB):</label>
+                        <div class="range-row">
+                            <input type="range" id="cfgScreamDb" min="60" max="110" value="85" step="1">
+                            <span class="range-val" id="valScreamDb">85 dB</span>
+                        </div>
+                        <small data-i18n="descScreamDb">૮૫ dB થી ઉપરનો અવાજ સ્વચાલિત ચીસ કે બૂમ તરીકે ગણાશે.</small>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="lblLuxThreshold">અંધારી ગલી લક્સ મર્યાદા (Lux):</label>
+                        <div class="range-row">
+                            <input type="range" id="cfgLuxThreshold" min="10" max="100" value="45" step="1">
+                            <span class="range-val" id="valLuxThreshold">45 Lux</span>
+                        </div>
+                        <small data-i18n="descLuxThreshold">૪૫ Lux થી ઓછી રોશની હોય ત્યારે ડેન્જર સ્કોર વધશે.</small>
+                    </div>
+                </div>
+
+                <!-- Motion & Snatch -->
+                <div class="form-card">
+                    <h4 data-i18n="cardSnatchTitle">📱 સ્નેચ & ઝપાઝપી સેન્સર્સ</h4>
+                    <div class="form-group">
+                        <label data-i18n="lblFreefall">ફ્રી-ફોલ ગ્રેવિટી થ્રેશોલ્ડ (m/s²):</label>
+                        <input type="number" id="cfgFreefallGravity" value="3.2" step="0.1">
+                        <small data-i18n="descFreefall">ફોન હાથમાંથી છૂટીને નીચે પડે ત્યારે ટ્રિગર થાય છે.</small>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="lblImpact">જમીન પર પછડાટ ઈમ્પેક્ટ પ્રવેગ (m/s²):</label>
+                        <input type="number" id="cfgImpactAccel" value="28.0" step="1">
+                        <small data-i18n="descImpact">પછડાટની તીવ્રતા ઓળખવા માટે.</small>
+                    </div>
+                </div>
+
+                <!-- Security & PINs -->
+                <div class="form-card">
+                    <h4 data-i18n="cardSecurityPinsTitle">🔐 સિક્યોરિટી & ડ્યુરેસ પિન (Duress Protocol)</h4>
+                    <div class="form-group">
+                        <label data-i18n="lblNormalPin">સામાન્ય કેન્સલ પિન (Normal PIN):</label>
+                        <input type="password" id="cfgNormalPin" value="1234" maxlength="4">
+                        <small data-i18n="descNormalPin">ભૂલથી દબાયેલ SOS બંધ કરવા માટે (1234).</small>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="lblDuressPin">ડ્યુરેસ કોર્સિયન પિન (Duress PIN - બંધક કોડ):</label>
+                        <input type="password" id="cfgDuressPin" value="9999" maxlength="4">
+                        <small data-i18n="descDuressPin">હુમલાખોરના દબાણ હેઠળ ૯૯૯૯ નાખતાં પોલીસને છૂપો હાઈ-એલર્ટ જાય છે!</small>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="lblGraceSeconds">ગ્રેસ કેન્સલ સમયગાળો (સેકન્ડ):</label>
+                        <input type="number" id="cfgGraceSeconds" value="5" min="3" max="15">
+                        <small data-i18n="descGraceSeconds">ખોટા અલાર્મ ટાળવા માટે યુઝરને અપાતો સમય.</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab 5: System Diagnostics -->
+        <section class="tab-pane" id="tabDiagnostics">
+            <div class="pane-header">
+                <div>
+                    <h3 data-i18n="diagnosticsPaneTitle">સર્વર હેલ્થ & ટેક્ટિકલ ડાયગ્નોસ્ટિક્સ</h3>
+                    <p data-i18n="diagnosticsPaneDesc">ઓપરેશનલ સિસ્ટમ સ્ટેટ્સ, એન્ક્રિપ્શન એન્જિન અને સર્વર ટેલિમેટ્રી.</p>
+                </div>
+            </div>
+
+            <div class="diagnostics-grid">
+                <div class="diag-card">
+                    <h4 data-i18n="diagLedgerTitle">🛡️ ક્રિપ્ટોગ્રાફિક લેજર એન્જિન</h4>
+                    <p><strong data-i18n="lblAlgorithm">અલ્ગોરિધમ:</strong> SHA-256 Block-Chain Linked Hashes</p>
+                    <p><strong data-i18n="lblCompliance">માન્યોતા:</strong> IT Act 2000, Section 65B Compliant</p>
+                    <p><strong data-i18n="lblTamperStatus">ટેમ્પર સ્ટેટસ:</strong> <span class="badge-ok">ACTIVE & VERIFIED</span></p>
+                </div>
+                <div class="diag-card">
+                    <h4 data-i18n="diagVisionTitle">🧠 Computer Vision & Audio Engine</h4>
+                    <p><strong>Vision AI:</strong> OpenCV Spatial Haar & Lux Radiance Analysis</p>
+                    <p><strong>Audio AI:</strong> Real-time FFT Peak Decibel Profiler</p>
+                    <p><strong>Latency:</strong> &lt; 42 ms (Edge Real-time)</p>
+                </div>
+                <div class="diag-card">
+                    <h4 data-i18n="diagNetworkTitle">📡 કનેક્ટિવિટી & નેટવર્ક બફર</h4>
+                    <p><strong>પ્રોટોકોલ:</strong> WebSockets Bidirectional Broadcast</p>
+                    <p><strong>ઓફલાઇન ફોલબેક:</strong> IndexedDB Local Edge Storage</p>
+                    <p><strong>ડેડ-મેન સ્વીચ:</strong> Active Unload Beacon Heartbeat</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Alert Toast Notification -->
+    <div class="toast-notification hidden" id="toastBox">
+        <span id="toastMsg">સેવ થઈ ગયું!</span>
+    </div>
+
+    <script src="/static/js/i18n.js"></script>
+    <script src="/static/js/admin.js"></script>
+</body>
+</html>
