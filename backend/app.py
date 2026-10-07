@@ -292,7 +292,14 @@ async def get_incident_ai_dossier(incident_id: str):
 
 @app.get("/api/incidents")
 async def list_all_incidents():
-    return evidence_mgr.list_incidents()
+    incidents = evidence_mgr.list_incidents()
+    if len(incidents) == 0:
+        try:
+            await seed_dynamic_demo_case()
+            incidents = evidence_mgr.list_incidents()
+        except Exception as e:
+            print(f"Auto-seed on list_incidents error: {e}")
+    return incidents
 
 @app.get("/api/incident/{incident_id}")
 async def get_incident(incident_id: str):
