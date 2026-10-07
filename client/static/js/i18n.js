@@ -15,6 +15,9 @@ const I18N_DATA = {
         navMobileSos: "મોબાઈલ SOS",
         navPoliceCockpit: "પોલીસ કંટ્રોલ રૂમ",
         navAdminMaster: "એડમિન માસ્ટર પોર્ટલ",
+        pwaInstallTitle: "શ્રી શ્રી SOS એપ ઇન્સ્ટોલ કરો",
+        pwaInstallSub: "હોમ સ્ક્રીનથી ૧-ટચ સુરક્ષા",
+        pwaInstallAction: "ઇન્સ્ટોલ કરો",
 
         profileTitle: "યુઝર પ્રોફાઇલ (ઇમરજન્સી વિગતો)",
         btnEdit: "સુધારો",
@@ -273,6 +276,9 @@ const I18N_DATA = {
         navMobileSos: "Mobile SOS",
         navPoliceCockpit: "Police Tactical Cockpit",
         navAdminMaster: "Admin Master Portal",
+        pwaInstallTitle: "Install Sri Sri SOS App",
+        pwaInstallSub: "1-Touch Security from Home Screen",
+        pwaInstallAction: "Install App",
 
         profileTitle: "User Profile (Emergency Details)",
         btnEdit: "Edit",
@@ -531,6 +537,9 @@ const I18N_DATA = {
         navMobileSos: "मोबाइल SOS",
         navPoliceCockpit: "पुलिस कंट्रोल रूम",
         navAdminMaster: "एडमिन मास्टर पोर्टल",
+        pwaInstallTitle: "श्री श्री SOS ऐप इंस्टॉल करें",
+        pwaInstallSub: "होम स्क्रीन से 1-टच सुरक्षा",
+        pwaInstallAction: "इंस्टॉल करें",
 
         profileTitle: "उपयोगकर्ता प्रोफ़ाइल (आपातकालीन विवरण)",
         btnEdit: "संपादित करें",
@@ -752,6 +761,9 @@ const I18N_DATA = {
         navMobileSos: "SOS Móvil",
         navPoliceCockpit: "Cabina Policial",
         navAdminMaster: "Portal Administrador",
+        pwaInstallTitle: "Instalar App Sri Sri SOS",
+        pwaInstallSub: "Seguridad de 1 toque en tu pantalla",
+        pwaInstallAction: "Instalar",
         profileTitle: "Perfil de Usuario (Emergencia)",
         btnEdit: "Editar", btnCancel: "Cancelar", btnSave: "Guardar",
         lblFullName: "Nombre Completo", lblPhone: "Teléfono", lblEmergencyContacts: "Contactos de Emergencia",
@@ -786,6 +798,9 @@ const I18N_DATA = {
         navMobileSos: "SOS Mobile",
         navPoliceCockpit: "Poste de Police",
         navAdminMaster: "Portail Administrateur",
+        pwaInstallTitle: "Installer l'application Sri Sri SOS",
+        pwaInstallSub: "Sécurité en 1 clic sur l'écran d'accueil",
+        pwaInstallAction: "Installer",
         profileTitle: "Profil Utilisateur (Urgence)",
         btnEdit: "Modifier", btnCancel: "Annuler", btnSave: "Enregistrer",
         lblFullName: "Nom Complet", lblPhone: "Téléphone", lblEmergencyContacts: "Contacts d'Urgence",
@@ -815,6 +830,9 @@ const I18N_DATA = {
         tagline: "الصندوق الأسود الرقمي المقاوم للتلاعب",
         cloudReady: "السحابة جاهزة", cloudLive: "🚨 طوارئ مباشرة", cloudOffline: "تخزين مؤقت بدون إنترنت 🟠", cloudSynced: "تمت المزامنة بنجاح ✅",
         navMobileSos: "تطبيق الطوارئ", navPoliceCockpit: "غرفة عمليات الشرطة", navAdminMaster: "بوابة المشرف",
+        pwaInstallTitle: "تثبيت تطبيق Sri Sri SOS",
+        pwaInstallSub: "أمان بلمسة واحدة من الشاشة الرئيسية",
+        pwaInstallAction: "تثبيت",
         profileTitle: "ملف المستخدم (بيانات الطوارئ)", btnEdit: "تعديل", btnCancel: "إلغاء", btnSave: "حفظ",
         lblFullName: "الاسم الكامل", lblPhone: "رقم الهاتف", lblEmergencyContacts: "جهات الاتصال للطوارئ",
         gpsTitle: "موقع GPS المباشر", gpsFetching: "جاري تحديد الموقع...", gpsAccuracy: "الدقة",
@@ -842,6 +860,9 @@ const I18N_DATA = {
         appName: "Sri Sri ❤️SOS AI", tagline: "防篡改数字黑匣子",
         cloudReady: "云端就绪", cloudLive: "🚨 实时紧急求助", cloudOffline: "离线缓存 🟠", cloudSynced: "已与云端同步 ✅",
         navMobileSos: "移动求救端", navPoliceCockpit: "警方指挥中心", navAdminMaster: "管理员控制台",
+        pwaInstallTitle: "安装 Sri Sri SOS 应用程序",
+        pwaInstallSub: "主屏幕一键紧急呼救",
+        pwaInstallAction: "立即安装",
         profileTitle: "个人紧急档案", btnEdit: "编辑", btnCancel: "取消", btnSave: "保存",
         lblFullName: "姓名", lblPhone: "电话号码", lblEmergencyContacts: "紧急联系人",
         gpsTitle: "实时GPS定位", gpsFetching: "定位中...", gpsAccuracy: "精度",
@@ -869,6 +890,9 @@ const I18N_DATA = {
         appName: "Sri Sri ❤️SOS AI", tagline: "Защищенный Цифровой Черный Ящик",
         cloudReady: "Облако готово", cloudLive: "🚨 Прямой эфир SOS", cloudOffline: "Офлайн-буфер 🟠", cloudSynced: "Синхронизировано ✅",
         navMobileSos: "Мобильный SOS", navPoliceCockpit: "Пульт полиции", navAdminMaster: "Панель администратора",
+        pwaInstallTitle: "Установить приложение Sri Sri SOS",
+        pwaInstallSub: "Защита в 1 касание с экрана",
+        pwaInstallAction: "Установить",
         profileTitle: "Экстренный профиль", btnEdit: "Изменить", btnCancel: "Отмена", btnSave: "Сохранить",
         lblFullName: "ФИО", lblPhone: "Телефон", lblEmergencyContacts: "Контакты для экстренной связи",
         gpsTitle: "GPS Координаты", gpsFetching: "Поиск спутников...", gpsAccuracy: "Точность",
@@ -896,6 +920,9 @@ const I18N_DATA = {
         appName: "Sri Sri ❤️SOS AI", tagline: "Manipulationssichere Digitale Blackbox",
         cloudReady: "Cloud Bereit", cloudLive: "🚨 Notfall Aktiv", cloudOffline: "Offline-Puffer 🟠", cloudSynced: "Synchronisiert ✅",
         navMobileSos: "Mobiler Notruf", navPoliceCockpit: "Polizeizentrale", navAdminMaster: "Admin-Portal",
+        pwaInstallTitle: "Sri Sri SOS App installieren",
+        pwaInstallSub: "1-Klick-Sicherheit vom Startbildschirm",
+        pwaInstallAction: "Installieren",
         profileTitle: "Notfallprofil", btnEdit: "Bearbeiten", btnCancel: "Abbrechen", btnSave: "Speichern",
         lblFullName: "Vollständiger Name", lblPhone: "Telefonnummer", lblEmergencyContacts: "Notfallkontakte",
         gpsTitle: "Live-GPS-Standort", gpsFetching: "GPS wird ermittelt...", gpsAccuracy: "Genauigkeit",
@@ -923,6 +950,9 @@ const I18N_DATA = {
         appName: "Sri Sri ❤️SOS AI", tagline: "टॅम्पर-प्रूफ डिजिटल ब्लॅकबॉक्स",
         cloudReady: "क्लाउड सज्ज आहे", cloudLive: "🚨 आणीबाणी थेट सुरू", cloudOffline: "ऑफलाइन डेटा सुरक्षित 🟠", cloudSynced: "सिंक झाले ✅",
         navMobileSos: "मोबाईल SOS", navPoliceCockpit: "पोलीस नियंत्रण कक्ष", navAdminMaster: "अ‍ॅडमिन मास्टर पॅनेल",
+        pwaInstallTitle: "श्री श्री SOS ॲप इंस्टॉल करा",
+        pwaInstallSub: "होम स्क्रीनवरून १-टच सुरक्षा",
+        pwaInstallAction: "इंस्टॉल करा",
         profileTitle: "वापरकर्ता प्रोफाइल", btnEdit: "बदला", btnCancel: "रद्द करा", btnSave: "जतन करा",
         lblFullName: "पूर्ण नाव", lblPhone: "मोबाईल नंबर", lblEmergencyContacts: "आपत्कालीन संपर्क",
         gpsTitle: "थेट जीपीएस स्थान", gpsFetching: "शोधत आहे...", gpsAccuracy: "अचूकता",
@@ -950,6 +980,9 @@ const I18N_DATA = {
         appName: "Sri Sri ❤️SOS AI", tagline: "பாதுகாப்பான டிஜிட்டல் பிளாக்பாக்ஸ்",
         cloudReady: "கிளவுட் தயார்", cloudLive: "🚨 நேரலை அவசரநிலை", cloudOffline: "ஆஃப்லைன் இடையகம் 🟠", cloudSynced: "ஒத்திசைக்கப்பட்டது ✅",
         navMobileSos: "மொபைல் SOS", navPoliceCockpit: "காவல் கட்டுப்பாட்டு அறை", navAdminMaster: "நிர்வாகி தளம்",
+        pwaInstallTitle: "ஸ்ரீ ஸ்ரீ SOS செயலியை நிறுவவும்",
+        pwaInstallSub: "முகப்புத் திரையிலிருந்து 1-தொடு பாதுகாப்பு",
+        pwaInstallAction: "நிறுவவும்",
         profileTitle: "பயனர் சுயவிவரம்", btnEdit: "திருத்து", btnCancel: "ரத்து செய்", btnSave: "சேமி",
         lblFullName: "முழு பெயர்", lblPhone: "கைபேசி எண்", lblEmergencyContacts: "அவசர தொடர்புகள்",
         gpsTitle: "நேரலை GPS இடம்", gpsFetching: "பெறப்படுகிறது...", gpsAccuracy: "துல்லியம்",
@@ -962,6 +995,9 @@ const I18N_DATA = {
         btnStartJourney: "பயணம் தொடங்கு", btnSafeArrived: "✅ பத்திரமாக வந்தேன்", lblRemainingTime: "மீதமுள்ள நேரம்:",
         helplineAbhayam: "📞 181 பெண்கள் உதவி எண்", helplinePolice: "🚨 112 காவல்துறை", btnWhatsappShare: "💬 WhatsApp பகிரவும்",
         navMobileSos: "மொபைல் SOS", navPoliceCockpit: "காவல் கட்டுப்பாட்டு அறை", navAdminMaster: "நிர்வாகி தளம்",
+        pwaInstallTitle: "ஸ்ரீ ஸ்ரீ SOS செயலியை நிறுவவும்",
+        pwaInstallSub: "முகப்புத் திரையிலிருந்து 1-தொடு பாதுகாப்பு",
+        pwaInstallAction: "நிறுவவும்",
         profileTitle: "பயனர் சுயவிவரம்", btnEdit: "திருத்து", btnCancel: "ரத்து செய்", btnSave: "சேமி",
         lblFullName: "முழு பெயர்", lblPhone: "கைபேசி எண்", lblEmergencyContacts: "அவசர தொடர்புகள்",
         gpsTitle: "நேரலை GPS இடம்", gpsFetching: "பெறப்படுகிறது...", gpsAccuracy: "துல்லியம்",
@@ -990,7 +1026,10 @@ let currentLang = localStorage.getItem('sos_lang') || 'gu';
 
 function t(key) {
     const langDict = I18N_DATA[currentLang] || I18N_DATA['gu'];
-    return langDict[key] || (I18N_DATA['en'] ? I18N_DATA['en'][key] : key) || key;
+    if (langDict && langDict[key]) return langDict[key];
+    if (I18N_DATA['en'] && I18N_DATA['en'][key]) return I18N_DATA['en'][key];
+    if (I18N_DATA['gu'] && I18N_DATA['gu'][key]) return I18N_DATA['gu'][key];
+    return null;
 }
 
 function setLanguage(lang) {

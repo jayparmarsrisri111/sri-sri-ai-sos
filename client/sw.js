@@ -1,7 +1,7 @@
 // Sri Sri ❤️SOS AI - Service Worker
 // Enables 100% Offline App Loading, Standalone PWA Execution, and Cache Resiliency
 
-const CACHE_NAME = 'sri-sri-sos-v2';
+const CACHE_NAME = 'sri-sri-sos-v3';
 const STATIC_ASSETS = [
   '/',
   '/dashboard',
