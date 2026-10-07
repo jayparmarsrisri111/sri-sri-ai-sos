@@ -859,38 +859,75 @@ def _create_synthetic_1sec_frame(seq: int, victim_name: str, phone: str, lat: fl
     img.save(buf, format='JPEG', quality=85)
     return buf.getvalue()
 
-@app.post("/api/admin/seed_dynamic_demo")
-async def seed_dynamic_demo_case(
-    user_name: Optional[str] = Form("પ્રિયા શર્મા (Priya Sharma)"),
-    phone_number: Optional[str] = Form("+91 98980 55443"),
-    contacts: Optional[str] = Form("+91 98250 11223 (વાલી / પિતા), 112 (પોલીસ કંટ્રોલ રૂમ)")
-):
-    """
-    Seeds a rich, realistic, dynamic demonstration emergency case with:
-    - 5 sequential 1-second burst camera frames
-    - 3 sequential 1-second acoustic audio clips
-    - Live GPS coordinates along Law Garden / CG Road, Ahmedabad
-    - SHA-256 blockchain chain of custody log
-    - ERSS 112 CAD Police patrol unit dispatch
-    """
-    emergency_contacts = [c.strip() for c in contacts.split(",") if c.strip()]
+DYNAMIC_DEMO_SCENARIOS = [
+    {
+        "user_name": "પૂજા પટેલ (Pooja Patel)",
+        "phone_number": "+91 98980 12345",
+        "contacts": "+91 98250 11223 (પિતા), +91 94260 99887 (ભાઈ), 112 (પોલીસ)",
+        "base_lat": 23.0285,
+        "base_lng": 72.5070,
+        "frames_count": 5,
+        "audio_count": 3,
+        "speed": 34.5,
+        "location_name": "S.G. Highway (ISKCON to Pakwan)",
+        "priority": "CRITICAL"
+    },
+    {
+        "user_name": "પ્રિયા શર્મા (Priya Sharma)",
+        "phone_number": "+91 98765 43210",
+        "contacts": "+91 98980 55443 (માતા), 112 (ERSS કંટ્રોલ રૂમ)",
+        "base_lat": 23.0245,
+        "base_lng": 72.5580,
+        "frames_count": 5,
+        "audio_count": 3,
+        "speed": 4.2,
+        "location_name": "C.G. Road / Law Garden",
+        "priority": "HIGH"
+    },
+    {
+        "user_name": "અંજલિ શાહ (Anjali Shah)",
+        "phone_number": "+91 97120 88990",
+        "contacts": "+91 98240 66554 (પતિ), 181 (અભયમ મહિલા હેલ્પલાઇન)",
+        "base_lat": 23.0360,
+        "base_lng": 72.5290,
+        "frames_count": 4,
+        "audio_count": 2,
+        "speed": 18.0,
+        "location_name": "Vastrapur Lake Boulevard",
+        "priority": "CRITICAL"
+    },
+    {
+        "user_name": "દીપિકા મહેતા (Deepika Mehta)",
+        "phone_number": "+91 99090 33445",
+        "contacts": "+91 98255 77889 (વાલી), 112 (પોલીસ)",
+        "base_lat": 23.0180,
+        "base_lng": 72.5710,
+        "frames_count": 4,
+        "audio_count": 2,
+        "speed": 2.1,
+        "location_name": "Sabarmati Riverfront Promenade",
+        "priority": "ELEVATED"
+    }
+]
+
+async def _seed_single_scenario(sc):
+    contacts_list = [c.strip() for c in sc["contacts"].split(",") if c.strip()]
     metadata = evidence_mgr.create_incident(
-        user_name=user_name,
-        phone_number=phone_number,
-        emergency_contacts=emergency_contacts
+        user_name=sc["user_name"],
+        phone_number=sc["phone_number"],
+        emergency_contacts=contacts_list
     )
     inc_id = metadata["incident_id"]
+    base_lat = sc["base_lat"]
+    base_lng = sc["base_lng"]
 
-    base_lat = 23.0245
-    base_lng = 72.5580
-
-    # 1. Generate 5 sequential 1-second burst photo frames
-    for s in range(1, 6):
+    # 1. Sequential 1-second burst camera frames
+    for s in range(1, sc["frames_count"] + 1):
         cur_lat = round(base_lat + (s * 0.0003), 6)
         cur_lng = round(base_lng + (s * 0.0002), 6)
-        frame_bytes = _create_synthetic_1sec_frame(s, user_name, phone_number, cur_lat, cur_lng)
-        gps_data = {"lat": cur_lat, "lng": cur_lng, "accuracy": 6.0, "speed": 2.3}
-        chunk = evidence_mgr.save_chunk(
+        frame_bytes = _create_synthetic_1sec_frame(s, sc["user_name"], sc["phone_number"], cur_lat, cur_lng)
+        gps_data = {"lat": cur_lat, "lng": cur_lng, "accuracy": 5.0, "speed": sc["speed"]}
+        evidence_mgr.save_chunk(
             incident_id=inc_id,
             chunk_type="photo",
             data_bytes=frame_bytes,
@@ -903,21 +940,21 @@ async def seed_dynamic_demo_case(
             "timestamp": datetime.utcnow().isoformat(),
             "lat": cur_lat,
             "lng": cur_lng,
-            "accuracy": 6.0,
-            "speed": 2.3
+            "accuracy": 5.0,
+            "speed": sc["speed"]
         })
-        metadata["last_location"] = {"lat": cur_lat, "lng": cur_lng, "accuracy": 6.0}
+        metadata["last_location"] = {"lat": cur_lat, "lng": cur_lng, "accuracy": 5.0}
 
-    # 2. Generate 3 sequential 1-second audio clips
-    for a in range(1, 4):
-        audio_bytes = _create_synthetic_1sec_audio(freq=880 + (a * 120), duration_sec=1.0)
+    # 2. Sequential 1-second distress audio clips
+    for a in range(1, sc["audio_count"] + 1):
+        audio_bytes = _create_synthetic_1sec_audio(freq=820 + (a * 140), duration_sec=1.0)
         evidence_mgr.save_chunk(
             incident_id=inc_id,
             chunk_type="audio",
             data_bytes=audio_bytes,
             file_ext="wav",
             gps={"lat": base_lat, "lng": base_lng},
-            seq=5 + a
+            seq=sc["frames_count"] + a
         )
 
     # 3. Save updated metadata
@@ -925,31 +962,71 @@ async def seed_dynamic_demo_case(
     with open(inc_dir / "metadata.json", "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
 
-    # 4. Trigger ERSS 112 dispatch simulation
-    await dispatch_police_erss(inc_id, priority="CRITICAL")
+    # 4. Trigger ERSS 112 dispatch
+    await dispatch_police_erss(inc_id, priority=sc.get("priority", "CRITICAL"))
 
-    # 5. Broadcast new incident to dashboard
-    await ws_manager.broadcast_to_incident("TACTICAL_GLOBAL", {
-        "event": "INCIDENT_STARTED",
-        "incident": metadata
-    })
+    # 5. Pre-generate official court PDF dossier so download is instant
+    try:
+        timeline = evidence_mgr.get_incident_timeline(inc_id)
+        generate_police_dossier_pdf(metadata, timeline, str(inc_dir / f"Forensic_Dossier_{inc_id}.pdf"), STORAGE_DIR)
+    except Exception as e:
+        print(f"Pre-gen PDF note: {e}")
 
+    return metadata
+
+@app.post("/api/admin/seed_dynamic_demo")
+async def seed_dynamic_demo_case(
+    user_name: Optional[str] = Form("પ્રિયા શર્મા (Priya Sharma)"),
+    phone_number: Optional[str] = Form("+91 98980 55443"),
+    contacts: Optional[str] = Form("+91 98250 11223 (વાલી / પિતા), 112 (પોલીસ કંટ્રોલ રૂમ)")
+):
+    sc = {
+        "user_name": user_name,
+        "phone_number": phone_number,
+        "contacts": contacts,
+        "base_lat": 23.0245,
+        "base_lng": 72.5580,
+        "frames_count": 5,
+        "audio_count": 3,
+        "speed": 12.5,
+        "priority": "CRITICAL"
+    }
+    meta = await _seed_single_scenario(sc)
     return {
         "status": "ok",
-        "incident_id": inc_id,
-        "user_name": user_name,
+        "incident_id": meta["incident_id"],
+        "user_name": meta["user_name"],
         "total_chunks": 8,
         "frames_created": 5,
         "audio_created": 3,
         "message": "ડાયનેમિક ૧-સેકન્ડ લાઇવ કેસ ડેટા સફળતાપૂર્વક જનરેટ થયો!"
     }
 
+@app.post("/api/admin/seed_dataset")
+async def seed_comprehensive_dataset():
+    created = []
+    for sc in DYNAMIC_DEMO_SCENARIOS:
+        meta = await _seed_single_scenario(sc)
+        created.append({
+            "incident_id": meta["incident_id"],
+            "user_name": meta["user_name"],
+            "location": sc.get("location_name")
+        })
+    return {
+        "status": "ok",
+        "total_cases": len(created),
+        "cases": created,
+        "message": "૪ લાઈવ ડાયનેમિક કેસો અમદાવાદ પોલીસ રડાર પર સફળતાપૂર્વક તૈયાર થયા!"
+    }
+
 @app.on_event("startup")
 async def seed_initial_demo_if_empty():
     try:
         incidents = evidence_mgr.list_incidents()
-        if len(incidents) == 0:
-            await seed_dynamic_demo_case()
+        if len(incidents) < 4:
+            for sc in DYNAMIC_DEMO_SCENARIOS:
+                await _seed_single_scenario(sc)
+            print("Successfully populated comprehensive 4-case dynamic demonstration dataset.")
     except Exception as e:
         print(f"Startup initial seed note: {e}")
 
