@@ -1593,6 +1593,8 @@ function registerServiceWorkerAndPwa() {
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
+        const pwaBanner = document.getElementById('pwaInstallBanner');
+        if (pwaBanner) pwaBanner.classList.remove('hidden');
         if (pwaInstallBtn) {
             pwaInstallBtn.classList.remove('hidden');
             pwaInstallBtn.addEventListener('click', async () => {
@@ -1600,6 +1602,7 @@ function registerServiceWorkerAndPwa() {
                     deferredPrompt.prompt();
                     const choice = await deferredPrompt.userChoice;
                     if (choice.outcome === 'accepted') {
+                        if (pwaBanner) pwaBanner.classList.add('hidden');
                         pwaInstallBtn.classList.add('hidden');
                     }
                     deferredPrompt = null;

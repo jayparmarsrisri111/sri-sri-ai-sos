@@ -33,6 +33,7 @@
             <div class="header-controls">
                 <!-- Multilingual Selector for ALL World Languages -->
                 <div class="lang-selector-box">
+                    <span class="lang-globe-icon">🌐</span>
                     <select class="lang-select-box" id="clientLangSelect">
                         <option value="gu">ગુજરાતી (Gujarati)</option>
                         <option value="en">English (Global)</option>
@@ -61,20 +62,34 @@
             <a href="/admin" class="m-switch-btn" title="Admin Master Portal">⚙️ <span data-i18n="navAdminMaster">એડમિન પેનલ</span></a>
         </div>
 
-        <!-- 🛡️ Sentinel Status Bar (Solves Disadvantages 1, 2, 3, 6, 7) -->
-        <div class="sentinel-chips-bar" id="sentinelChipsBar">
-            <span class="chip-badge active-green" id="wakeLockBadge" title="Wake Lock Keeps Screen Active">
-                ⚡ વેક-લૉક સક્રિય (સ્ક્રીન ઑન)
-            </span>
-            <span class="chip-badge active-purple" id="hardwareKeyBadge" title="Headset / Volume Key SOS Trigger Armed">
-                🎧 ઇયરફોન/વોલ્યુમ બટન સક્રિય
-            </span>
-            <span class="chip-badge" id="superEarBadge" title="Super-Ear Mic Boost on Pocket Occlusion">
-                🦻 સુપર-ઇયર માઇક સ્ટેન્ડબાય
-            </span>
-            <button class="chip-btn-install hidden" id="pwaInstallBtn" title="Install Native App on Phone">
-                📲 એપ ઇન્સ્ટોલ કરો
+        <!-- 📲 PWA Native App Install Action Banner -->
+        <div class="pwa-install-banner hidden" id="pwaInstallBanner">
+            <div class="pwa-install-info">
+                <span class="pwa-install-icon">📲</span>
+                <div class="pwa-install-text">
+                    <strong data-i18n="pwaInstallTitle">શ્રી શ્રી SOS એપ ઇન્સ્ટોલ કરો</strong>
+                    <span data-i18n="pwaInstallSub">હોમ સ્ક્રીનથી ૧-ટચ સુરક્ષા</span>
+                </div>
+            </div>
+            <button class="pwa-install-btn-action" id="pwaInstallBtn" data-i18n="pwaInstallAction">
+                ઇન્સ્ટોલ કરો
             </button>
+        </div>
+
+        <!-- 🛡️ Sentinel Status Bar (Triad of Real-Time Protection Monitors) -->
+        <div class="sentinel-chips-bar" id="sentinelChipsBar">
+            <div class="chip-badge active-green" id="wakeLockBadge" title="Wake Lock Keeps Screen Active">
+                <span class="chip-icon">⚡</span>
+                <span class="chip-label">સ્ક્રીન ઓન</span>
+            </div>
+            <div class="chip-badge active-purple" id="hardwareKeyBadge" title="Headset / Volume Key SOS Trigger Armed">
+                <span class="chip-icon">🎧</span>
+                <span class="chip-label">વોલ્યુમ કી SOS</span>
+            </div>
+            <div class="chip-badge active-blue" id="superEarBadge" title="Super-Ear Mic Boost on Pocket Occlusion">
+                <span class="chip-icon">🦻</span>
+                <span class="chip-label">સુપર-ઇયર માઇક</span>
+            </div>
         </div>
 
         <!-- Offline Network Alert & Emergency SMS Fallback (Solves Disadvantage: No Internet) -->
