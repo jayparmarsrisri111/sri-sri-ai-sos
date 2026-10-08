@@ -1,53 +1,68 @@
-# 🛡️ Sri Sri ❤️SOS AI: Next-Gen Autonomous AI Guardian & Digital Blackbox
-> **વિશ્વનું સૌપ્રથમ હાઇ-પાવર AI મલ્ટી-મોડલ SOS & પુરાવા માટેનું ક્લાઉડ ટૂલ**
+# 🛡️ Sri Sri ❤️ SOS AI: Next-Gen Autonomous AI Guardian & Digital Blackbox
+> **World's First High-Powered AI Multimodal Emergency SOS, Acoustic Forensics & Tamper-Proof Cloud Blackbox System**
 
 ---
 
-## 📌 સમસ્યા (The Core Problem)
-છેડતી, હુમલા, લૂંટ કે અકસ્માત વખતે ગુનેગાર ભોગ બનનારનો સ્માર્ટફોન છીનવી લે છે, ફોટો/વિડીયો ડિલીટ કરી નાખે છે અથવા ફોન તોડી નાખે છે. સામાન્ય SOS એપ્સ ફક્ત SMS મોકલે છે, પરંતુ કોઈ જીવંત ઓટોનોમસ AI ડિટેક્શન કે કાનૂની પુરાવો સાચવી શકતી નથી.
-
-## 🧠 શ્રી શ્રી SOS AI: હાઇ-પાવર AI ફીચર્સ (જે આજે માર્કેટમાં ક્યાંય અસ્તિત્વમાં નથી!)
-1. **👁️ Real-Time Computer Vision Suspect Profiler:** દર ૧ સેકન્ડે અપલોડ થતી ફ્રેમ પર ઓન-ધ-ફ્લાય AI ચાલે છે — શકમંદનો ચહેરો, નિકટતા (< ૧ મીટર), કપડાંનો રંગ (ડાર્ક જેકેટ, રેડ શર્ટ વગેરે), અંધારું/લાઇટિંગ ઇન્ડેક્સ અને કેમેરા જટર/ઝપાઝપી ડિટેક્ટ કરે છે.
-2. **🎙️ Acoustic Forensics & Scream Peak AI:** માઇક્રોફોનમાંથી ચીસ (> ૮૫ dB), આક્રમક બૂમો, હાંફવાનો અવાજ કે ફોન પડ્યા પછીનો અકુદરતી સન્નાટો ઓળખીને રિસ્પોન્સ સ્કોર વધારે છે.
-3. **🚨 Dead-Man's Cloud Snitch (Zero-Touch Breach Trigger):** જો ગુનેગાર ફોન તોડી નાખે, બેટરી કાઢી નાખે કે સ્વિચ ઓફ કરી દે, તો ક્લાઉડ સર્વર ૪ સેકન્ડમાં આપમેળે **"DEVICE DESTROYED / CRITICAL AMBUSH 🚨"** જાહેર કરીને પોલીસને હાઇ-એલર્ટ સાયરન આપે છે.
-4. **🗣️ Interactive Conversational AI Voice Decoy:** નકલી કોલ દરમિયાન ફક્ત રેકોર્ડિંગ નથી વાગતું — પીડિતા ફોન પર જે પણ બોલે (દા.ત. *"પપ્પા ક્યાં પહોંચ્યા?"*), AI સામેથી વાસ્તવિક પપ્પા કે પોલીસ અધિકારી બનીને સંવાદ કરે છે (*"બેટા, હું ગલીના નાકે ગાડીમાં ઊભો છું, જલ્દી બહાર આવ"*), જેથી હુમલાખોર ડરીને ભાગી જાય.
-5. **📱 AI Free-Fall & Sudden Snatch Physics Sensor:** જો કોઈ ફોન હાથમાંથી ઝૂંટવી લે કે પીડિતા નીચે પડી જાય, તો એક્સિલરોમીટર ફ્રી-ફોલ ફિઝિક્સ ગણીને સ્ક્રીન અડ્યા વગર આપમેળે SOS ચાલુ કરી દે છે.
-6. **📄 Autonomous Instant Police E-FIR Generator:** કંટ્રોલ રૂમમાં એક જ ક્લિકમાં શંકાસ્પદનું AI વર્ણન, અવાજનો રિપોર્ટ, GPS મેપ અને ક્રિપ્ટોગ્રાફિક ચેઇન-ઓફ-કસ્ટડી સાથે પોલીસ માટેની કાનૂની FIR તૈયાર કરી આપે છે.
-7. **🔒 Cryptographic SHA-256 Tamper-Proof Custody:** કોર્ટ-માન્ય ડિજિટલ પુરાવો જે ૧૦૦% અસલ સાબિત થાય છે.
-
+## 📌 The Core Problem
+During violent assaults, stalking, kidnappings, armed robberies, or severe road accidents, perpetrators routinely snatch, destroy, or force-erase evidence from the victim's smartphone. Traditional SOS applications only transmit a one-time SMS with static GPS coordinates, lacking autonomous AI threat analysis, continuous live forensic streaming, or legally verifiable chain-of-custody evidence preservation.
 
 ---
 
-## 🏗️ સિસ્ટમ આર્કિટેક્ચર (System Architecture)
+## 🧠 High-Power AI Capabilities
+
+1. **👁️ Real-Time Computer Vision Suspect Profiler:**
+   Analyzes live camera frames uploaded every second using computer vision AI. Extracts suspect facial landmarks, physical proximity (< 1 meter warning), attire classification (e.g., dark hoodie, red jacket), ambient darkness/lighting index, and camera violent jitter/struggle detection.
+
+2. **🎙️ Acoustic Forensics & Scream Peak AI:**
+   Monitors microphone input continuously for vocal distress signatures: human screams (> 85 dB threshold), aggressive confrontations, panic breathing/gasping, and abnormal post-impact silence following a violent device drop.
+
+3. **🚨 Dead-Man's Cloud Snitch (Zero-Touch Breach Trigger):**
+   If an assailant smashes the victim's device, removes the SIM/battery, or terminates connectivity, the cloud server automatically registers a heartbeat dropout within 4 seconds and triggers a **"DEVICE DESTROYED / CRITICAL AMBUSH 🚨"** high-priority siren to emergency dispatchers.
+
+4. **🗣️ Interactive Conversational AI Voice Decoy:**
+   Unlike standard canned audio loops, the conversational decoy agent dynamically responds to what the victim says during a simulated call (e.g., victim says *"Dad, where are you?"*, AI immediately responds *"I just pulled up right around the corner in my car, stay on the line and walk towards me"*), psychological de-escalation that deters attackers without provoking violence.
+
+5. **📱 Free-Fall & Violent Snatch Sensor Physics:**
+   Hardware accelerometer and gyroscope telemetry continuously analyze sudden microgravity free-falls and high-G acceleration spikes to trigger emergency SOS automatically without requiring manual screen unlocking.
+
+6. **📄 Autonomous Instant Police E-FIR Dossier Generator:**
+   Generates a court-admissible PDF police dossier in one click, compiling suspect biometric summaries, acoustic forensic logs, geofenced GPS breadcrumbs, and full cryptographic validation metadata for immediate law enforcement action.
+
+7. **🔒 Cryptographic SHA-256 Tamper-Proof Chain of Custody:**
+   Each captured media chunk and telemetry payload is cryptographically chained using SHA-256 hash algorithms, ensuring 100% court-admissible digital evidence integrity.
+
+---
+
+## 🏗️ System Architecture
 
 ```mermaid
 flowchart TD
-    subgraph MobileDevice ["📱 ભોગ બનનારનો મોબાઈલ (PWA Client)"]
-        A[🚨 SOS Trigger / 3x Shake] --> B[Continuous 1s Snapshot Loop]
+    subgraph MobileDevice ["📱 Victim Mobile Device (PWA Client)"]
+        A[🚨 SOS Trigger / 3x Shake / Free-Fall] --> B[Continuous 1s Snapshot Loop]
         A --> C[2s Audio Slices Loop]
         A --> D[High-Accuracy GPS Telemetry]
-        E[🕵️ Stealth Mode Screen] -.-> A
+        E[🕵️ Stealth Mode Cloaked Screen] -.-> A
     end
 
-    subgraph CloudServer ["☁️ Digital Blackbox Cloud Server (FastAPI)"]
+    subgraph CloudServer ["☁️ Digital Blackbox Cloud Server (Backend API)"]
         F[Micro-Chunk Ingestion Engine]
         G[Cryptographic SHA-256 Chain of Custody]
-        H[Encrypted File Storage]
-        I[Real-time WebSocket Broadcaster]
+        H[Encrypted File Storage & Retention]
+        I[Real-Time WebSocket & Event Broadcaster]
         F --> G --> H
         F --> I
     end
 
-    subgraph CommandRoom ["🚨 પોલીસ & વાલી કંટ્રોલ રૂમ (Dashboard)"]
-        J[Live Leaflet GPS Breadcrumb Map]
-        K[Live Photo Feed 1s Stream]
-        L[Live Audio Clip Playback]
+    subgraph CommandRoom ["🚨 Police & Tactical Command Cockpit (Dashboard)"]
+        J[Live Leaflet GPS Breadcrumb Tracking]
+        K[Live Photo Stream & Suspect Profiler]
+        L[Live Audio Forensic Playback]
         M[Automated Cryptographic Integrity Audit]
-        N[📄 FIR Admissible PDF Evidence Dossier]
+        N[📄 Court-Admissible Police E-FIR Dossier]
     end
 
-    B -->|Direct HTTP Stream| F
-    C -->|Direct HTTP Stream| F
+    B -->|Direct Stream| F
+    C -->|Direct Stream| F
     D -->|Telemetry Update| F
     I -->|WebSocket Stream| J
     I -->|WebSocket Stream| K
@@ -58,71 +73,89 @@ flowchart TD
 
 ---
 
-## 🚀 પ્રોજેક્ટ કેવી રીતે રન કરવો (How to Run Live on Any Device)
+## 🚀 Getting Started & Execution
 
-### ૧. લોકલ નેટવર્ક પર રન કરો (Local Run)
+### 1. Run on Local Network
 ```bash
 python run.py
 ```
-* **પીડિતાનો મોબાઇલ SOS:** `http://localhost:8055/` અથવા `http://<YOUR-IP>:8055/`
-* **પોલીસ કંટ્રોલ રૂમ (Tactical Cockpit):** `http://localhost:8055/dashboard`
-* **એડમિન પેનલ (Admin Master):** `http://localhost:8055/admin`
+* **Victim Mobile SOS Interface:** `http://localhost:8055/` or `http://<YOUR-IP>:8055/`
+* **Police Tactical Command Dashboard:** `http://localhost:8055/dashboard`
+* **Administrative Operations Portal:** `http://localhost:8055/admin`
 
 ---
 
-### ૨. મોબાઈલ પર કેમેરા/માઈક સાથે લાઈવ ચલાવો (HTTPS Mode)
-મોબાઈલ બ્રાઉઝર્સ (Chrome / Safari) કેમેરા અને માઇક્રોફોન ફક્ત **HTTPS** પર જ પરવાનગી આપે છે. નીચેનો કમાન્ડ આપમેળે SSL સર્ટિફિકેટ બનાવીને HTTPS શરૂ કરે છે:
+### 2. Run with Native HTTPS for Mobile Devices
+Mobile browsers (Google Chrome, Apple Safari, iOS WebKit) mandate secure origins (**HTTPS**) to grant camera (`getUserMedia`), microphone, and sensor access:
 ```bash
 python run.py --https
 ```
-તમારા મોબાઈલમાં ઓપન કરો: `https://<YOUR-LOCAL-IP>:8055/`
+Access on any mobile phone on the same Wi-Fi:
+`https://<YOUR-LOCAL-IP>:8055/` *(Accept self-signed certificate in browser settings)*
 
 ---
 
-### ૩. કોઈપણ ડિવાઇસ પર ઈન્ટરનેટથી લાઈવ ખોલવા માટે (Instant Public Live Link 🌍)
-જો કોઈપણ વ્યક્તિ દુનિયાના કોઈપણ ખૂણેથી પોતાના મોબાઈલ પર સિસ્ટમ વાપરવા માંગે છે (WiFi વગર):
+### 3. Deploy via Instant Public Cloud Tunnel 🌍
+To test remotely across cellular networks or worldwide without local Wi-Fi pairing:
 ```bash
 python run.py --tunnel
 ```
-આ કમાન્ડથી સ્ક્રીન પર **Public Live HTTPS Link** (દા.ત. `https://xxxx.loca.lt`) દેખાશે, જેને કોઈપણ મોબાઈલ, ટેબ્લેટ કે લેપટોપ પર સીધું ખોલી શકાય છે.
+The console will display an instant **Public Live HTTPS Link** (e.g., `https://xxxx.trycloudflare.com` or `https://xxxx.loca.lt`) accessible from any browser globally.
 
 ---
 
-### ૪. સંપૂર્ણ સિસ્ટમ વેલિડેશન અને ટેસ્ટિંગ (Full System Verification)
+### 4. Run Full System Verification Suite
+Run the automated test suite covering all functional modules:
 ```bash
 python test_master_verification.py
 ```
-(બધા ૫૮ ટેસ્ટ 100% પાસ થશે: Frontend, CSS Responsive, Cryptographic SHA-256 chain, AI Profiler, PDF, ERSS 112, CAP 1.2 Feed વગેરે).
+*Validates 58+ comprehensive test cases: responsive frontend UX, cryptographic SHA-256 chain validation, AI visual profiling, audio forensics, PDF legal dossier generation, ERSS 112 dispatch simulation, and CAP 1.2 alert feeds.*
 
 ---
 
-## 🔑 મુખ્ય ફીચર્સ (Key Features)
+## 🔑 Key Architectural Highlights
 
-| ફીચર | વર્ણન |
+| Feature | Description |
 | :--- | :--- |
-| **Micro-Chunk Streaming** | સામાન્ય વિડીયો રેકોર્ડિંગમાં જો ફોન સ્વિચ ઓફ થાય તો ફાઇલ કરપ્ટ થાય છે. આ સિસ્ટમમાં દર ૧ સેકન્ડે સ્વતંત્ર બ્લોક ક્લાઉડ પર જાય છે. |
-| **Cryptographic Chaining** | દરેક બ્લોક અગાઉના બ્લોકના SHA-256 હેશ સાથે જોડાયેલો છે (`Chain_Hash = SHA256(Prev_Hash + Data_Hash + Seq)`). |
-| **Stealth Mode** | હુમલાખોરને લાગે કે ફોન લોક છે તે માટે નકલી ઘડિયાળ અને બેટરી ડિસ્પ્લે સાથે સ્ક્રીન બ્લેક થઈ જાય છે, જ્યારે બેકગ્રાઉન્ડમાં કેમેરા ચાલુ રહે છે. |
-| **Interactive GPS Trail** | ભોગ બનનાર જ્યાં પણ ભાગે કે તેને લઈ જવામાં આવે, તેનો લાઈવ રસ્તો (Breadcrumb polyline) મેપ પર દોરાતો રહે છે. |
-| **1-Click Police Dossier** | તપાસ અધિકારી માટે એક ક્લિકમાં હેશ-પ્રમાણિત PDF રિપોર્ટ ડાઉનલોડ થાય છે જે કાનૂની પુરાવા તરીકે ઉપયોગી છે. |
+| **Micro-Chunk Streaming** | Prevents video/audio file corruption if the device is abruptly damaged; media uploads in independent 1-second chunks. |
+| **Cryptographic Chaining** | Every chunk is mathematically bound to its predecessor via SHA-256 (`Chain_Hash = SHA256(Prev_Hash + Data_Hash + Seq)`). |
+| **Stealth Cloak Mode** | Displays a realistic dark lock screen with battery and clock indicators to fool attackers while covert recording continues in the background. |
+| **Interactive Breadcrumb GPS** | Live interactive polyline tracking updates in real time on the police dashboard with accurate bearings and velocity. |
+| **1-Click Police Dossier** | Compiles certified forensic logs, maps, and hashes into an official downloadable police dossier. |
+| **PWA Offline Support** | Operates as an installable Progressive Web App with offline caching and background service worker resilience. |
 
 ---
 
-## 📂 પ્રોજેક્ટ સ્ટ્રક્ચર (Project Structure)
+## 📂 Project Directory Structure
+
 ```
 a:\SRI SRI ❤️AI SOS\
 ├── backend/
-│   ├── app.py                 # FastAPI Server, WebSockets, Endpoints
-│   ├── evidence_manager.py    # SHA-256 Chain of Custody & Verification
-│   └── pdf_generator.py       # ReportLab Police Dossier Generator
+│   ├── app.py                 # Core API Server, WebSockets, REST Endpoints
+│   ├── ai_analyzer.py         # Computer Vision & Acoustic Forensic AI Engine
+│   ├── safe_route_engine.py   # AI Navigation & Threat Avoidance Routing
+│   ├── evidence_manager.py    # SHA-256 Cryptographic Chain of Custody
+│   ├── pdf_generator.py       # Court-Admissible Police Dossier Generator
+│   └── ssl_generator.py       # Auto-Generating SSL/TLS Certificate Helper
 ├── client/
-│   ├── index.html             # Mobile SOS Blackbox PWA
-│   ├── dashboard.html         # Police Tactical Live Dashboard
-│   └── static/
-│       ├── css/ (sos.css, dashboard.css)
-│       └── js/  (sos.js, dashboard.js)
-├── storage/incidents/         # Cryptographically logged cloud evidence store
-├── requirements.txt           # Python dependencies
-├── run.py                     # 1-Click Server Launcher
-└── README.md                  # Project Documentation
+│   ├── index.html             # Mobile SOS Blackbox PWA Interface
+│   ├── dashboard.html         # Police Tactical Cockpit Live Dashboard
+│   ├── admin.html             # Administrative Configuration & Monitoring
+│   ├── manifest.json          # PWA Application Manifest
+│   ├── sw.js                  # Service Worker for Offline & Background Cache
+│   └── static/                # CSS Stylesheets, Audio SFX, Brand Assets
+├── storage/
+│   ├── incidents/             # Cryptographically Signed Cloud Evidence Store
+│   └── admin_config.json      # Dynamic Emergency Contact & Service Configs
+├── Dockerfile                 # Containerized Deployment Configuration
+├── netlify.toml               # Static Deployment Configuration
+├── requirements.txt           # Python Production Dependencies
+├── run.py                     # Unified Application Orchestration Launcher
+├── test_master_verification.py# Complete System Automated Test Suite
+└── README.md                  # Comprehensive Documentation
 ```
+
+---
+
+## 📜 Legal & Forensic Admissibility
+Every piece of digital evidence gathered by Sri Sri SOS AI is backed by deterministic hashing (`SHA-256`) and an immutable timestamped audit log conforming to digital forensics chain-of-custody standards, providing verifiable integrity for legal proceedings and law enforcement investigations.
