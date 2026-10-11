@@ -23,7 +23,7 @@
         <div class="universal-top-nav">
             <div class="top-nav-brand">
                 <img src="/static/images/logo.svg" alt="Sri Sri ❤️SOS AI" class="top-nav-logo">
-                <span class="top-nav-title"><span class="brand-title-badge"><span class="brand-sri">SRI SRI</span> <span class="heart-text">❤️</span> <span class="brand-ai-sos"><span class="brand-ai-chip">AI</span><span class="brand-sos-text">SOS</span></span></span> <span class="top-nav-sub">Unified Platform</span></span>
+                <span class="top-nav-title"><span class="brand-title-badge"><span class="brand-sri">SRI SRI</span> <span class="heart-text">❤️</span> <span class="brand-ai-sos"><span class="brand-ai-chip">AI</span><span class="brand-sos-text">SOS</span></span></span> <span class="top-nav-sub" data-i18n="adminUnifiedSub">Unified Platform</span></span>
             </div>
             <div class="app-switcher-tabs">
                 <a href="/" target="_blank" class="app-switch-link" title="Open Mobile Client App">
@@ -39,7 +39,7 @@
                     <span data-i18n="navAdminMaster">એડમિન માસ્ટર પોર્ટલ</span>
                 </a>
             </div>
-            <!-- All World Languages Selector + Google Translate -->
+            <!-- All World Languages Selector -->
             <div class="world-lang-picker">
                 <span class="globe-icon">🌐</span>
                 <select class="lang-select-box" id="adminLangSelect">
@@ -55,8 +55,6 @@
                     <option value="mr">मराठी (Marathi)</option>
                     <option value="ta">தமிழ் (Tamil)</option>
                 </select>
-                <!-- Google Translate auto bridge for all remaining 100+ languages -->
-                <div id="google_translate_element"></div>
             </div>
         </div>
 
@@ -340,21 +338,21 @@
             <div class="diagnostics-grid">
                 <div class="diag-card">
                     <h4 data-i18n="diagLedgerTitle">🛡️ ક્રિપ્ટોગ્રાફિક લેજર એન્જિન</h4>
-                    <p><strong data-i18n="lblAlgorithm">અલ્ગોરિધમ:</strong> SHA-256 Block-Chain Linked Hashes</p>
-                    <p><strong data-i18n="lblCompliance">માન્યોતા:</strong> IT Act 2000, Section 65B Compliant</p>
-                    <p><strong data-i18n="lblTamperStatus">ટેમ્પર સ્ટેટસ:</strong> <span class="badge-ok">ACTIVE & VERIFIED</span></p>
+                    <p data-i18n="adminAlgoText"><strong data-i18n="lblAlgorithm">અલ્ગોરિધમ:</strong> SHA-256 Block-Chain Linked Hashes</p>
+                    <p data-i18n="adminSec65bText"><strong data-i18n="lblCompliance">માન્યોતા:</strong> IT Act 2000, Section 65B Compliant</p>
+                    <p><strong data-i18n="lblTamperStatus">ટેમ્પર સ્ટેટસ:</strong> <span class="badge-ok" data-i18n="adminActiveTag">ACTIVE & VERIFIED</span></p>
                 </div>
                 <div class="diag-card">
                     <h4 data-i18n="diagVisionTitle">🧠 Computer Vision & Audio Engine</h4>
-                    <p><strong>Vision AI:</strong> OpenCV Spatial Haar & Lux Radiance Analysis</p>
-                    <p><strong>Audio AI:</strong> Real-time FFT Peak Decibel Profiler</p>
-                    <p><strong>Latency:</strong> &lt; 42 ms (Edge Real-time)</p>
+                    <p data-i18n="adminVisionText"><strong>Vision AI:</strong> OpenCV Spatial Haar & Lux Radiance Analysis</p>
+                    <p data-i18n="adminAudioText"><strong>Audio AI:</strong> Real-time FFT Peak Decibel Profiler</p>
+                    <p data-i18n="adminLatencyText"><strong>Latency:</strong> &lt; 42 ms (Edge Real-time)</p>
                 </div>
                 <div class="diag-card">
                     <h4 data-i18n="diagNetworkTitle">📡 કનેક્ટિવિટી & નેટવર્ક બફર</h4>
-                    <p><strong>પ્રોટોકોલ:</strong> WebSockets Bidirectional Broadcast</p>
-                    <p><strong>ઓફલાઇન ફોલબેક:</strong> IndexedDB Local Edge Storage</p>
-                    <p><strong>ડેડ-મેન સ્વીચ:</strong> Active Unload Beacon Heartbeat</p>
+                    <p data-i18n="adminProtoText"><strong>પ્રોટોકોલ:</strong> WebSockets Bidirectional Broadcast</p>
+                    <p data-i18n="adminOfflineText"><strong>ઓફલાઇન ફોલબેક:</strong> IndexedDB Local Edge Storage</p>
+                    <p data-i18n="adminDeadmanText"><strong>ડેડ-મેન સ્વીચ:</strong> Active Unload Beacon Heartbeat</p>
                 </div>
             </div>
         </section>
@@ -362,7 +360,7 @@
 
     <!-- Alert Toast Notification -->
     <div class="toast-notification hidden" id="toastBox">
-        <span id="toastMsg">સેવ થઈ ગયું!</span>
+        <span id="toastMsg" data-i18n="toastSaved">સેવ થઈ ગયું!</span>
     </div>
 
     <script src="/static/js/i18n.js"></script>

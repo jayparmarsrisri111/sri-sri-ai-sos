@@ -87,7 +87,7 @@
                     <select id="incidentSelect">
                         <option value="" data-i18n="optLoading">લોડ કરી રહ્યું છે...</option>
                     </select>
-                    <button class="btn-action" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 5px 12px; font-size: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; white-space: nowrap;" id="seedDemoCaseBtn" title="Generate Dynamic 1-Sec Live Case">
+                    <button class="btn-action" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 5px 12px; font-size: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; white-space: nowrap;" id="seedDemoCaseBtn" title="Generate Dynamic 1-Sec Live Case" data-i18n="seedDemoCaseBtn">
                         ⚡ ૧-સેકન્ડ લાઈવ કેસ બનાવો
                     </button>
                 </div>
@@ -357,8 +357,8 @@
             <div class="fir-modal-body">
                 <div class="fir-paper" id="firPaperContent">
                     <div class="fir-official-header">
-                        <h4>GOVERNMENT OF GUJARAT / POLICE DEPARTMENT</h4>
-                        <h5>FIRST INFORMATION REPORT (E-FIR RECORD UNDER BNS / IT ACT 65B)</h5>
+                        <h4 data-i18n="firTitleDept">GOVERNMENT OF GUJARAT / POLICE DEPARTMENT</h4>
+                        <h5 data-i18n="firSubtitle">FIRST INFORMATION REPORT (E-FIR RECORD UNDER BNS / IT ACT 65B)</h5>
                         <div class="fir-meta-row">
                             <span><b>FIR No:</b> <span id="firNumber">GJ-POL-2026-XXXX</span></span>
                             <span><b>તારીખ & સમય:</b> <span id="firDateTime">--</span></span>
@@ -366,25 +366,25 @@
                     </div>
                     <hr>
                     <div class="fir-section">
-                        <h6>૧. ભોગ બનનાર વ્યક્તિની વિગતો (Victim Information):</h6>
+                        <h6 data-i18n="firVictimHeader">૧. ભોગ બનનાર વ્યક્તિની વિગતો (Victim Information):</h6>
                         <p><b>નામ:</b> <span id="firVictimName">--</span> | <b>સંપર્ક:</b> <span id="firVictimPhone">--</span></p>
                         <p><b>ઘટના સ્થળ (GPS):</b> <span id="firVictimCoords">--</span></p>
                     </div>
                     <div class="fir-section">
-                        <h6>૨. આર્ટિફિશિયલ ઇન્ટેલિજન્સ ફોરેન્સિક પુરાવા (AI Forensic Findings):</h6>
+                        <h6 data-i18n="firAiHeader">૨. આર્ટિફિશિયલ ઇન્ટેલિજન્સ ફોરેન્સિક પુરાવા (AI Forensic Findings):</h6>
                         <p><b>ખતરાનું સ્તર (Threat Level):</b> <span id="firThreatLevel">CRITICAL AMBUSH</span></p>
                         <p><b>શકમંદ વર્ણન (Visual AI):</b> <span id="firSuspectProfile">--</span></p>
                         <p><b>અવાજ વિશ્લેષણ (Acoustic AI):</b> <span id="firAcousticSummary">ચીસ અને હુમલાખોરનો આક્રમક અવાજ ડિટેક્ટ થયો.</span></p>
                         <p><b>વાહનની ગતિ / મુસાફરી ટ્રેજેક્ટરી:</b> <span id="firSpeedTrajectory">--</span></p>
                     </div>
                     <div class="fir-section">
-                        <h6>૩. ડિજિટલ પુરાવા ચેઇન ઓફ કસ્ટડી (Cryptographic Custody):</h6>
+                        <h6 data-i18n="firChainHeader">૩. ડિજિટલ પુરાવા ચેઇન ઓફ કસ્ટડી (Cryptographic Custody):</h6>
                         <p><b>કુલ પુરાવા બ્લોક્સ:</b> <span id="firTotalChunks">--</span> (ફોટા + ઓડિયો ક્લિપ્સ)</p>
                         <p><b>ડિજિટલ ક્રિપ્ટો હેશ:</b> <code id="firChainHash">--</code></p>
                     </div>
                     <div class="fir-section">
-                        <h6>૪. તાત્કાલિક પોલીસ કાર્યવાહી નિર્દેશ:</h6>
-                        <p id="firActionDirectives">નજીકની PCR વાન અને મહિલા સુરક્ષા પેટ્રોલિંગ સ્ક્વોડને આપેલા GPS લોકેશન પર તાત્કાલિક રવાના કરો.</p>
+                        <h6 data-i18n="firActionHeader">૪. તાત્કાલિક પોલીસ કાર્યવાહી નિર્દેશ:</h6>
+                        <p id="firActionDirectives" data-i18n="firDirectiveText">નજીકની PCR વાન અને મહિલા સુરક્ષા પેટ્રોલિંગ સ્ક્વોડને આપેલા GPS લોકેશન પર તાત્કાલિક રવાના કરો.</p>
                     </div>
                 </div>
             </div>
@@ -399,26 +399,26 @@
     <div class="fir-modal-overlay hidden" id="capFeedModalOverlay">
         <div class="fir-modal-card" style="max-width: 650px;">
             <div class="fir-modal-header" style="background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);">
-                <h3>📡 Common Alerting Protocol (CAP 1.2 ITU-T Standard Feed)</h3>
+                <h3 data-i18n="capModalTitle">📡 Common Alerting Protocol (CAP 1.2 ITU-T Standard Feed)</h3>
                 <button class="fir-close-btn" id="closeCapModalBtn">✕</button>
             </div>
             <div class="fir-modal-body">
                 <div class="fir-paper" style="border-left: 4px solid #0f766e;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
                         <div>
-                            <span style="background: #ccfbf1; color: #0f766e; padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 11px;">OASIS / ITU-T COMPLIANT</span>
-                            <h4 style="margin: 4px 0 0 0; color: #0f172a; font-size: 16px;">🚨 NATIONAL EMERGENCY ALERT BROADCAST</h4>
+                            <span style="background: #ccfbf1; color: #0f766e; padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 11px;" data-i18n="capModalBadge">OASIS / ITU-T COMPLIANT</span>
+                            <h4 style="margin: 4px 0 0 0; color: #0f172a; font-size: 16px;" data-i18n="capNationalTitle">🚨 NATIONAL EMERGENCY ALERT BROADCAST</h4>
                         </div>
                         <span style="font-size: 12px; color: #64748b;" id="capTimestamp">LIVE BROADCAST</span>
                     </div>
                     <div class="fir-section" style="margin-bottom: 10px;">
-                        <p><b>Authority:</b> Gujarat Police Emergency Response Command (ERSS 112 / SEOC)</p>
-                        <p><b>Incident Status:</b> <span style="color:#ef4444; font-weight:700;">ACTUAL / URGENT (Women Safety SOS Active)</span></p>
-                        <p><b>Target Scope:</b> Public / First Responder Tactical Broadcast</p>
-                        <p><b>Jurisdictional Polygon:</b> Ahmedabad City Cyber Police & PCR Fleet Network</p>
+                        <p data-i18n="capAuthorityText"><b>Authority:</b> Gujarat Police Emergency Response Command (ERSS 112 / SEOC)</p>
+                        <p><b>Incident Status:</b> <span style="color:#ef4444; font-weight:700;" data-i18n="capActualTag">ACTUAL / URGENT (Women Safety SOS Active)</span></p>
+                        <p data-i18n="capScopeText"><b>Target Scope:</b> Public / First Responder Tactical Broadcast</p>
+                        <p data-i18n="capJurisdictionText"><b>Jurisdictional Polygon:</b> Ahmedabad City Cyber Police & PCR Fleet Network</p>
                     </div>
                     <div class="fir-section" style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                        <h6 style="margin: 0 0 4px 0; color: #0f766e;">XML CAP 1.2 Protocol Payload:</h6>
+                        <h6 style="margin: 0 0 4px 0; color: #0f766e;" data-i18n="capXmlHeader">XML CAP 1.2 Protocol Payload:</h6>
                         <pre style="margin:0; font-size: 11px; color: #334155; overflow-x: auto; font-family: monospace; line-height: 1.4;">&lt;alert xmlns="urn:oasis:names:tc:emergency:cap:1.2"&gt;
   &lt;identifier&gt;GJ-ERSS-112-SOS-ALERT&lt;/identifier&gt;
   &lt;sender&gt;police.control.ahmedabad@gujarat.gov.in&lt;/sender&gt;
@@ -438,8 +438,8 @@
                 </div>
             </div>
             <div class="fir-modal-footer">
-                <a href="/api/emergency/cap-feed" target="_blank" class="btn-action" style="background: #0f766e; color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-weight:700;">🔗 Raw XML ફીડ ઓપન કરો</a>
-                <button class="btn-action" style="background: #475569; color: #fff;" id="closeCapModalFooterBtn">બંધ કરો</button>
+                <a href="/api/emergency/cap-feed" target="_blank" class="btn-action" style="background: #0f766e; color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-weight:700;" data-i18n="capRawBtn">🔗 Raw XML ફીડ ઓપન કરો</a>
+                <button class="btn-action" style="background: #475569; color: #fff;" id="closeCapModalFooterBtn" data-i18n="closeCapModalFooterBtn">બંધ કરો</button>
             </div>
         </div>
     </div>

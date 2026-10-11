@@ -287,15 +287,15 @@
         <div class="sentinel-chips-bar" id="sentinelChipsBar">
             <div class="chip-badge active-green" id="wakeLockBadge" title="Wake Lock Keeps Screen Active">
                 <span class="chip-icon">⚡</span>
-                <span class="chip-label">સ્ક્રીન ઓન</span>
+                <span class="chip-label" data-i18n="shortcutScreenOn">સ્ક્રીન ઓન</span>
             </div>
             <div class="chip-badge active-purple" id="hardwareKeyBadge" title="Headset / Volume Key SOS Trigger Armed">
                 <span class="chip-icon">🎧</span>
-                <span class="chip-label">વોલ્યુમ કી SOS</span>
+                <span class="chip-label" data-i18n="shortcutVolKey">વોલ્યુમ કી SOS</span>
             </div>
             <div class="chip-badge active-blue" id="superEarBadge" title="Super-Ear Mic Boost on Pocket Occlusion">
                 <span class="chip-icon">🦻</span>
-                <span class="chip-label">સુપર-ઇયર માઇક</span>
+                <span class="chip-label" data-i18n="shortcutMic">સુપર-ઇયર માઇક</span>
             </div>
         </div>
 
@@ -304,11 +304,11 @@
             <div class="offline-content">
                 <span class="offline-icon">📶⚠️</span>
                 <div>
-                    <strong>ઓફલાઇન મોડ: ઇન્ટરનેટ કનેક્શન નથી!</strong>
-                    <p>તમામ પુરાવા એન્ક્રિપ્ટેડ એજ સ્ટોરેજમાં સુરક્ષિત છે. નેટવર્ક આવતાં જ ઓટો-અપલોડ થશે.</p>
+                    <strong data-i18n="offlineTitle">ઓફલાઇન મોડ: ઇન્ટરનેટ કનેક્શન નથી!</strong>
+                    <p data-i18n="offlineDesc">તમામ પુરાવા એન્ક્રિપ્ટેડ એજ સ્ટોરેજમાં સુરક્ષિત છે. નેટવર્ક આવતાં જ ઓટો-અપલોડ થશે.</p>
                 </div>
             </div>
-            <a href="#" class="btn-offline-sms" id="offlineSmsBtn">
+            <a href="#" class="btn-offline-sms" id="offlineSmsBtn" data-i18n="btnOfflineSms">
                 📲 1-ક્લિક ઇમરજન્સી SMS મોકલો (ઇન્ટરનેટ વગર)
             </a>
         </div>
@@ -690,8 +690,8 @@
                 </div>
 
                 <div class="seo-footer-credits">
-                    <span>© 2026 Sri Sri ❤️SOS AI. All rights reserved.</span>
-                    <span>ઇમરજન્સી હેલ્પલાઇન: <strong>112 (પોલીસ)</strong> | <strong>181 (અભયમ)</strong></span>
+                    <span data-i18n="footerCopyright">© 2026 Sri Sri ❤️SOS AI. All rights reserved.</span>
+                    <span data-i18n="footerHelpline">ઇમરજન્સી હેલ્પલાઇન: <strong>112 (પોલીસ)</strong> | <strong>181 (અભયમ)</strong></span>
                 </div>
             </section>
 
@@ -760,7 +760,7 @@
                 </div>
 
                 <div class="dashboard-link-box">
-                    <a href="/dashboard" target="_blank" class="dashboard-link">
+                    <a href="/dashboard" target="_blank" class="dashboard-link" data-i18n="liveBreadcrumbLink">
                         🖥️ વાલી / પોલીસ કંટ્રોલ રૂમ ડેશબોર્ડ ખોલો ↗
                     </a>
                 </div>
@@ -847,20 +847,20 @@
                 <div class="caller-profile">
                     <div class="caller-avatar" id="callAvatar">👨</div>
                     <h2 class="caller-name-display" id="callNameDisplay">Papa (પપ્પા)</h2>
-                    <span class="call-type">ઇનકમિંગ વોઈસ કોલ...</span>
+                    <span class="call-type" data-i18n="callIncomingTitle">ઇનકમિંગ વોઈસ કોલ...</span>
                 </div>
 
                 <div class="call-actions-row">
                     <div class="call-btn-col">
                         <button class="btn-call-circle btn-decline" id="declineCallBtn">✕</button>
-                        <span>કટ કરો</span>
+                        <span data-i18n="callCutBtn">કટ કરો</span>
                     </div>
                     <div class="call-btn-col">
                         <button class="btn-call-circle btn-accept" id="acceptCallBtn">
                             <span class="call-ring-wave"></span>
                             📞
                         </button>
-                        <span>ઉપાડો</span>
+                        <span data-i18n="callPickBtn">ઉપાડો</span>
                     </div>
                 </div>
             </div>
@@ -884,7 +884,7 @@
 
                 <div class="call-actions-row single">
                     <button class="btn-call-circle btn-decline" id="endActiveCallBtn">✕</button>
-                    <span>કોલ પૂરો કરો</span>
+                    <span data-i18n="callEndBtn">કોલ પૂરો કરો</span>
                 </div>
             </div>
         </div>
@@ -895,14 +895,14 @@
                 <div class="perm-header">
                     <span class="perm-header-icon">🛡️⚠️</span>
                     <div>
-                        <h3>કેમેરા / માઇક પરમિશન સેટિંગ્સ</h3>
+                        <h3 data-i18n="permTitle">કેમેરા / માઇક પરમિશન સેટિંગ્સ</h3>
                         <small style="color:#94a3b8;">ઝડપી ૧-ક્લિક પુનઃપ્રાપ્તિ ગાઇડ</small>
                     </div>
                 </div>
 
                 <div class="perm-reassure-box">
                     <strong>✅ ચિંતા કરશો નહીં — SOS સંપૂર્ણ ચાલુ છે!</strong>
-                    <p>કેમેરા બ્લોક હોવા છતાં, તમારું GPS લોકેશન, ઇમ્પેક્ટ મોશન અને સાયલન્ટ પોલીસ એલર્ટ્સ ૧૦૦% કામ કરી રહ્યા છે.</p>
+                    <p data-i18n="permDesc">કેમેરા બ્લોક હોવા છતાં, તમારું GPS લોકેશન, ઇમ્પેક્ટ મોશન અને સાયલન્ટ પોલીસ એલર્ટ્સ ૧૦૦% કામ કરી રહ્યા છે.</p>
                 </div>
 
                 <div class="perm-steps-list">
@@ -921,8 +921,8 @@
                 </div>
 
                 <div class="perm-actions">
-                    <button class="btn-perm-retry" id="permRetryBtn">🔄 પરમિશન રીસેટ & ફરી ચાલુ કરો</button>
-                    <button class="btn-perm-dismiss" id="permDismissBtn">સેન્સર મોડમાં ચાલુ રાખો</button>
+                    <button class="btn-perm-retry" id="permRetryBtn" data-i18n="permRetryBtn">🔄 પરમિશન રીસેટ & ફરી ચાલુ કરો</button>
+                    <button class="btn-perm-dismiss" id="permDismissBtn" data-i18n="permDismissBtn">સેન્સર મોડમાં ચાલુ રાખો</button>
                 </div>
             </div>
         </div>
@@ -934,7 +934,7 @@
                     <div class="head-left">
                         <span class="p-head-icon">🏠📍</span>
                         <div>
-                            <h3>તમારા સેવ કરેલા સ્થાનો (Saved Places)</h3>
+                            <h3 data-i18n="savedPlacesTitle">તમારા સેવ કરેલા સ્થાનો (Saved Places)</h3>
                             <small style="color:#94a3b8;">ઘર (Home) અને ઓફિસ (Office) નું લોકેશન સેટ કરો</small>
                         </div>
                     </div>
@@ -952,12 +952,12 @@
                             </div>
                         </div>
                         <div class="place-actions">
-                            <button class="btn-place-action primary" id="btnSaveCurrentGpsHome">
+                            <button class="btn-place-action primary" id="btnSaveCurrentGpsHome" data-i18n="btnSaveCurrentGpsHome">
                                 📌 વર્તમાન લાઈવ GPS ને 'ઘર' બનાવો
                             </button>
                             <div class="place-input-row">
                                 <input type="text" id="inputCustomHomeAddr" class="place-input" placeholder="અથવા ઘરનું સરનામું/વિસ્તાર લખો...">
-                                <button class="btn-place-save" id="btnSaveCustomHome">સેવ કરો</button>
+                                <button class="btn-place-save" id="btnSaveCustomHome" data-i18n="btnSaveCustomHome">સેવ કરો</button>
                             </div>
                         </div>
                     </div>
@@ -972,12 +972,12 @@
                             </div>
                         </div>
                         <div class="place-actions">
-                            <button class="btn-place-action primary" id="btnSaveCurrentGpsOffice">
+                            <button class="btn-place-action primary" id="btnSaveCurrentGpsOffice" data-i18n="btnSaveCurrentGpsOffice">
                                 📌 વર્તમાન લાઈવ GPS ને 'ઓફિસ' બનાવો
                             </button>
                             <div class="place-input-row">
                                 <input type="text" id="inputCustomOfficeAddr" class="place-input" placeholder="અથવા ઓફિસનું સરનામું/વિસ્તાર લખો...">
-                                <button class="btn-place-save" id="btnSaveCustomOffice">સેવ કરો</button>
+                                <button class="btn-place-save" id="btnSaveCustomOffice" data-i18n="btnSaveCustomOffice">સેવ કરો</button>
                             </div>
                         </div>
                     </div>
@@ -988,7 +988,7 @@
                 </div>
 
                 <div class="places-modal-foot">
-                    <button class="btn-primary-sm full-width" id="btnDonePlaces">✅ પૂર્ણ થયું (Done)</button>
+                    <button class="btn-primary-sm full-width" id="btnDonePlaces" data-i18n="btnDonePlaces">✅ પૂર્ણ થયું (Done)</button>
                 </div>
             </div>
         </div>
