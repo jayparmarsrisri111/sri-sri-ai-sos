@@ -1,0 +1,63 @@
+[
+  {
+    "timestamp": "2026-10-09T22:52:09.119890+05:30",
+    "event": "AUTOMATIC_SEO_LAUNCH_PING",
+    "target_date": "11-10-2026",
+    "results": {
+      "Google": {
+        "status": "dispatched",
+        "note": "HTTP Error 404: Sitemaps ping is deprecated. See https://developers.google.com/search/blog/2023/06/sitemaps-lastmod-ping."
+      },
+      "Bing": {
+        "status": "dispatched",
+        "note": "HTTP Error 410: Gone"
+      },
+      "IndexNow": {
+        "status": 202,
+        "message": "Success"
+      }
+    }
+  },
+  {
+    "timestamp": "2026-10-09T22:56:59.263337+05:30",
+    "event": "AUTOMATIC_SEO_LAUNCH_PING",
+    "phase": "PRIMARY_10_51_AM",
+    "target_date": "11-10-2026",
+    "launch_window": "10:51 AM to 11:30 AM IST",
+    "results": {
+      "Google": {
+        "status": "dispatched",
+        "note": "HTTP Error 404: Sitemaps ping is deprecated. See https://developers.google.com/search/blog/2023/06/sitemaps-lastmod-ping."
+      },
+      "Bing": {
+        "status": "dispatched",
+        "note": "HTTP Error 410: Gone"
+      },
+      "IndexNow": {
+        "status": 202,
+        "message": "Success"
+      }
+    }
+  },
+  {
+    "timestamp": "2026-10-11T22:17:05.024884+05:30",
+    "event": "AUTOMATIC_SEO_LAUNCH_PING",
+    "phase": "PRIMARY_10_51_AM",
+    "target_date": "11-10-2026",
+    "launch_window": "10:51 AM to 11:30 AM IST",
+    "results": {
+      "Google": {
+        "status": "dispatched",
+        "note": "HTTP Error 404: Sitemaps ping is deprecated. See https://developers.google.com/search/blog/2023/06/sitemaps-lastmod-ping."
+      },
+      "Bing": {
+        "status": "dispatched",
+        "note": "HTTP Error 410: Gone"
+      },
+      "IndexNow": {
+        "status": 202,
+        "message": "Success"
+      }
+    }
+  }
+]

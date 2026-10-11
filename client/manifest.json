@@ -1,12 +1,16 @@
 {
-  "name": "Sri Sri ❤️SOS AI - Digital Blackbox",
+  "id": "/",
+  "name": "Sri Sri ❤️SOS AI - Digital Blackbox & Women Safety",
   "short_name": "SriSri SOS",
+  "lang": "gu",
+  "dir": "ltr",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0a0e17",
   "theme_color": "#ef4444",
   "orientation": "portrait-primary",
-  "description": "Next-Gen AI Emergency Blackbox, Girls Safety, Acoustic Intelligence and Police Dispatch System",
+  "description": "Next-Gen AI Emergency Blackbox, Girls Safety, Acoustic Intelligence and Police Dispatch System launched on 11-10-2026",
   "icons": [
     {
       "src": "/static/images/icon-192.png",
@@ -32,7 +36,7 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["safety", "utilities", "social"],
+  "categories": ["safety", "utilities", "social", "security", "government"],
   "shortcuts": [
     {
       "name": "🚨 Quick SOS Trigger",

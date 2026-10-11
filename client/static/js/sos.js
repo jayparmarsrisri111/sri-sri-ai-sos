@@ -2301,6 +2301,47 @@ async function endSafeEscortJourney() {
     alert("✅ યાત્રા સફળતાપૂર્વક પૂર્ણ થઈ! તમે સુરક્ષિત રીતે ગંતવ્ય સ્થાને પહોંચી ગયા છો.");
 }
 
+// ========================================================
+// 🚀 AUTOMATIC SEO LAUNCH WATCHER (Target: 11-10-2026)
+// ========================================================
+function initAutomaticSeoWatcher() {
+    const seoBadge = document.getElementById('seoLiveBadge');
+    if (!seoBadge) return;
+
+    // Launch Target: 11-10-2026 10:51:00 AM IST (+05:30) (Launch Window: 10:51 AM to 11:30 AM)
+    const targetLaunchDate = new Date('2026-10-11T10:51:00+05:30');
+
+    function updateSeoCountdown() {
+        const now = new Date();
+        const diff = targetLaunchDate - now;
+
+        if (diff <= 0) {
+            seoBadge.className = 'seo-launch-pill active-live';
+            seoBadge.innerText = '🟢 SEO LIVE (11-10-2026)';
+            seoBadge.title = 'સત્તાવાર લોન્ચ: સર્ચ એન્જિન ઇન્ડેક્સિંગ લાઇવ છે!';
+        } else {
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            seoBadge.className = 'seo-launch-pill pending-countdown';
+            seoBadge.innerText = `⏳ Auto-Live: 11-10-2026 10:51 AM (${hours}h ${mins}m બાકી)`;
+            seoBadge.title = `૧૧-૧૦-૨૦૨૬ સવારે ૧૦:૫૧ થી ૧૧:૩૦ દરમિયાન આ પ્રોજેક્ટનું SEO ઓટોમેટિક લાઇવ થશે. બાકી સમય: ${hours} કલાક, ${mins} મિનિટ.`;
+        }
+    }
+
+    updateSeoCountdown();
+    setInterval(updateSeoCountdown, 30000);
+
+    seoBadge.addEventListener('click', async () => {
+        try {
+            const res = await fetch('/api/seo/status');
+            const data = await res.json();
+            alert(`🚀 Sri Sri ❤️SOS AI - ઓટોમેટિક SEO સ્ટેટસ:\n\n• લક્ષ્ય તારીખ & સમય: ૧૧-૧૦-૨૦૨૬ સવારે ૧૦:૫૧ થી ૧૧:૩૦ IST\n• વર્તમાન સ્થિતિ: ${data.is_live ? "🟢 સંપૂર્ણ લાઇવ (Live)" : "⏳ પૂર્વ-તૈયારી (Pre-Launch Staging)"}\n• બાકી સમય: ${data.countdown_text}\n• Robots નિર્દેશ: ${data.robots_directive}\n• સેટિંગ: ૧૧-૧૦-૨૦૨૬ ના દિવસે સવારે ૧૦:૫૧ વાગ્યે કોઈપણ માનવીય દખલ વગર ઓટોમેટિક લાઇવ થઈ જશે!`);
+        } catch (e) {
+            alert("૧૧-૧૦-૨૦૨૬ ના રોજ સવારે ૧૦:૫૧ વાગ્યે SEO આપોઆપ લાઇવ થઈ જશે!");
+        }
+    });
+}
+
 // Init
 window.addEventListener('DOMContentLoaded', () => {
     loadProfile();
@@ -2314,5 +2355,6 @@ window.addEventListener('DOMContentLoaded', () => {
     requestWakeLock();
     setupBackgroundKeepAliveAndHardwareKeys();
     initSafeRouteEngine();
+    initAutomaticSeoWatcher();
 });
 

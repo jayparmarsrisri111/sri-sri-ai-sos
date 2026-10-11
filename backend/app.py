@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime
 from PIL import Image, ImageDraw
 
-from fastapi import FastAPI, UploadFile, File, Form, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, WebSocket, WebSocketDisconnect, HTTPException, Response
 from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +20,7 @@ from backend.evidence_manager import EvidenceManager
 from backend.pdf_generator import generate_police_dossier_pdf
 from backend.ai_analyzer import ai_engine
 from backend.safe_route_engine import safe_route_engine
+from backend.seo_manager import seo_manager
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 CLIENT_DIR = BASE_DIR / "client"
@@ -76,6 +77,11 @@ ws_manager = ConnectionManager()
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
+@app.on_event("startup")
+async def app_startup_event():
+    # Start background launch sentinel for automatic 11-10-2026 SEO launch
+    asyncio.create_task(seo_manager.run_launch_sentinel())
+
 class StartIncidentRequest(BaseModel):
     user_name: Optional[str] = "Anonymous"
     phone_number: Optional[str] = "Unknown"
@@ -85,7 +91,16 @@ class StartIncidentRequest(BaseModel):
 async def serve_mobile_sos():
     index_file = CLIENT_DIR / "index.html"
     if index_file.exists():
-        return HTMLResponse(content=index_file.read_text(encoding="utf-8"))
+        raw_html = index_file.read_text(encoding="utf-8")
+        processed_html = seo_manager.process_index_html(raw_html)
+        status = seo_manager.get_status()
+        return HTMLResponse(
+            content=processed_html,
+            headers={
+                "X-Robots-Tag": status["x_robots_tag"],
+                "X-SEO-Launch-Status": "LIVE" if status["is_live"] else "SCHEDULED-2026-10-11"
+            }
+        )
     return HTMLResponse("<h1>SOS Mobile App not found</h1>", status_code=404)
 
 @app.get("/dashboard", response_class=HTMLResponse)
@@ -115,6 +130,35 @@ async def serve_service_worker():
     if sw.exists():
         return FileResponse(sw, media_type="application/javascript")
     raise HTTPException(status_code=404, detail="Service Worker not found")
+
+@app.get("/robots.txt")
+async def serve_robots():
+    content = seo_manager.get_robots_txt_content()
+    return Response(content=content, media_type="text/plain; charset=utf-8")
+
+@app.get("/sitemap.xml")
+async def serve_sitemap():
+    sm = CLIENT_DIR / "sitemap.xml"
+    if sm.exists():
+        return FileResponse(sm, media_type="application/xml; charset=utf-8")
+    raise HTTPException(status_code=404, detail="sitemap.xml not found")
+
+@app.get("/api/seo/status")
+async def get_seo_status():
+    return seo_manager.get_status()
+
+@app.post("/api/seo/force_launch")
+async def force_seo_launch(active: bool = Form(...)):
+    seo_manager.set_force_active(active)
+    if active:
+        await seo_manager.ping_search_engines()
+    return {"status": "success", "seo": seo_manager.get_status()}
+
+@app.post("/api/seo/ping_search_engines")
+async def trigger_seo_ping():
+    results = await seo_manager.ping_search_engines()
+    return {"status": "success", "results": results}
+
 
 @app.post("/api/incident/start")
 async def start_incident(payload: StartIncidentRequest):

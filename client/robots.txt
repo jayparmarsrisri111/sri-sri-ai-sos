@@ -1,0 +1,23 @@
+# Robots.txt for Sri Sri ❤️SOS AI
+# Platform: Autonomous AI Emergency Blackbox & Women Safety
+# Official Launch Date: 2026-10-11
+# Crawlers: Googlebot, Bingbot, Slurp, DuckDuckBot, Applebot, Baiduspider, Yandex
+
+User-agent: *
+Allow: /
+Allow: /dashboard
+Allow: /static/
+Allow: /manifest.json
+Allow: /sw.js
+
+# Disallow administrative and private storage endpoints to safeguard evidence and incident records
+Disallow: /admin
+Disallow: /admin.html
+Disallow: /api/
+Disallow: /storage/
+
+# Crawl-delay for polite indexing
+Crawl-delay: 1
+
+# XML Sitemap Location
+Sitemap: https://sri-sri-sos-ai.onrender.com/sitemap.xml

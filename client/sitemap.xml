@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+    <!-- Primary Public Mobile SOS Application Page -->
+    <url>
+        <loc>https://sri-sri-sos-ai.onrender.com/</loc>
+        <lastmod>2026-10-11T00:00:00+05:30</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+        
+        <!-- Multilingual Regional SEO hreflang Alternates -->
+        <xhtml:link rel="alternate" hreflang="gu" href="https://sri-sri-sos-ai.onrender.com/?lang=gu" />
+        <xhtml:link rel="alternate" hreflang="hi" href="https://sri-sri-sos-ai.onrender.com/?lang=hi" />
+        <xhtml:link rel="alternate" hreflang="en" href="https://sri-sri-sos-ai.onrender.com/?lang=en" />
+        <xhtml:link rel="alternate" hreflang="mr" href="https://sri-sri-sos-ai.onrender.com/?lang=mr" />
+        <xhtml:link rel="alternate" hreflang="ta" href="https://sri-sri-sos-ai.onrender.com/?lang=ta" />
+        <xhtml:link rel="alternate" hreflang="es" href="https://sri-sri-sos-ai.onrender.com/?lang=es" />
+        <xhtml:link rel="alternate" hreflang="fr" href="https://sri-sri-sos-ai.onrender.com/?lang=fr" />
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://sri-sri-sos-ai.onrender.com/" />
+        
+        <!-- Google Image Search Optimization -->
+        <image:image>
+            <image:loc>https://sri-sri-sos-ai.onrender.com/static/images/og-banner.png</image:loc>
+            <image:title>Sri Sri ❤️SOS AI - Digital Blackbox and Women Safety</image:title>
+            <image:caption>Next-Gen Autonomous AI Emergency Blackbox, Acoustic Forensics and Police Dispatch Platform</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://sri-sri-sos-ai.onrender.com/static/images/logo.svg</image:loc>
+            <image:title>Sri Sri SOS AI Official Shield Logo</image:title>
+        </image:image>
+    </url>
+
+    <!-- Tactical Police & Guardian Control Cockpit -->
+    <url>
+        <loc>https://sri-sri-sos-ai.onrender.com/dashboard</loc>
+        <lastmod>2026-10-11T00:00:00+05:30</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+        
+        <xhtml:link rel="alternate" hreflang="gu" href="https://sri-sri-sos-ai.onrender.com/dashboard?lang=gu" />
+        <xhtml:link rel="alternate" hreflang="hi" href="https://sri-sri-sos-ai.onrender.com/dashboard?lang=hi" />
+        <xhtml:link rel="alternate" hreflang="en" href="https://sri-sri-sos-ai.onrender.com/dashboard?lang=en" />
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://sri-sri-sos-ai.onrender.com/dashboard" />
+        
+        <image:image>
+            <image:loc>https://sri-sri-sos-ai.onrender.com/static/images/og-banner.png</image:loc>
+            <image:title>Police and Guardian Tactical Command Cockpit</image:title>
+            <image:caption>Real-Time GPS Breadcrumb Tracking and Multimodal Evidence Forensic Terminal</image:caption>
+        </image:image>
+    </url>
+
+</urlset>
