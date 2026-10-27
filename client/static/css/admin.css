@@ -986,3 +986,72 @@ body {
     display: none !important;
 }
 
+/* ========================================================
+   🌐 UNIVERSAL MULTI-LANGUAGE & RTL RESILIENCE (ADMIN PORTAL)
+   Ensures zero design distortion across all 11 languages
+   ======================================================== */
+:root {
+    --font-universal: 'Outfit', 'Noto Sans Gujarati', 'Noto Sans Devanagari', 'Noto Sans Tamil', 'Noto Sans Arabic', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+    font-family: var(--font-universal);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+.admin-header {
+    flex-wrap: wrap;
+    gap: 14px;
+}
+.header-right {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-left: auto;
+}
+.status-summary-bar {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+.tab-navigation {
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.tab-btn {
+    white-space: normal;
+    word-break: break-word;
+    min-height: 40px;
+    line-height: 1.25;
+}
+.incidents-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.incidents-table th, .incidents-table td {
+    white-space: nowrap;
+}
+
+/* RTL for Admin Portal */
+html[dir="rtl"] body {
+    direction: rtl;
+    text-align: right;
+}
+html[dir="rtl"] .header-right {
+    margin-left: 0;
+    margin-right: auto;
+}
+html[dir="rtl"] .stat-card,
+html[dir="rtl"] .config-card,
+html[dir="rtl"] .incidents-table th,
+html[dir="rtl"] .incidents-table td {
+    text-align: right;
+}
+html[dir="rtl"] .table-actions {
+    direction: ltr;
+    display: flex;
+    justify-content: flex-end;
+}
+
+

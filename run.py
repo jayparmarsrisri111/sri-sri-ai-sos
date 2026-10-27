@@ -24,12 +24,12 @@ def get_local_ip():
 
 def start_public_tunnel(port):
     """
-    Starts an instant public HTTPS tunnel so any user in the world
-    can access the app on their device without being on the same Wi-Fi.
+    Starts an instant public HTTPS tunnel so any user worldwide
+    can access the application on their device without being on the same local network.
     """
     def run_lt():
         try:
-            print("\n🌐 પબ્લિક લાઇવ લિંક તૈયાર થઈ રહી છે (Creating Public Live HTTPS Tunnel)...")
+            print("\n🌐 Creating Public Live HTTPS Tunnel...")
             proc = subprocess.Popen(
                 ["npx", "localtunnel", "--port", str(port)],
                 stdout=subprocess.PIPE,
@@ -41,10 +41,10 @@ def start_public_tunnel(port):
                 if "your url is:" in line.lower():
                     tunnel_url = line.strip().split()[-1]
                     print("\n" + "🌟" * 35)
-                    print(f"🌍 પબ્લિક લાઇવ લિંક (કોઈપણ મોબાઇલ/ડિવાઇસ માટે):")
+                    print(f"🌍 Public Live Tunnel Link (Any device/mobile browser):")
                     print(f"👉 {tunnel_url}")
-                    print(f"🚨 પોલીસ ડેશબોર્ડ: {tunnel_url}/dashboard")
-                    print(f"⚙️ એડમિન પેનલ: {tunnel_url}/admin")
+                    print(f"🚨 Police Cockpit: {tunnel_url}/dashboard")
+                    print(f"⚙️ Admin Master Portal: {tunnel_url}/admin")
                     print("🌟" * 35 + "\n")
                     break
         except Exception as e:
@@ -75,27 +75,27 @@ if __name__ == "__main__":
     proto = "https" if is_https else "http"
 
     print("=" * 75)
-    print("🛡️  SRI SRI ❤️SOS AI - DIGITAL BLACKBOX & GIRLS SAFETY SYSTEM (LIVE)")
+    print("🛡️  SRI SRI ❤️SOS AI - DIGITAL BLACKBOX & WOMEN SAFETY SYSTEM (LIVE)")
     print("=" * 75)
-    print(f"📡 સર્વર શરૂ થઈ રહ્યું છે ({proto.upper()})...")
+    print(f"📡 Server initializing ({proto.upper()})...")
     print()
-    print(f"📱 મોબાઇલ SOS એપ (પીડિતા માટે):")
-    print(f"   -> કમ્પ્યુટર પર: {proto}://localhost:{port}/")
-    print(f"   -> મોબાઇલ ફોન પરથી (WiFi): {proto}://{local_ip}:{port}/")
+    print(f"📱 Mobile SOS Web App (For Citizen / User):")
+    print(f"   -> Local Computer: {proto}://localhost:{port}/")
+    print(f"   -> Mobile Phone (Local Wi-Fi): {proto}://{local_ip}:{port}/")
     print()
-    print(f"🚨 પોલીસ & વાલી લાઈવ કંટ્રોલ રૂમ (Tactical Cockpit):")
-    print(f"   -> {proto}://localhost:{port}/dashboard")
-    print(f"   -> મોબાઇલ/ટેબ્લેટ પરથી: {proto}://{local_ip}:{port}/dashboard")
+    print(f"🚨 Police & Guardian Tactical Cockpit:")
+    print(f"   -> Local Computer: {proto}://localhost:{port}/dashboard")
+    print(f"   -> Mobile / Tablet: {proto}://{local_ip}:{port}/dashboard")
     print()
-    print(f"⚙️  એડમિન માસ્ટર ડેટા પોર્ટલ (Admin Master Portal):")
-    print(f"   -> {proto}://localhost:{port}/admin")
+    print(f"⚙️  Admin Master Portal:")
+    print(f"   -> Local Computer: {proto}://localhost:{port}/admin")
     print()
     if is_https:
-        print("🔒 HTTPS મોડ ચાલુ છે (મોબાઇલ બ્રાઉઝરમાં કેમેરા, માઇક અને GPS સંપૂર્ણ કામ કરશે).")
+        print("🔒 HTTPS mode active: Camera, Microphone, and GPS permissions fully enabled.")
     else:
-        print("💡 સૂચના: મોબાઇલ પર કેમેરા/માઇક માટે HTTPS જોઈએ. `python run.py --https` અથવા `python run.py --tunnel` વાપરો.")
+        print("💡 Note: Modern mobile browsers require HTTPS for camera/mic access. Use `python run.py --https` or `python run.py --tunnel`.")
     print("=" * 75)
-    print("કીબોર્ડ પર Ctrl + C દબાવીને સર્વર બંધ કરી શકાય છે.\n")
+    print("Press Ctrl + C to stop the server.\n")
 
     if args.tunnel:
         start_public_tunnel(port)

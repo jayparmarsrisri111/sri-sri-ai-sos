@@ -1,4 +1,26 @@
 // Digital Blackbox - Police & Guardian Tactical Dashboard Script
+// 100% English Code, Robust XSS Defense, and Universal Multi-Language Support
+
+// HTML Sanitization Helper to Prevent Stored/Reflected XSS
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// Multi-Language Helper with Safe English Fallbacks
+function tr(key, fallback) {
+    if (typeof t === 'function') {
+        const val = t(key);
+        if (val && val !== key) return val;
+    }
+    return fallback;
+}
+
 
 let currentIncidentId = null;
 let currentIncidentMeta = null;
@@ -111,7 +133,7 @@ function updateMapLocation(lat, lng, accuracy = 15) {
             iconAnchor: [12, 12]
         });
         marker = L.marker(latLng, { icon: victimIcon }).addTo(map);
-        marker.bindPopup("<b>ભોગ બનનારનું વર્તમાન લોકેશન</b>").openPopup();
+        marker.bindPopup(`<b>${tr("lblVictimLocation", "Victim Current Location")}</b>`).openPopup();
     } else {
         marker.setLatLng(latLng);
     }
@@ -132,7 +154,7 @@ function updateMapLocation(lat, lng, accuracy = 15) {
     pathPolyline.setLatLngs(pathCoordinates);
     map.panTo(latLng);
 
-    coordDisplay.innerText = `અક્ષાંશ: ${lat.toFixed(5)}, રેખાંશ: ${lng.toFixed(5)} (±${Math.round(accuracy)}m)`;
+    coordDisplay.innerText = `${tr("lblLatitude", "Lat")}: ${lat.toFixed(5)}, ${tr("lblLongitude", "Lng")}: ${lng.toFixed(5)} (±${Math.round(accuracy)}m)`;
 }
 
 // Connect to WebSocket for real-time live events
@@ -143,7 +165,7 @@ function setupWebSocket() {
     ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
-        wsStatusText.innerText = "લાઈવ કનેક્ટેડ";
+        wsStatusText.innerText = tr("wsConnected", "Live Connected");
         wsStatusText.style.color = "var(--accent-green)";
     };
 
@@ -157,7 +179,7 @@ function setupWebSocket() {
     };
 
     ws.onclose = () => {
-        wsStatusText.innerText = "પુનઃજોડાણ...";
+        wsStatusText.innerText = tr("wsReconnecting", "Reconnecting...");
         wsStatusText.style.color = "var(--accent-yellow)";
         setTimeout(setupWebSocket, 3000);
     };
@@ -250,11 +272,11 @@ function handleLiveEvent(msg) {
             updateThreatGauge(msg.ai_analysis.threat_score, msg.ai_analysis.threat_level);
             if (aiVisualThreat) {
                 aiVisualThreat.innerText = msg.ai_analysis.face_count > 0 
-                    ? `🚨 ${msg.ai_analysis.face_count} ચહેરો નજીક પકડાયો (${msg.ai_analysis.dominant_color})`
-                    : `ચહેરો દેખાતો નથી (${msg.ai_analysis.dominant_color})`;
+                    ? `🚨 ${msg.ai_analysis.face_count} ${tr("lblFaceDetected", "face(s) detected near")} (${escapeHtml(msg.ai_analysis.dominant_color)})`
+                    : `${tr("lblNoFaceDetected", "No face detected")} (${escapeHtml(msg.ai_analysis.dominant_color)})`;
             }
             if (aiMotionThreat) {
-                aiMotionThreat.innerText = msg.ai_analysis.is_physical_struggle ? "🚨 ઝપાઝપી / હલનચલન" : "સ્થિર કેપ્ચર";
+                aiMotionThreat.innerText = msg.ai_analysis.is_physical_struggle ? `🚨 ${tr("lblPhysicalStruggle", "Physical Struggle / Rapid Motion")}` : tr("lblNormalMotion", "Stationary / Stable Capture");
             }
             if (aiSuspectProfile && msg.ai_analysis.visual_findings) {
                 aiSuspectProfile.innerText = msg.ai_analysis.visual_findings.slice(0, 2).join(' | ');
@@ -269,7 +291,7 @@ function handleLiveEvent(msg) {
         if (msg.ai_analysis) {
             if (aiAudioThreat && msg.ai_analysis.acoustic_findings) {
                 const isScream = msg.ai_analysis.acoustic_findings.some(f => f.includes("SPIKE") || f.includes("Scream"));
-                aiAudioThreat.innerText = isScream ? "🚨 ચીસ / બૂમરાણ પકડાઈ" : "સામાન્ય અવાજ";
+                aiAudioThreat.innerText = isScream ? `🚨 ${tr("lblScreamDetected", "Scream / Distress Peak Detected")}` : tr("lblNormalAudio", "Ambient Audio Stable");
                 if (isScream) {
                     updateThreatGauge(Math.max(currentThreatScore, 85), "CRITICAL AMBUSH 🚨");
                 }
@@ -286,13 +308,13 @@ function handleLiveEvent(msg) {
         if (msg.event_type === "POCKET_OCCLUSION_ACTIVE") {
             const aiPocket = document.getElementById('aiPocketOcclusion');
             if (aiPocket) {
-                aiPocket.innerText = "🎧 ખિસ્સામાં/પર્સમાં ઓક્લુઝન: સુપર-ઇયર માઇક +350% સક્રિય";
+                aiPocket.innerText = `🎧 ${tr("lblPocketOcclusion", "In-Pocket Occlusion: Super-Ear Mic +350% Boost Active")}`;
                 aiPocket.style.color = "#f59e0b";
             }
         } else {
             const aiPocket = document.getElementById('aiPocketOcclusion');
             if (aiPocket) {
-                aiPocket.innerText = "સામાન્ય કેપ્ચર (કેમેરા ઓપન)";
+                aiPocket.innerText = tr("lblNormalCameraCapture", "Clear Camera Capture (Open)");
                 aiPocket.style.color = "#86efac";
             }
         }
@@ -304,17 +326,17 @@ function handleLiveEvent(msg) {
         if (cadAlert) {
             cadAlert.classList.remove('hidden');
             if (cadTitle) cadTitle.innerText = `🚔 ERSS 112 DISPATCH: ${msg.assigned_unit}`;
-            if (cadDesc) cadDesc.innerText = `ટોકન: ${msg.cad_token} | ઓફિસર બેજ: ${msg.officer_badge} | ETA: ${msg.eta_minutes} મિનિટ`;
+            if (cadDesc) cadDesc.innerText = `${tr("lblToken", "Token")}: ${escapeHtml(msg.cad_token)} | ${tr("lblBadge", "Officer Badge")}: ${escapeHtml(msg.officer_badge)} | ETA: ${msg.eta_minutes} min`;
         }
         if (aiPoliceBrief) {
-            aiPoliceBrief.innerText = `🚔 ERSS 112 યુનિટ ${msg.assigned_unit} રવાના થઈ ગઈ છે. ETA: ${msg.eta_minutes} મિનિટ.`;
+            aiPoliceBrief.innerText = `🚔 ERSS 112 Unit ${escapeHtml(msg.assigned_unit)} dispatched to live scene. ETA: ${msg.eta_minutes} min.`;
         }
 
     } else if (msg.event === "DEAD_MAN_TRIGGERED") {
         if (deadmanAlert) deadmanAlert.classList.remove("hidden");
         updateThreatGauge(100, "CRITICAL AMBUSH 🚨");
         if (aiPoliceBrief) {
-            aiPoliceBrief.innerText = "🚨 ચેતવણી: પીડિતાનો ફોન તોડી નાખવામાં આવ્યો અથવા સ્વિચ ઓફ થયો! છેલ્લું GPS લોકેશન લૉક થયું છે. તાત્કાલિક પોલીસ રિસ્પોન્સ મોકલો.";
+            aiPoliceBrief.innerText = `🚨 ${tr("lblDeadmanBrief", "WARNING: Victim device destroyed or connection severed! Final GPS coordinates locked. Immediate police tactical team dispatch recommended.")}`;
         }
 
     } else if (msg.event === "DURESS_COERCION_TRIGGERED") {
@@ -322,13 +344,13 @@ function handleLiveEvent(msg) {
         updateThreatGauge(100, "CRITICAL COERCION 🚨🚨");
         playSirenAlarm(4);
         if (aiPoliceBrief) {
-            aiPoliceBrief.innerText = "🚨 ગંભીર ચેતવણી: પીડિતાએ હુમલાખોરના દબાણ હેઠળ ૯૯૯૯ ડ્યુરેસ પિન દાખલ કર્યો છે! હુમલાખોરને કેન્સલ દેખાય છે પરંતુ ગુપ્ત ટ્રેકિંગ ૧૦૦% ચાલુ છે! તાત્કાલિક કમાન્ડો રવાના કરો!";
+            aiPoliceBrief.innerText = `🚨 ${tr("lblDuressBrief", "CRITICAL WARNING: Victim was forced to enter Duress Coercion PIN 9999! Fake dismiss shown on mobile screen while covert cloud surveillance is 100% ACTIVE! Send armed response immediately!")}`;
         }
 
     } else if (msg.event === "BATTERY_CRITICAL_ALERT") {
         if (batteryAlert) {
             batteryAlert.classList.remove("hidden");
-            if (batteryDesc) batteryDesc.innerText = `વિક્ટિમ ફોન બેટરી: ${msg.battery_level}%. છેલ્લું જીપીએસ લોકેશન લૉક થયું છે.`;
+            if (batteryDesc) batteryDesc.innerText = `${tr("lblVictimBattery", "Victim Battery Level")}: ${msg.battery_level}%. ${tr("lblGpsLocked", "Final GPS coordinates locked.")}`;
         }
         if (msg.lat && msg.lng) {
             updateMapLocation(msg.lat, msg.lng, 10);
@@ -340,21 +362,21 @@ function handleLiveEvent(msg) {
         const corrDesc = document.getElementById('corridorAlertDesc');
         if (corrAlert) {
             corrAlert.classList.remove('hidden');
-            if (corrTitle) corrTitle.innerText = "⚠️ સેફ કોરિડોર ડિવીએશન એલર્ટ (મહિલા મુસાફરી રડાર)";
+            if (corrTitle) corrTitle.innerText = `⚠️ ${tr("lblCorridorAlert", "Safe Corridor Deviation Alert (Women Transit Radar)")}`;
             if (corrDesc && msg.telemetry) {
-                corrDesc.innerText = msg.telemetry.alert_message || "મહિલા મુખ્ય પ્રકાશિત રસ્તેથી ભટકીને અવાવરૂ/અંધારાવાળા વિસ્તાર તરફ ગઈ છે!";
+                corrDesc.innerText = msg.telemetry.alert_message || tr("lblCorridorDesc", "Traveler has deviated away from illuminated safe corridor into dark/unlit sector!");
             }
         }
         playSirenAlarm(2);
         if (aiPoliceBrief) {
-            aiPoliceBrief.innerText = "⚠️ ટેક્ટિકલ એલર્ટ: મહિલા સેફ કોરિડોરથી ભટકીને અંધારાવાળી ગલી તરફ જઈ રહી છે. નજીકની PCR વાનને પેટ્રોલિંગ એલર્ટ મોકલો.";
+            aiPoliceBrief.innerText = `⚠️ ${tr("lblCorridorBrief", "TACTICAL ALERT: Traveler deviated into unlit alleyway. PCR patrol team alerted.")}`;
         }
 
     } else if (msg.event === "SAFE_JOURNEY_COMPLETED") {
         const corrAlert = document.getElementById('corridorDeviationAlert');
         if (corrAlert) corrAlert.classList.add('hidden');
         if (aiPoliceBrief) {
-            aiPoliceBrief.innerText = "✅ અપડેટ: મહિલા સુરક્ષિત રીતે ગંતવ્ય સ્થાને પહોંચી ગઈ છે.";
+            aiPoliceBrief.innerText = `✅ ${tr("lblJourneyComplete", "UPDATE: Traveler safely arrived at destination.")}`;
         }
 
     } else if (msg.event === "GRACE_CANCELLED") {
@@ -363,7 +385,7 @@ function handleLiveEvent(msg) {
         stripStatus.style.background = "#0284c7";
         stripStatus.style.color = "#e0f2fe";
         if (aiPoliceBrief) {
-            aiPoliceBrief.innerText = "વિક્ટિમે ૫ સેકન્ડના ગ્રેસ પિરિયડમાં રદ કર્યું (ખોટો અલાર્મ ટળ્યો).";
+            aiPoliceBrief.innerText = tr("lblGraceBrief", "Victim cancelled within 5-second grace period (False alarm averted).");
         }
 
     } else if (msg.event === "INCIDENT_CLOSED") {
@@ -382,7 +404,7 @@ async function loadIncidentList(selectId = null) {
         
         // Auto-seed if database is currently empty
         if (!incidents || incidents.length === 0) {
-            incidentSelect.innerHTML = '<option value="">નવો ૧-સેકન્ડ લાઇવ કેસ લોડ થઈ રહ્યો છે...</option>';
+            incidentSelect.innerHTML = `<option value="">${tr("optLoading", "Loading live case...")}</option>`;
             try {
                 const seedRes = await fetch('/api/admin/seed_dynamic_demo', {
                     method: 'POST',
@@ -403,7 +425,7 @@ async function loadIncidentList(selectId = null) {
         
         incidentSelect.innerHTML = '';
         if (!incidents || incidents.length === 0) {
-            incidentSelect.innerHTML = '<option value="">કોઈ ઇન્સિડન્ટ મળ્યા નથી</option>';
+            incidentSelect.innerHTML = `<option value="">${tr("noIncidentsFound", "No incidents found")}</option>`;
             return;
         }
 
@@ -496,8 +518,8 @@ function renderTimeline(entries) {
         appendAuditRow(entry);
     });
 
-    photoBadge.innerText = `${photos} ફોટો`;
-    audioBadge.innerText = `${audios} ઓડિયો ક્લિપ`;
+    photoBadge.innerText = `${photos} ${tr("lblPhotosCount", "Photos")}`;
+    audioBadge.innerText = `${audios} ${tr("lblAudioCount", "Audio Clips")}`;
 
     if (photos === 0) photoFeed.appendChild(photoEmptyState);
     if (audios === 0) audioList.appendChild(audioEmptyState);
@@ -523,7 +545,7 @@ function appendPhotoToFeed(chunk, url) {
     // Prepend to show newest first
     photoFeed.insertBefore(thumb, photoFeed.firstChild);
     const count = photoFeed.querySelectorAll('.photo-thumb').length;
-    photoBadge.innerText = `${count} ફોટો`;
+    photoBadge.innerText = `${count} ${tr("lblPhotosCount", "Photos")}`;
 }
 
 function appendAudioToList(chunk, url) {
@@ -536,14 +558,14 @@ function appendAudioToList(chunk, url) {
     const timeStr = new Date(chunk.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     item.innerHTML = `
         <div class="audio-info">
-            <strong>ક્લિપ #${chunk.seq}</strong>
+            <strong>${tr("lblClip", "Clip")} #${chunk.seq}</strong>
             <span>${timeStr} | ${Math.round((chunk.size_bytes || 0) / 1024)} KB</span>
         </div>
         <audio controls src="${url}"></audio>
     `;
     audioList.insertBefore(item, audioList.firstChild);
     const count = audioList.querySelectorAll('.audio-item').length;
-    audioBadge.innerText = `${count} ઓડિયો ક્લિપ`;
+    audioBadge.innerText = `${count} ${tr("lblAudioCount", "Audio Clips")}`;
 }
 
 function appendAuditRow(entry) {
@@ -918,6 +940,17 @@ if (seedDemoCaseBtn) {
         }
     });
 }
+
+// React dynamically when user switches language
+window.addEventListener('languageChanged', (e) => {
+    if (currentIncidentMeta) {
+        renderMetadata(currentIncidentMeta);
+    }
+    const countP = photoFeed ? photoFeed.querySelectorAll('.photo-thumb').length : 0;
+    if (photoBadge) photoBadge.innerText = `${countP} ${tr("lblPhotosCount", "Photos")}`;
+    const countA = audioList ? audioList.querySelectorAll('.audio-item').length : 0;
+    if (audioBadge) audioBadge.innerText = `${countA} ${tr("lblAudioCount", "Audio Clips")}`;
+});
 
 // Init
 window.addEventListener('DOMContentLoaded', () => {

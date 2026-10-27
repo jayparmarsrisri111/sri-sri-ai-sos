@@ -38,6 +38,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Security Headers Middleware
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(self), microphone=(self), geolocation=(self)"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob: ws: wss:; "
+        "frame-ancestors 'self';"
+    )
+    return response
+
 evidence_mgr = EvidenceManager(STORAGE_DIR)
 
 # WebSocket connection manager for live dashboard feeds
@@ -186,7 +201,16 @@ async def upload_photo(
     speed: Optional[float] = Form(None),
     altitude: Optional[float] = Form(None)
 ):
+    safe_inc_id = "".join(c for c in incident_id if c.isalnum() or c in ("_", "-"))
+    if not safe_inc_id:
+        raise HTTPException(status_code=400, detail="Invalid incident identifier")
+
+    # Limit photo file size to 15MB
+    MAX_PHOTO_SIZE = 15 * 1024 * 1024
     contents = await file.read()
+    if len(contents) > MAX_PHOTO_SIZE:
+        raise HTTPException(status_code=413, detail="Photo payload exceeds 15MB limit")
+
     gps_data = None
     if lat is not None and lng is not None:
         gps_data = {
@@ -197,9 +221,10 @@ async def upload_photo(
             "altitude": altitude
         }
 
-    ext = file.filename.split(".")[-1] if "." in file.filename else "jpg"
+    raw_ext = (file.filename.split(".")[-1] if file.filename and "." in file.filename else "jpg").lower()
+    ext = raw_ext if raw_ext in ("jpg", "jpeg", "png", "webp") else "jpg"
     chunk_entry = evidence_mgr.save_chunk(
-        incident_id=incident_id,
+        incident_id=safe_inc_id,
         chunk_type="photo",
         data_bytes=contents,
         file_ext=ext,
@@ -209,15 +234,15 @@ async def upload_photo(
     )
 
     # Autonomous Computer Vision & Threat Analysis
-    ai_vision = ai_engine.analyze_image_frame(contents, incident_id)
+    ai_vision = ai_engine.analyze_image_frame(contents, safe_inc_id)
     chunk_entry["ai_analysis"] = ai_vision
 
     # Real-time WebSocket push to control room with AI Threat Intel
-    await ws_manager.broadcast_to_incident(incident_id, {
+    await ws_manager.broadcast_to_incident(safe_inc_id, {
         "event": "NEW_PHOTO",
-        "incident_id": incident_id,
+        "incident_id": safe_inc_id,
         "chunk": chunk_entry,
-        "photo_url": f"/api/incident/{incident_id}/file/{chunk_entry['file_rel_path']}",
+        "photo_url": f"/api/incident/{safe_inc_id}/file/{chunk_entry['file_rel_path']}",
         "ai_analysis": ai_vision
     })
 
@@ -232,7 +257,16 @@ async def upload_audio(
     lng: Optional[float] = Form(None),
     accuracy: Optional[float] = Form(None)
 ):
+    safe_inc_id = "".join(c for c in incident_id if c.isalnum() or c in ("_", "-"))
+    if not safe_inc_id:
+        raise HTTPException(status_code=400, detail="Invalid incident identifier")
+
+    # Limit audio chunk size to 25MB
+    MAX_AUDIO_SIZE = 25 * 1024 * 1024
     contents = await file.read()
+    if len(contents) > MAX_AUDIO_SIZE:
+        raise HTTPException(status_code=413, detail="Audio payload exceeds 25MB limit")
+
     gps_data = None
     if lat is not None and lng is not None:
         gps_data = {
@@ -241,9 +275,10 @@ async def upload_audio(
             "accuracy": accuracy
         }
 
-    ext = file.filename.split(".")[-1] if "." in file.filename else "webm"
+    raw_ext = (file.filename.split(".")[-1] if file.filename and "." in file.filename else "webm").lower()
+    ext = raw_ext if raw_ext in ("webm", "wav", "ogg", "mp3", "m4a") else "webm"
     chunk_entry = evidence_mgr.save_chunk(
-        incident_id=incident_id,
+        incident_id=safe_inc_id,
         chunk_type="audio",
         data_bytes=contents,
         file_ext=ext,
@@ -252,15 +287,15 @@ async def upload_audio(
     )
 
     # Autonomous Acoustic Forensics
-    ai_audio = ai_engine.analyze_audio_chunk(contents, incident_id)
+    ai_audio = ai_engine.analyze_audio_chunk(contents, safe_inc_id)
     chunk_entry["ai_analysis"] = ai_audio
 
     # Real-time WebSocket push
-    await ws_manager.broadcast_to_incident(incident_id, {
+    await ws_manager.broadcast_to_incident(safe_inc_id, {
         "event": "NEW_AUDIO",
-        "incident_id": incident_id,
+        "incident_id": safe_inc_id,
         "chunk": chunk_entry,
-        "audio_url": f"/api/incident/{incident_id}/file/{chunk_entry['file_rel_path']}",
+        "audio_url": f"/api/incident/{safe_inc_id}/file/{chunk_entry['file_rel_path']}",
         "ai_analysis": ai_audio
     })
 
@@ -380,17 +415,29 @@ async def export_pdf(incident_id: str):
 
 @app.get("/api/incident/{incident_id}/file/{subfolder}/{filename}")
 async def get_evidence_file(incident_id: str, subfolder: str, filename: str):
-    file_path = STORAGE_DIR / incident_id / subfolder / filename
-    if not file_path.exists():
+    if subfolder not in ("photos", "audio"):
+        raise HTTPException(status_code=403, detail="Unauthorized evidence subfolder")
+    safe_inc_id = "".join(c for c in incident_id if c.isalnum() or c in ("_", "-"))
+    safe_filename = os.path.basename(filename)
+    if not safe_inc_id or not safe_filename:
+        raise HTTPException(status_code=400, detail="Invalid file path parameters")
+    
+    file_path = (STORAGE_DIR / safe_inc_id / subfolder / safe_filename).resolve()
+    if not file_path.is_relative_to(STORAGE_DIR.resolve()):
+        raise HTTPException(status_code=403, detail="Forbidden file path")
+    if not file_path.exists() or not file_path.is_file():
         raise HTTPException(status_code=404, detail="Evidence file not found")
     
     media_type = "image/jpeg"
-    if filename.endswith(".webm"):
+    lower_name = safe_filename.lower()
+    if lower_name.endswith(".webm"):
         media_type = "audio/webm"
-    elif filename.endswith(".wav"):
+    elif lower_name.endswith(".wav"):
         media_type = "audio/wav"
-    elif filename.endswith(".png"):
+    elif lower_name.endswith(".png"):
         media_type = "image/png"
+    elif lower_name.endswith(".webp"):
+        media_type = "image/webp"
 
     return FileResponse(path=str(file_path), media_type=media_type)
 
@@ -406,14 +453,17 @@ async def close_incident(incident_id: str, reason: str = "Resolved by user"):
 
 @app.delete("/api/incident/{incident_id}")
 async def delete_incident_endpoint(incident_id: str):
-    success = evidence_mgr.delete_incident(incident_id)
+    safe_inc_id = "".join(c for c in incident_id if c.isalnum() or c in ("_", "-"))
+    if not safe_inc_id:
+        raise HTTPException(status_code=400, detail="Invalid incident ID")
+    success = evidence_mgr.delete_incident(safe_inc_id)
     if not success:
         raise HTTPException(status_code=404, detail="Incident not found")
-    await ws_manager.broadcast_to_incident(incident_id, {
+    await ws_manager.broadcast_to_incident(safe_inc_id, {
         "event": "INCIDENT_DELETED",
-        "incident_id": incident_id
+        "incident_id": safe_inc_id
     })
-    return {"status": "deleted", "incident_id": incident_id}
+    return {"status": "deleted", "incident_id": safe_inc_id}
 
 @app.post("/api/incident/{incident_id}/duress")
 async def trigger_duress_coercion(incident_id: str, pin: str = Form("9999")):
@@ -680,24 +730,24 @@ async def get_city_safety_map_data():
     return safe_route_engine.get_city_safety_data()
 
 POPULAR_LOCATIONS = [
-    {"name": "Navrangpura (નવરંગપુરા)", "display_name": "Navrangpura, Ahmedabad, Gujarat", "lat": 23.0360, "lng": 72.5610},
-    {"name": "SG Highway (એસ.જી. હાઇવે)", "display_name": "Sarkhej - Gandhinagar Highway, Ahmedabad, Gujarat", "lat": 23.0470, "lng": 72.5150},
-    {"name": "C.G. Road (સી.જી. રોડ)", "display_name": "Chimanlal Girdharlal Road, Navrangpura, Ahmedabad", "lat": 23.0315, "lng": 72.5590},
-    {"name": "Kalupur Railway Station (કાલુપુર રેલવે સ્ટેશન)", "display_name": "Ahmedabad Junction (Kalupur), Ahmedabad", "lat": 23.0232, "lng": 72.6006},
-    {"name": "Gita Mandir Central Bus Stand (ગીતા મંદિર બસ સ્ટેન્ડ)", "display_name": "Gita Mandir ST Bus Station, Ahmedabad", "lat": 23.0125, "lng": 72.5875},
-    {"name": "Satellite / Shivranjani (સેટેલાઇટ)", "display_name": "Satellite, Shivranjani Cross Roads, Ahmedabad", "lat": 23.0270, "lng": 72.5310},
-    {"name": "Maninagar (મણિનગર)", "display_name": "Maninagar, Ahmedabad, Gujarat", "lat": 22.9980, "lng": 72.6050},
-    {"name": "Gandhinagar Infocity (ગાંધીનગર ઇન્ફોસિટી)", "display_name": "Infocity, Gandhinagar, Gujarat", "lat": 23.1950, "lng": 72.6320},
-    {"name": "Bhavnagar City (ભાવનગર)", "display_name": "Bhavnagar, Gujarat, India", "lat": 21.7645, "lng": 72.1519},
-    {"name": "Bhavnagar Railway Station (ભાવનગર રેલવે સ્ટેશન)", "display_name": "Bhavnagar Terminus, Bhavnagar, Gujarat", "lat": 21.7700, "lng": 72.1400},
-    {"name": "Surat City (સુરત)", "display_name": "Surat, Gujarat, India", "lat": 21.1702, "lng": 72.8311},
-    {"name": "Vadodara / Baroda (વડોદરા)", "display_name": "Vadodara, Gujarat, India", "lat": 22.3072, "lng": 73.1812},
-    {"name": "Rajkot City (રાજકોટ)", "display_name": "Rajkot, Gujarat, India", "lat": 22.3039, "lng": 70.8022},
-    {"name": "Gujarat University (ગુજરાત યુનિવર્સિટી)", "display_name": "Gujarat University, Navrangpura, Ahmedabad", "lat": 23.0380, "lng": 72.5450},
-    {"name": "Civil Hospital (સિવિલ હોસ્પિટલ)", "display_name": "Ahmedabad Civil Hospital, Asarwa, Ahmedabad", "lat": 23.0520, "lng": 72.6020},
+    {"name": "Navrangpura", "display_name": "Navrangpura, Ahmedabad, Gujarat", "lat": 23.0360, "lng": 72.5610},
+    {"name": "SG Highway", "display_name": "Sarkhej - Gandhinagar Highway, Ahmedabad, Gujarat", "lat": 23.0470, "lng": 72.5150},
+    {"name": "C.G. Road", "display_name": "Chimanlal Girdharlal Road, Navrangpura, Ahmedabad", "lat": 23.0315, "lng": 72.5590},
+    {"name": "Kalupur Railway Station", "display_name": "Ahmedabad Junction (Kalupur), Ahmedabad", "lat": 23.0232, "lng": 72.6006},
+    {"name": "Gita Mandir Central Bus Stand", "display_name": "Gita Mandir ST Bus Station, Ahmedabad", "lat": 23.0125, "lng": 72.5875},
+    {"name": "Satellite / Shivranjani", "display_name": "Satellite, Shivranjani Cross Roads, Ahmedabad", "lat": 23.0270, "lng": 72.5310},
+    {"name": "Maninagar", "display_name": "Maninagar, Ahmedabad, Gujarat", "lat": 22.9980, "lng": 72.6050},
+    {"name": "Gandhinagar Infocity", "display_name": "Infocity, Gandhinagar, Gujarat", "lat": 23.1950, "lng": 72.6320},
+    {"name": "Bhavnagar City", "display_name": "Bhavnagar, Gujarat, India", "lat": 21.7645, "lng": 72.1519},
+    {"name": "Bhavnagar Railway Station", "display_name": "Bhavnagar Terminus, Bhavnagar, Gujarat", "lat": 21.7700, "lng": 72.1400},
+    {"name": "Surat City", "display_name": "Surat, Gujarat, India", "lat": 21.1702, "lng": 72.8311},
+    {"name": "Vadodara / Baroda", "display_name": "Vadodara, Gujarat, India", "lat": 22.3072, "lng": 73.1812},
+    {"name": "Rajkot City", "display_name": "Rajkot, Gujarat, India", "lat": 22.3039, "lng": 70.8022},
+    {"name": "Gujarat University", "display_name": "Gujarat University, Navrangpura, Ahmedabad", "lat": 23.0380, "lng": 72.5450},
+    {"name": "Civil Hospital", "display_name": "Ahmedabad Civil Hospital, Asarwa, Ahmedabad", "lat": 23.0520, "lng": 72.6020},
     {"name": "Sardar Vallabhbhai Patel International Airport", "display_name": "SVP International Airport, Hansol, Ahmedabad", "lat": 23.0734, "lng": 72.6266},
-    {"name": "Iskcon Cross Road (ઇસ્કોન ચાર રસ્તા)", "display_name": "Iskcon Circle, SG Highway, Ahmedabad", "lat": 23.0275, "lng": 72.5080},
-    {"name": "Vastrapur Lake (વસ્ત્રાપુર લેક)", "display_name": "Vastrapur, Ahmedabad, Gujarat", "lat": 23.0365, "lng": 72.5290},
+    {"name": "Iskcon Cross Road", "display_name": "Iskcon Circle, SG Highway, Ahmedabad", "lat": 23.0275, "lng": 72.5080},
+    {"name": "Vastrapur Lake", "display_name": "Vastrapur, Ahmedabad, Gujarat", "lat": 23.0365, "lng": 72.5290},
 ]
 
 @app.get("/api/safety/geocode")

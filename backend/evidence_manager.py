@@ -16,7 +16,12 @@ class EvidenceManager:
         self.active_incidents: Dict[str, Dict[str, Any]] = {}
 
     def get_incident_dir(self, incident_id: str) -> Path:
-        inc_dir = self.storage_dir / incident_id
+        safe_id = "".join(c for c in incident_id if c.isalnum() or c in ("_", "-"))
+        if not safe_id:
+            safe_id = "UNKNOWN"
+        inc_dir = (self.storage_dir / safe_id).resolve()
+        if not inc_dir.is_relative_to(self.storage_dir.resolve()):
+            raise ValueError("Invalid path traversal attempted")
         inc_dir.mkdir(parents=True, exist_ok=True)
         (inc_dir / "photos").mkdir(exist_ok=True)
         (inc_dir / "audio").mkdir(exist_ok=True)
@@ -284,9 +289,16 @@ class EvidenceManager:
 
     def delete_incident(self, incident_id: str) -> bool:
         import shutil
+        safe_id = "".join(c for c in incident_id if c.isalnum() or c in ("_", "-"))
+        if not safe_id:
+            return False
         if incident_id in self.active_incidents:
             del self.active_incidents[incident_id]
-        inc_dir = self.storage_dir / incident_id
+        if safe_id in self.active_incidents:
+            del self.active_incidents[safe_id]
+        inc_dir = (self.storage_dir / safe_id).resolve()
+        if not inc_dir.is_relative_to(self.storage_dir.resolve()):
+            return False
         if inc_dir.exists():
             shutil.rmtree(inc_dir, ignore_errors=True)
             return True

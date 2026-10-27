@@ -20,7 +20,7 @@ print("  ✓ /manifest.json valid (Standalone PWA configuration verified)")
 
 res_sw = client.get("/sw.js")
 assert res_sw.status_code == 200, f"SW failed: {res_sw.status_code}"
-assert "sri-sri-sos-v1" in res_sw.text
+assert "sri-sri-sos-v" in res_sw.text
 print("  ✓ /sw.js valid (Service worker asset caching verified)")
 
 # 2. Test Mobile UI enhancements

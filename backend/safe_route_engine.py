@@ -20,7 +20,7 @@ from typing import Dict, List, Any, Optional
 DEFAULT_CITY_SAFE_HAVENS = [
     {
         "id": "sh_1",
-        "name": "Navrangpura Police Station (નવરંગપુરા પોલીસ સ્ટેશન)",
+        "name": "Navrangpura Police Station",
         "type": "POLICE_STATION",
         "lat": 23.0360,
         "lng": 72.5610,
@@ -30,7 +30,7 @@ DEFAULT_CITY_SAFE_HAVENS = [
     },
     {
         "id": "sh_2",
-        "name": "Women Helpdesk & Pink Booth (મહિલા પિંક બૂથ)",
+        "name": "Women Helpdesk & Pink Booth",
         "type": "PINK_BOOTH",
         "lat": 23.0280,
         "lng": 72.5680,
@@ -40,7 +40,7 @@ DEFAULT_CITY_SAFE_HAVENS = [
     },
     {
         "id": "sh_3",
-        "name": "24x7 Apollo Pharmacy & Emergency Clinic (એપોલો ફાર્મસી)",
+        "name": "24x7 Apollo Pharmacy & Emergency Clinic",
         "type": "PHARMACY_HOSPITAL",
         "lat": 23.0250,
         "lng": 72.5650,
@@ -50,7 +50,7 @@ DEFAULT_CITY_SAFE_HAVENS = [
     },
     {
         "id": "sh_4",
-        "name": "IndianOil 24x7 Fuel Station & Smart CCTV Point (પેટ્રોલ પંપ)",
+        "name": "IndianOil 24x7 Fuel Station & Smart CCTV Point",
         "type": "FUEL_STATION",
         "lat": 23.0315,
         "lng": 72.5740,
@@ -60,7 +60,7 @@ DEFAULT_CITY_SAFE_HAVENS = [
     },
     {
         "id": "sh_5",
-        "name": "Metro Transit Station (મેટ્રો ટ્રાન્ઝિટ સ્ટેશન)",
+        "name": "Metro Transit Station",
         "type": "METRO_TRANSIT",
         "lat": 23.0385,
         "lng": 72.5780,
@@ -74,23 +74,23 @@ DEFAULT_CITY_SAFE_HAVENS = [
 DEFAULT_CITY_DARK_SPOTS = [
     {
         "id": "ds_1",
-        "name": "Deserted Warehouse Back-Alley (અવાવરૂ ગોડાઉન પાછળની ગલી)",
+        "name": "Deserted Warehouse Back-Alley",
         "lat": 23.0265,
         "lng": 72.5710,
         "lux_level": 8,
         "cctv_present": False,
         "danger_reason": "Broken street lamps, dead-end blind alley, no natural surveillance",
-        "danger_reason_gu": "સ્ટ્રીટ લાઇટ બંધ છે, અવાવરૂ બંધ ગલી, કોઈ સીસીટીવી નથી"
+        "danger_reason_gu": "Broken street lamps, dead-end blind alley, no natural surveillance"
     },
     {
         "id": "ds_2",
-        "name": "Isolated Railway Underpass (નિર્જન રેલવે અંડરપાસ)",
+        "name": "Isolated Railway Underpass",
         "lat": 23.0320,
         "lng": 72.5665,
         "lux_level": 14,
         "cctv_present": False,
         "danger_reason": "Low visibility tunnel, zero footfall after 8 PM",
-        "danger_reason_gu": "ઓછી લાઈટ વાળો ટનલ અંડરપાસ, રાત્રે ૮ વાગ્યા પછી સદંતર નિર્જન"
+        "danger_reason_gu": "Low visibility tunnel, zero footfall after 8 PM"
     }
 ]
 

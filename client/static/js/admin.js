@@ -1,4 +1,25 @@
 // Sri Sri ❤️SOS AI - Admin Master Portal Client Script
+// 100% English Code, Robust XSS Defense, and Universal Multi-Language Support
+
+// HTML Sanitization Helper to Prevent Stored/Reflected XSS
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// Multi-Language Helper with Safe English Fallbacks
+function tr(key, fallback) {
+    if (typeof t === 'function') {
+        const val = t(key);
+        if (val && val !== key) return val;
+    }
+    return fallback;
+}
 
 // DOM Elements
 const tabBtns = document.querySelectorAll('.tab-btn');
@@ -50,6 +71,7 @@ tabBtns.forEach(btn => {
 
 // Toast notification helper
 function showToast(msg, isError = false) {
+    if (!toastMsg || !toastBox) return;
     toastMsg.innerText = msg;
     toastBox.style.background = isError ? "#ef4444" : "#22c55e";
     toastBox.classList.remove('hidden');
@@ -76,92 +98,108 @@ async function loadStats() {
         const res = await fetch('/api/admin/stats');
         if (res.ok) {
             const data = await res.json();
-            statTotalIncidents.innerText = data.total_incidents || 0;
-            statActiveIncidents.innerText = data.active_incidents || 0;
-            statTotalPhotos.innerText = data.total_photos || 0;
-            statStorageMb.innerText = `${data.total_storage_mb || 0} MB`;
-            statWsConns.innerText = data.active_ws_connections || 0;
+            if (statTotalIncidents) statTotalIncidents.innerText = data.total_incidents || 0;
+            if (statActiveIncidents) statActiveIncidents.innerText = data.active_incidents || 0;
+            if (statTotalPhotos) statTotalPhotos.innerText = data.total_photos || 0;
+            if (statStorageMb) statStorageMb.innerText = `${data.total_storage_mb || 0} MB`;
+            if (statWsConns) statWsConns.innerText = data.active_ws_connections || 0;
         }
     } catch (e) {
-        console.error("Failed to load admin stats:", e);
+        console.error("Failed to load admin platform stats:", e);
     }
 }
 
-// Fetch Incidents Ledger
+// Fetch Incidents Ledger with XSS protection and multi-language support
 async function loadIncidents() {
+    if (!incidentsTableBody) return;
     try {
-        incidentsTableBody.innerHTML = `<tr><td colspan="8" class="text-center">ઇન્સિડન્ટ્સ લોડ થઈ રહ્યા છે...</td></tr>`;
+        const loadingText = tr("loadingIncidents", "Loading incidents register...");
+        incidentsTableBody.innerHTML = `<tr><td colspan="8" class="text-center">${escapeHtml(loadingText)}</td></tr>`;
         const res = await fetch('/api/incidents');
-        if (!res.ok) throw new Error("Failed to load incidents");
+        if (!res.ok) throw new Error("Failed to load incidents from server");
         const incidents = await res.json();
 
-        if (incidents.length === 0) {
-            incidentsTableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: var(--text-muted); padding: 24px;">કોઈ ઇન્સિડન્ટ્સ મળ્યા નથી.</td></tr>`;
+        if (!Array.isArray(incidents) || incidents.length === 0) {
+            const noIncidentsText = tr("noIncidentsFound", "No emergency incidents recorded in blackbox register.");
+            incidentsTableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: var(--text-muted); padding: 24px;">${escapeHtml(noIncidentsText)}</td></tr>`;
             return;
         }
 
-        // Sort descending
+        // Sort descending by start time
         incidents.sort((a, b) => new Date(b.start_time || 0) - new Date(a.start_time || 0));
+
+        const activeLang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'en';
+        const localeCode = activeLang === 'gu' ? 'gu-IN' : activeLang === 'hi' ? 'hi-IN' : 'en-US';
 
         let rowsHtml = '';
         incidents.forEach(inc => {
             const isActive = inc.status === "ACTIVE";
             const statusBadge = isActive 
                 ? `<span class="badge-active">ACTIVE 🚨</span>` 
-                : `<span class="badge-closed">${inc.status}</span>`;
+                : `<span class="badge-closed">${escapeHtml(inc.status)}</span>`;
             
             const timeFormatted = inc.start_time 
-                ? new Date(inc.start_time).toLocaleString('gu-IN') 
+                ? new Date(inc.start_time).toLocaleString(localeCode) 
                 : '--';
+
+            const safeId = escapeHtml(inc.incident_id);
+            const safeName = escapeHtml(inc.user_name || 'Anonymous');
+            const safePhone = escapeHtml(inc.phone_number || '--');
+            const photoCount = parseInt(inc.photo_count || 0, 10);
+            const audioCount = parseInt(inc.audio_count || 0, 10);
+            const viewControlText = tr("btnViewControl", "Cockpit");
 
             rowsHtml += `
                 <tr>
-                    <td><strong>${inc.incident_id}</strong></td>
-                    <td>${inc.user_name || 'Anonymous'}</td>
-                    <td>${inc.phone_number || '--'}</td>
-                    <td>${timeFormatted}</td>
+                    <td><strong>${safeId}</strong></td>
+                    <td>${safeName}</td>
+                    <td>${safePhone}</td>
+                    <td>${escapeHtml(timeFormatted)}</td>
                     <td>${statusBadge}</td>
-                    <td>📸 ${inc.photo_count || 0} | 🎙️ ${inc.audio_count || 0}</td>
+                    <td>📸 ${photoCount} | 🎙️ ${audioCount}</td>
                     <td><span class="badge-crypto-ok">🛡️ SHA-256 OK</span></td>
                     <td class="table-actions">
-                        <a href="/api/incident/${inc.incident_id}/pdf" target="_blank" class="btn-tbl btn-tbl-pdf">📄 PDF</a>
-                        <a href="/dashboard" class="btn-tbl btn-tbl-view">🖥️ કંટ્રોલ</a>
-                        <button class="btn-tbl btn-tbl-del" onclick="deleteIncident('${inc.incident_id}')">🗑️</button>
+                        <a href="/api/incident/${safeId}/pdf" target="_blank" class="btn-tbl btn-tbl-pdf">📄 PDF</a>
+                        <a href="/dashboard" class="btn-tbl btn-tbl-view">🖥️ ${escapeHtml(viewControlText)}</a>
+                        <button class="btn-tbl btn-tbl-del" onclick="deleteIncident('${safeId}')" title="Delete Incident">🗑️</button>
                     </td>
                 </tr>
             `;
         });
         incidentsTableBody.innerHTML = rowsHtml;
     } catch (e) {
-        incidentsTableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color:#f87171;">ડેટા લોડ કરવામાં ક્ષતિ: ${e.message}</td></tr>`;
+        console.error("Error loading incidents:", e);
+        const errText = tr("errorLoadingIncidents", "Error loading incident records: ");
+        incidentsTableBody.innerHTML = `<tr><td colspan="8" class="text-center" style="color:#f87171;">${escapeHtml(errText + e.message)}</td></tr>`;
     }
 }
 
-// Delete Incident
+// Delete Incident with Confirmation and Safety
 async function deleteIncident(incidentId) {
-    if (!confirm(`શું તમે ખરેખર ઇન્સિડન્ટ ${incidentId} ડિલીટ કરવા માંગો છો?`)) return;
+    const confirmPrompt = tr("confirmDeleteIncident", "Are you sure you want to permanently delete incident ") + incidentId + "?";
+    if (!confirm(confirmPrompt)) return;
     try {
-        const res = await fetch(`/api/incident/${incidentId}`, { method: 'DELETE' });
+        const res = await fetch(`/api/incident/${encodeURIComponent(incidentId)}`, { method: 'DELETE' });
         if (res.ok) {
-            showToast("ઇન્સિડન્ટ સફળતાપૂર્વક ડિલીટ થયો!");
+            showToast(tr("toastIncidentDeleted", "Incident successfully removed from registry!"));
             loadStats();
             loadIncidents();
         } else {
-            showToast("ડિલીટ કરવામાં નિષ્ફળ!", true);
+            showToast(tr("toastDeleteFailed", "Failed to delete incident from server."), true);
         }
     } catch (e) {
         showToast(e.message, true);
     }
 }
 
-// Fetch Admin Config
+// Fetch Admin System Configuration
 async function loadConfig() {
     try {
         const res = await fetch('/api/admin/config');
         if (res.ok) {
             currentAdminConfig = await res.json();
             
-            // Populate Dispatch
+            // Populate Dispatch Numbers
             if (currentAdminConfig.emergency_numbers) {
                 const em = currentAdminConfig.emergency_numbers;
                 if (cfgPoliceNum) cfgPoliceNum.value = em.police || "112";
@@ -171,7 +209,7 @@ async function loadConfig() {
                 if (cfgAmbulanceNum) cfgAmbulanceNum.value = em.ambulance || "108";
             }
 
-            // Populate AI Sensitivity
+            // Populate AI Sensitivity Thresholds
             if (currentAdminConfig.ai_sensitivity) {
                 const ai = currentAdminConfig.ai_sensitivity;
                 if (cfgScreamDb) {
@@ -186,7 +224,7 @@ async function loadConfig() {
                 if (cfgImpactAccel) cfgImpactAccel.value = ai.snatch_impact_accel || 28.0;
             }
 
-            // Populate Security
+            // Populate Security Configuration
             if (currentAdminConfig.security) {
                 const sec = currentAdminConfig.security;
                 if (cfgNormalPin) cfgNormalPin.value = sec.normal_cancel_pin || "1234";
@@ -195,7 +233,7 @@ async function loadConfig() {
             }
         }
     } catch (e) {
-        console.error("Failed to load admin config:", e);
+        console.error("Failed to load admin configuration:", e);
     }
 }
 
@@ -243,16 +281,16 @@ async function saveConfigToServer() {
             body: JSON.stringify(currentAdminConfig)
         });
         if (res.ok) {
-            showToast("કન્ફિગરેશન સફળતાપૂર્વક સેવ થઈ ગયું! 💾");
+            showToast(tr("toastConfigSaved", "Configuration saved successfully! 💾"));
         } else {
-            showToast("સેવ કરવામાં ક્ષતિ આવી!", true);
+            showToast(tr("toastConfigError", "Error saving configuration to server!"), true);
         }
     } catch (e) {
         showToast(e.message, true);
     }
 }
 
-// Refresh Incidents
+// Refresh Incidents Button Listener
 if (refreshIncidentsBtn) {
     refreshIncidentsBtn.addEventListener('click', () => {
         loadStats();
@@ -290,15 +328,15 @@ if (simStartSosBtn) {
                 activeSimIncidentId = data.incident_id;
                 simSeq = 0;
                 if (simActiveBadge) {
-                    simActiveBadge.innerText = `સક્રિય કેસ: ${activeSimIncidentId} 🚨`;
+                    simActiveBadge.innerText = `${tr("simActivePrefix", "Active Case: ")} ${activeSimIncidentId} 🚨`;
                     simActiveBadge.style.background = "rgba(239, 68, 68, 0.2)";
                 }
-                showToast(`✅ ટેસ્ટ SOS શરૂ થયું (${activeSimIncidentId})! કંટ્રોલ રૂમમાં સાયરન વાગ્યું.`);
+                showToast(`✅ ${tr("simAlertStarted", "Simulated SOS incident initialized!")} (${activeSimIncidentId})`);
                 loadStats();
                 loadIncidents();
             }
         } catch (e) {
-            showToast("સિમ્યુલેશન શરૂ કરવામાં ભૂલ!", true);
+            showToast(tr("simErrorStart", "Error initiating simulation!"), true);
         }
     });
 }
@@ -306,7 +344,7 @@ if (simStartSosBtn) {
 if (simUploadFrameBtn) {
     simUploadFrameBtn.addEventListener('click', async () => {
         if (!activeSimIncidentId) {
-            alert("પહેલાં '૧. લાઈવ ટેસ્ટ SOS શરૂ કરો' દબાવો.");
+            alert(tr("simNeedStartAlert", "Please click '1. Start Live Test SOS' first."));
             return;
         }
         simSeq++;
@@ -332,17 +370,17 @@ if (simUploadFrameBtn) {
                 formData.append('lng', 72.5714);
                 formData.append('accuracy', 6.0);
                 formData.append('speed', 1.8);
-                const res = await fetch(`/api/incident/${activeSimIncidentId}/upload_photo`, {
+                const res = await fetch(`/api/incident/${encodeURIComponent(activeSimIncidentId)}/upload_photo`, {
                     method: 'POST',
                     body: formData
                 });
                 if (res.ok) {
-                    showToast(`📸 ફ્રેમ #${simSeq} અપલોડ થઈ! AI વિઝન એનાલિસિસ પૂર્ણ.`);
+                    showToast(`📸 ${tr("simUploadSuccess", "Frame uploaded! Computer Vision analysis complete.")} (#${simSeq})`);
                     loadStats();
                 }
             }, 'image/jpeg');
         } catch (e) {
-            showToast("ફ્રેમ અપલોડ નિષ્ફળ!", true);
+            showToast(tr("simFrameUploadFailed", "Frame upload simulation failed!"), true);
         }
     });
 }
@@ -350,18 +388,18 @@ if (simUploadFrameBtn) {
 if (simDeadManBtn) {
     simDeadManBtn.addEventListener('click', async () => {
         if (!activeSimIncidentId) {
-            alert("પહેલાં '૧. લાઈવ ટેસ્ટ SOS શરૂ કરો' દબાવો.");
+            alert(tr("simNeedStartAlert", "Please click '1. Start Live Test SOS' first."));
             return;
         }
         try {
-            const res = await fetch(`/api/incident/${activeSimIncidentId}/dead_man_trigger?reason=Admin_Simulation_Smashed_Device`, {
+            const res = await fetch(`/api/incident/${encodeURIComponent(activeSimIncidentId)}/dead_man_trigger?reason=Admin_Simulation_Smashed_Device`, {
                 method: 'POST'
             });
             if (res.ok) {
-                showToast("💥 ફોન સ્મેશ્ડ/ડેડ-મેન એલર્ટ કંટ્રોલ રૂમમાં મોકલાઈ ગયું!");
+                showToast(`💥 ${tr("simDeadManSuccess", "Dead-Man device smashed alert broadcasted to control room!")}`);
             }
         } catch (e) {
-            showToast("ડેડ-મેન સિમ્યુલેશન નિષ્ફળ!", true);
+            showToast(tr("simDeadManFailed", "Dead-Man simulation failed!"), true);
         }
     });
 }
@@ -369,21 +407,21 @@ if (simDeadManBtn) {
 if (simDuressBtn) {
     simDuressBtn.addEventListener('click', async () => {
         if (!activeSimIncidentId) {
-            alert("પહેલાં '૧. લાઈવ ટેસ્ટ SOS શરૂ કરો' દબાવો.");
+            alert(tr("simNeedStartAlert", "Please click '1. Start Live Test SOS' first."));
             return;
         }
         try {
             const formData = new FormData();
             formData.append('pin', '9999');
-            const res = await fetch(`/api/incident/${activeSimIncidentId}/duress`, {
+            const res = await fetch(`/api/incident/${encodeURIComponent(activeSimIncidentId)}/duress`, {
                 method: 'POST',
                 body: formData
             });
             if (res.ok) {
-                showToast("🥷 ૯૯૯૯ બંધક એલર્ટ (Duress Hostage Alert) કંટ્રોલ રૂમમાં વાગ્યું!");
+                showToast(`🥷 ${tr("simDuressSuccess", "Code 9999 Duress hostage alert triggered covertly!")}`);
             }
         } catch (e) {
-            showToast("ડ્યુરેસ સિમ્યુલેશન નિષ્ફળ!", true);
+            showToast(tr("simDuressFailed", "Duress simulation failed!"), true);
         }
     });
 }
@@ -391,7 +429,7 @@ if (simDuressBtn) {
 if (simBatteryBtn) {
     simBatteryBtn.addEventListener('click', async () => {
         if (!activeSimIncidentId) {
-            alert("પહેલાં '૧. લાઈવ ટેસ્ટ SOS શરૂ કરો' દબાવો.");
+            alert(tr("simNeedStartAlert", "Please click '1. Start Live Test SOS' first."));
             return;
         }
         try {
@@ -399,20 +437,25 @@ if (simBatteryBtn) {
             formData.append('battery_level', 8.0);
             formData.append('lat', 23.0225);
             formData.append('lng', 72.5714);
-            const res = await fetch(`/api/incident/${activeSimIncidentId}/battery_alert`, {
+            const res = await fetch(`/api/incident/${encodeURIComponent(activeSimIncidentId)}/battery_alert`, {
                 method: 'POST',
                 body: formData
             });
             if (res.ok) {
-                showToast("🔋 ૮% ક્રિટિકલ બેટરી એલર્ટ કંટ્રોલ રૂમમાં લૉક થયું!");
+                showToast(`🔋 ${tr("simBatterySuccess", "Critical 8% battery distress alert sent to control room!")}`);
             }
         } catch (e) {
-            showToast("બેટરી એલર્ટ નિષ્ફળ!", true);
+            showToast(tr("simBatteryFailed", "Battery alert simulation failed!"), true);
         }
     });
 }
 
-// Init
+// React instantly when user changes language
+window.addEventListener('languageChanged', () => {
+    loadIncidents();
+});
+
+// Initialization
 window.addEventListener('DOMContentLoaded', () => {
     loadStats();
     loadIncidents();

@@ -152,7 +152,7 @@ if (toggleEditBtn) {
         if (editForm.classList.contains('hidden')) {
             editForm.classList.remove('hidden');
             userDisplay.classList.add('hidden');
-            toggleEditBtn.innerText = (typeof currentLang !== 'undefined' && currentLang === 'en') ? 'Cancel' : (typeof currentLang !== 'undefined' && currentLang === 'hi') ? 'रद्द करें' : 'રદ કરો';
+            toggleEditBtn.innerText = tr('btnCancel', 'Cancel');
         } else {
             editForm.classList.add('hidden');
             userDisplay.classList.remove('hidden');
@@ -179,7 +179,7 @@ function startGpsTracking() {
                 altitude: pos.coords.altitude
             };
             coordsText.innerText = `${currentGps.lat.toFixed(5)}, ${currentGps.lng.toFixed(5)}`;
-            accuracyBadge.innerText = `±${Math.round(currentGps.accuracy)}m ચોકસાઈ`;
+            accuracyBadge.innerText = `±${Math.round(currentGps.accuracy)}m ${tr("gpsAccuracy", "Accuracy")}`;
             sendTelemetryUpdate();
         },
         (err) => {
@@ -204,7 +204,7 @@ function fallbackGpsSimulation() {
             speed: 1.2
         };
         coordsText.innerText = `${currentGps.lat.toFixed(5)}, ${currentGps.lng.toFixed(5)}`;
-        accuracyBadge.innerText = "±8m ચોકસાઈ (GPS)";
+        accuracyBadge.innerText = `±8m ${tr("gpsAccuracy", "Accuracy")} (GPS)`;
         sendTelemetryUpdate();
     }, 3000);
 }
@@ -448,7 +448,7 @@ async function triggerEmergency() {
 
     // Visual feedback
     sosBtn.style.transform = "scale(0.9)";
-    cloudStatusText.innerText = "🚨 ઇમરજન્સી લાઈવ";
+    cloudStatusText.innerText = `🚨 ${tr("cloudLive", "Emergency Live")}`;
     cloudStatus.style.background = "rgba(239, 68, 68, 0.2)";
     cloudStatus.style.borderColor = "#EF4444";
     cloudStatus.style.color = "#FCA5A5";
@@ -811,7 +811,7 @@ async function submitPin() {
 
         // Fake Dismiss: Show reassuring message to fool attacker looking at screen
         if (transmissionCard) transmissionCard.classList.add('hidden');
-        cloudStatusText.innerText = "SOS રદ થયું";
+        cloudStatusText.innerText = tr("sosTerminated", "SOS Ended");
         cloudStatus.style.background = "rgba(34, 197, 94, 0.15)";
         cloudStatus.style.color = "var(--accent-green)";
         alert("✅ SOS બંધ કરવામાં આવ્યો છે. તમે સુરક્ષિત છો.");
@@ -835,7 +835,7 @@ async function submitPin() {
         closePinModal();
         stopEmergency();
     } else {
-        alert("ખોટો PIN! સાચો PIN દાખલ કરો.");
+        alert(tr("invalidPinAlert", "Incorrect PIN! Please enter the correct PIN."));
         if (sosPinInput) sosPinInput.value = "";
     }
 }
@@ -1240,7 +1240,7 @@ if (fakeCallNowBtn) {
 
 if (fakeCall5sBtn) {
     fakeCall5sBtn.addEventListener('click', () => {
-        fakeCall5sBtn.innerText = "⏳ ૫ સેકન્ડમાં કોલ આવશે...";
+        fakeCall5sBtn.innerText = `⏳ ${tr("call5sCountdown", "Calling in 5s...")}`;
         fakeCall5sBtn.disabled = true;
         setTimeout(() => {
             triggerFakeCall();
