@@ -1245,5 +1245,42 @@ html[dir="rtl"] .mono-hash {
     display: inline-block;
 }
 
+/* ========================================================
+   📱 FULL DYNAMIC VIEWPORT & ULTRA-COMPACT RESILIENCE
+   Ensures zero design distortion on all devices & foldables
+   ======================================================== */
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+.fir-modal-overlay {
+    height: 100vh;
+    height: 100dvh;
+}
+
+@media (max-width: 340px) {
+    .tactical-navbar {
+        padding: 8px 10px;
+    }
+    .nav-logo-img {
+        width: 30px;
+        height: 30px;
+    }
+    .nav-title {
+        font-size: 13px;
+    }
+    .dash-switch-btn {
+        font-size: 9px;
+        padding: 4px 2px;
+    }
+    .incident-strip {
+        padding: 8px 10px;
+    }
+    .strip-item {
+        font-size: 11px;
+    }
+}
+
+
 
 

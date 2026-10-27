@@ -1054,4 +1054,41 @@ html[dir="rtl"] .table-actions {
     justify-content: flex-end;
 }
 
+/* ========================================================
+   📱 FULL DYNAMIC VIEWPORT & ULTRA-COMPACT RESILIENCE
+   Ensures zero design distortion on all devices & foldables
+   ======================================================== */
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+@media (max-width: 340px) {
+    .universal-top-nav {
+        padding: 6px 8px;
+    }
+    .top-nav-title {
+        font-size: 13px;
+    }
+    .admin-logo {
+        width: 32px;
+        height: 32px;
+    }
+    .app-switch-link {
+        font-size: 9.5px;
+        padding: 4px 2px;
+    }
+    .status-summary-bar {
+        grid-template-columns: 1fr;
+    }
+    .stat-card {
+        padding: 8px 10px;
+    }
+    .tab-btn {
+        padding: 6px 8px;
+        font-size: 11px;
+    }
+}
+
+
 

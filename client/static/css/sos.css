@@ -2905,5 +2905,60 @@ html[dir="rtl"] .pin-input-group input {
     direction: ltr;
 }
 
+/* ========================================================
+   📱 FULL DYNAMIC VIEWPORT & ULTRA-COMPACT RESILIENCE
+   Ensures zero design distortion on all devices & foldables
+   ======================================================== */
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+.mobile-container {
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+.modal-overlay, .places-modal-overlay, .calc-overlay {
+    height: 100vh;
+    height: 100dvh;
+}
+
+@media (max-width: 340px) {
+    .mobile-container {
+        padding: 8px 6px;
+    }
+    .app-header {
+        padding: 6px 8px;
+    }
+    .brand-logo-img {
+        width: 30px;
+        height: 30px;
+    }
+    .brand-sri {
+        font-size: 0.82em;
+    }
+    .brand-sos-text {
+        font-size: 0.75em;
+    }
+    .sos-btn {
+        width: 150px;
+        height: 150px;
+    }
+    .sos-text {
+        font-size: 32px;
+    }
+    .chip-badge {
+        font-size: 9px;
+        padding: 4px 2px;
+    }
+    .route-meta-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+    .safety-metrics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
 
 
