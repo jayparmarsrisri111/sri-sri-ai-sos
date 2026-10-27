@@ -1249,13 +1249,59 @@ html[dir="rtl"] .mono-hash {
    📱 FULL DYNAMIC VIEWPORT & ULTRA-COMPACT RESILIENCE
    Ensures zero design distortion on all devices & foldables
    ======================================================== */
-body {
+html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     min-height: 100vh;
     min-height: 100dvh;
+    box-sizing: border-box;
 }
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+.tactical-navbar, .incident-strip, .tactical-grid {
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
 .fir-modal-overlay {
     height: 100vh;
     height: 100dvh;
+}
+
+.incident-selector-wrapper {
+    flex-wrap: wrap;
+    max-width: 100%;
+}
+
+@media (max-width: 480px) {
+    .incident-selector-wrapper select {
+        max-width: 140px;
+    }
+    .dash-app-switcher {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 4px;
+    }
+    .dash-switch-btn {
+        width: 100%;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: center;
+        padding: 6px 2px;
+        font-size: 10.5px;
+    }
 }
 
 @media (max-width: 340px) {

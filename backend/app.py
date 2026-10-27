@@ -51,6 +51,8 @@ async def add_security_headers(request, call_next):
         "default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob: ws: wss:; "
         "frame-ancestors 'self';"
     )
+    if request.url.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-cache, must-revalidate"
     return response
 
 evidence_mgr = EvidenceManager(STORAGE_DIR)

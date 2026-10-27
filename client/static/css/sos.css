@@ -62,7 +62,7 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-shrink: 0;
+    flex-shrink: 1;
     min-width: 0;
 }
 
@@ -331,6 +331,8 @@ body {
     align-items: center;
     justify-content: center;
     padding: 30px 0;
+    position: relative;
+    overflow: hidden;
 }
 
 .sos-btn {
@@ -2909,19 +2911,177 @@ html[dir="rtl"] .pin-input-group input {
    📱 FULL DYNAMIC VIEWPORT & ULTRA-COMPACT RESILIENCE
    Ensures zero design distortion on all devices & foldables
    ======================================================== */
-body {
+html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     min-height: 100vh;
     min-height: 100dvh;
+    box-sizing: border-box;
 }
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 .mobile-container {
+    width: 100%;
+    max-width: 520px;
     min-height: 100vh;
     min-height: 100dvh;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
+
 .modal-overlay, .places-modal-overlay, .calc-overlay {
     height: 100vh;
     height: 100dvh;
 }
 
+/* Sentinel chips bar equal 3-column grid */
+.sentinel-chips-bar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+}
+
+.chip-badge {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 6px 4px;
+    font-size: 10.5px;
+}
+
+.chip-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* App switcher equal 3-column grid */
+.mobile-app-switcher {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+}
+
+.m-switch-btn {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 8px 4px;
+    font-size: 11px;
+}
+
+/* Fluid responsive action rows */
+.actions-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+
+.actions-row button {
+    flex: 1 1 calc(33.333% - 8px);
+    min-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.timer-btns-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+
+.timer-select-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+}
+
+/* Mobile App Header (width <= 480px) */
+@media (max-width: 480px) {
+    .app-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px;
+        gap: 6px;
+        width: 100%;
+    }
+    .brand {
+        min-width: 0;
+        flex: 1 1 auto;
+        gap: 6px;
+    }
+    .brand-logo-img {
+        width: 34px;
+        height: 34px;
+    }
+    .brand-name {
+        font-size: 14px;
+        line-height: 1.2;
+    }
+    .brand-sri {
+        font-size: 0.9em;
+        letter-spacing: 0.5px;
+    }
+    .brand-tagline {
+        font-size: 8px;
+    }
+    .header-controls {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+    .lang-selector-box {
+        height: 28px;
+        padding: 0 4px;
+        max-width: 90px;
+    }
+    .lang-select-box {
+        font-size: 10.5px;
+        max-width: 70px;
+    }
+    .cloud-badge {
+        height: 28px;
+        padding: 0 6px;
+        font-size: 10px;
+        max-width: 105px;
+    }
+    .cloud-badge span:not(.badge-dot) {
+        max-width: 75px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
+        vertical-align: middle;
+    }
+    .modal-card, .places-modal-card, .calc-modal-card, .perm-modal-card {
+        max-width: calc(100vw - 20px) !important;
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+}
+
+/* Ultra-Compact Screens (width <= 340px) */
 @media (max-width: 340px) {
     .mobile-container {
         padding: 8px 6px;
@@ -2930,21 +3090,21 @@ body {
         padding: 6px 8px;
     }
     .brand-logo-img {
-        width: 30px;
-        height: 30px;
+        width: 28px;
+        height: 28px;
     }
     .brand-sri {
-        font-size: 0.82em;
+        font-size: 0.8em;
     }
     .brand-sos-text {
-        font-size: 0.75em;
+        font-size: 0.72em;
     }
     .sos-btn {
-        width: 150px;
-        height: 150px;
+        width: 145px;
+        height: 145px;
     }
     .sos-text {
-        font-size: 32px;
+        font-size: 30px;
     }
     .chip-badge {
         font-size: 9px;
@@ -2957,7 +3117,11 @@ body {
     .safety-metrics-grid {
         grid-template-columns: 1fr;
     }
+    .actions-row button {
+        flex: 1 1 100%;
+    }
 }
+
 
 
 
