@@ -1,0 +1,29 @@
+name: 24/7 Keep-Alive Monitor
+
+on:
+  schedule:
+    # Runs every 12 minutes to prevent Render 15-minute inactivity spin-down
+    - cron: '*/12 * * * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    name: Ping Render 24/7 Live Service
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Ping Sri Sri SOS AI
+        run: |
+          echo "Pinging https://sri-sri-sos-ai.onrender.com/api/health to keep service 24/7 alive..."
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" --max-time 60 https://sri-sri-sos-ai.onrender.com/api/health || true)
+          echo "Response: $RESPONSE"
+          
+          STATUS=$(echo "$RESPONSE" | tr -d '\r' | grep "HTTP_STATUS" | cut -d: -f2)
+          if [ "$STATUS" = "200" ]; then
+            echo "SUCCESS: Sri Sri SOS AI server is ACTIVE and HEALTHY (Zero Cold-Start Guaranteed)."
+          else
+            echo "Waking up server via root ping..."
+            curl -s -m 60 https://sri-sri-sos-ai.onrender.com/ > /dev/null || true
+            echo "Wakeup probe sent successfully."
+          fi

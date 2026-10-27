@@ -7,7 +7,7 @@ import struct
 import math
 from pathlib import Path
 from typing import Dict, List, Optional, Any
-from datetime import datetime
+from datetime import datetime, timezone
 from PIL import Image, ImageDraw
 
 from fastapi import FastAPI, UploadFile, File, Form, WebSocket, WebSocketDisconnect, HTTPException, Response
@@ -157,6 +157,19 @@ async def serve_sitemap():
     if sm.exists():
         return FileResponse(sm, media_type="application/xml; charset=utf-8")
     raise HTTPException(status_code=404, detail="sitemap.xml not found")
+
+@app.get("/api/health")
+async def health_check():
+    """
+    Lightweight health-check endpoint for 24/7 keep-alive pings,
+    cloud monitors (UptimeRobot, BetterStack), and container probes.
+    """
+    return {
+        "status": "healthy",
+        "service": "sri-sri-sos-ai",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "keep_alive": "24/7 active"
+    }
 
 @app.get("/api/seo/status")
 async def get_seo_status():
