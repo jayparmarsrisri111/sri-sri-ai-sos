@@ -2,6 +2,7 @@ import os
 import json
 import asyncio
 import io
+import time
 import wave
 import struct
 import math
@@ -38,9 +39,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Security Headers Middleware
+# Simple In-Memory Sliding-Window Rate Limiter for Abuse & DoS Protection
+_rate_limit_records: Dict[str, List[float]] = {}
+
+def check_rate_limit(client_ip: str, max_requests: int = 240, window_seconds: float = 60.0) -> bool:
+    now = time.time()
+    records = _rate_limit_records.get(client_ip, [])
+    # Prune timestamps older than window
+    valid_records = [t for t in records if now - t < window_seconds]
+    if len(valid_records) >= max_requests:
+        _rate_limit_records[client_ip] = valid_records
+        return False
+    valid_records.append(now)
+    _rate_limit_records[client_ip] = valid_records
+    return True
+
+# Security Headers & Abuse Prevention Middleware
 @app.middleware("http")
-async def add_security_headers(request, call_next):
+async def add_security_headers(request: Request, call_next):
+    # Enforce DoS Protection on API endpoints (exempt localhost / test environments if needed)
+    if request.url.path.startswith("/api/"):
+        client_ip = request.headers.get("x-forwarded-for", "").split(",")[0].strip() or (request.client.host if request.client else "unknown")
+        if client_ip != "127.0.0.1" and client_ip != "testclient":
+            if not check_rate_limit(client_ip, max_requests=240, window_seconds=60.0):
+                return JSONResponse(status_code=429, content={"error": "Rate limit exceeded. Too many requests. Please slow down."})
+
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "SAMEORIGIN"
@@ -97,7 +120,8 @@ if STATIC_DIR.exists():
 @app.on_event("startup")
 async def app_startup_event():
     # Start background launch sentinel for automatic 11-10-2026 SEO launch
-    asyncio.create_task(seo_manager.run_launch_sentinel())
+    if not os.environ.get("TESTING"):
+        asyncio.create_task(seo_manager.run_launch_sentinel())
 
 class StartIncidentRequest(BaseModel):
     user_name: Optional[str] = "Anonymous"
@@ -145,7 +169,7 @@ async def serve_manifest():
 async def serve_service_worker():
     sw = CLIENT_DIR / "sw.js"
     if sw.exists():
-        return FileResponse(sw, media_type="application/javascript")
+        return FileResponse(sw, media_type="application/javascript", headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
     raise HTTPException(status_code=404, detail="Service Worker not found")
 
 @app.get("/robots.txt")

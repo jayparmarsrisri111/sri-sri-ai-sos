@@ -131,6 +131,15 @@ async function loadIncidents() {
         const activeLang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'en';
         const localeCode = activeLang === 'gu' ? 'gu-IN' : activeLang === 'hi' ? 'hi-IN' : 'en-US';
 
+        const lblId = tr("thAdminId", "Incident ID");
+        const lblVictim = tr("thAdminVictim", "Victim");
+        const lblPhone = tr("thAdminPhone", "Phone");
+        const lblTime = tr("thAdminTime", "Date & Time");
+        const lblStatus = tr("thAdminStatus", "Status");
+        const lblMedia = tr("thAdminMedia", "Media");
+        const lblCrypto = tr("thAdminCrypto", "Integrity");
+        const lblActions = tr("thAdminActions", "Actions");
+
         let rowsHtml = '';
         incidents.forEach(inc => {
             const isActive = inc.status === "ACTIVE";
@@ -151,14 +160,14 @@ async function loadIncidents() {
 
             rowsHtml += `
                 <tr>
-                    <td data-label="Incident ID"><strong>${safeId}</strong></td>
-                    <td data-label="Victim">${safeName}</td>
-                    <td data-label="Phone">${safePhone}</td>
-                    <td data-label="Started">${escapeHtml(timeFormatted)}</td>
-                    <td data-label="Status">${statusBadge}</td>
-                    <td data-label="Evidence">📸 ${photoCount} | 🎙️ ${audioCount}</td>
-                    <td data-label="Integrity"><span class="badge-crypto-ok">🛡️ SHA-256 OK</span></td>
-                    <td data-label="Actions" class="table-actions">
+                    <td data-label="${escapeHtml(lblId)}"><strong>${safeId}</strong></td>
+                    <td data-label="${escapeHtml(lblVictim)}">${safeName}</td>
+                    <td data-label="${escapeHtml(lblPhone)}">${safePhone}</td>
+                    <td data-label="${escapeHtml(lblTime)}">${escapeHtml(timeFormatted)}</td>
+                    <td data-label="${escapeHtml(lblStatus)}">${statusBadge}</td>
+                    <td data-label="${escapeHtml(lblMedia)}">📸 ${photoCount} | 🎙️ ${audioCount}</td>
+                    <td data-label="${escapeHtml(lblCrypto)}"><span class="badge-crypto-ok">🛡️ SHA-256 OK</span></td>
+                    <td data-label="${escapeHtml(lblActions)}" class="table-actions">
                         <a href="/api/incident/${safeId}/pdf" target="_blank" class="btn-tbl btn-tbl-pdf">📄 PDF</a>
                         <a href="/dashboard" class="btn-tbl btn-tbl-view">🖥️ ${escapeHtml(viewControlText)}</a>
                         <button class="btn-tbl btn-tbl-del" onclick="deleteIncident('${safeId}')" title="Delete Incident">🗑️</button>

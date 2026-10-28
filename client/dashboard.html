@@ -37,7 +37,7 @@
 
     <!-- Leaflet CSS for Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=20261029_v7">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Noto+Sans+Gujarati:wght@400;600;700&display=swap" rel="stylesheet">
@@ -61,6 +61,7 @@
                     <a href="/admin" class="dash-switch-btn" title="Admin Master Portal">⚙️ <span data-i18n="navAdminMaster">એડમિન પેનલ</span></a>
                 </div>
 
+                <div class="nav-controls-row">
                 <!-- Multilingual Selector for ALL World Languages -->
                 <div class="lang-selector-box">
                     <span class="globe-icon">🌐</span>
@@ -82,12 +83,13 @@
                     <span class="live-blip"></span>
                     <span id="wsStatusText" data-i18n="wsConnected">લાઈવ કનેક્ટેડ</span>
                 </div>
+                </div>
                 <div class="incident-selector-wrapper">
                     <label for="incidentSelect" data-i18n="lblIncidentSelect">કેસ / ઇન્સિડન્ટ:</label>
                     <select id="incidentSelect">
                         <option value="" data-i18n="optLoading">લોડ કરી રહ્યું છે...</option>
                     </select>
-                    <button class="btn-action" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 5px 12px; font-size: 12px; font-weight: 700; border-radius: 8px; cursor: pointer; white-space: nowrap;" id="seedDemoCaseBtn" title="Generate Dynamic 1-Sec Live Case" data-i18n="seedDemoCaseBtn">
+                    <button class="btn-action btn-seed-case" id="seedDemoCaseBtn" title="Generate Dynamic 1-Sec Live Case" data-i18n="seedDemoCaseBtn">
                         ⚡ ૧-સેકન્ડ લાઈવ કેસ બનાવો
                     </button>
                 </div>
@@ -446,7 +448,7 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="/static/js/i18n.js"></script>
-    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/i18n.js?v=20261029_v7"></script>
+    <script src="/static/js/dashboard.js?v=20261029_v7"></script>
 </body>
 </html>

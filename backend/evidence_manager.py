@@ -15,10 +15,12 @@ class EvidenceManager:
         self.storage_dir = storage_dir
         self.active_incidents: Dict[str, Dict[str, Any]] = {}
 
+    def sanitize_id(self, incident_id: str) -> str:
+        safe_id = "".join(c for c in str(incident_id) if c.isalnum() or c in ("_", "-"))
+        return safe_id if safe_id else "UNKNOWN"
+
     def get_incident_dir(self, incident_id: str) -> Path:
-        safe_id = "".join(c for c in incident_id if c.isalnum() or c in ("_", "-"))
-        if not safe_id:
-            safe_id = "UNKNOWN"
+        safe_id = self.sanitize_id(incident_id)
         inc_dir = (self.storage_dir / safe_id).resolve()
         if not inc_dir.is_relative_to(self.storage_dir.resolve()):
             raise ValueError("Invalid path traversal attempted")
@@ -71,14 +73,17 @@ class EvidenceManager:
         return metadata
 
     def get_incident_metadata(self, incident_id: str) -> Optional[Dict[str, Any]]:
+        safe_id = self.sanitize_id(incident_id)
+        if safe_id in self.active_incidents:
+            return self.active_incidents[safe_id]
         if incident_id in self.active_incidents:
             return self.active_incidents[incident_id]
         
-        meta_file = self.storage_dir / incident_id / "metadata.json"
+        meta_file = self.storage_dir / safe_id / "metadata.json"
         if meta_file.exists():
             with open(meta_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                self.active_incidents[incident_id] = data
+                self.active_incidents[safe_id] = data
                 return data
         return None
 
@@ -178,7 +183,8 @@ class EvidenceManager:
         return results
 
     def get_incident_timeline(self, incident_id: str) -> List[Dict[str, Any]]:
-        inc_dir = self.storage_dir / incident_id
+        safe_id = self.sanitize_id(incident_id)
+        inc_dir = self.storage_dir / safe_id
         chain_file = inc_dir / "chain_of_custody.jsonl"
         if not chain_file.exists():
             return []
@@ -202,7 +208,8 @@ class EvidenceManager:
         if not entries:
             return {"valid": False, "error": "No chain of custody found"}
 
-        inc_dir = self.storage_dir / incident_id
+        safe_id = self.sanitize_id(incident_id)
+        inc_dir = self.storage_dir / safe_id
         
         # Step 1: Check genesis
         genesis = entries[0]
@@ -273,7 +280,8 @@ class EvidenceManager:
         }
 
     def close_incident(self, incident_id: str, reason: str = "Resolved by user") -> Dict[str, Any]:
-        metadata = self.get_incident_metadata(incident_id)
+        safe_id = self.sanitize_id(incident_id)
+        metadata = self.get_incident_metadata(safe_id)
         if not metadata:
             return {"error": "Incident not found"}
         
@@ -281,7 +289,7 @@ class EvidenceManager:
         metadata["closed_at"] = datetime.now(timezone.utc).isoformat()
         metadata["close_reason"] = reason
         
-        inc_dir = self.storage_dir / incident_id
+        inc_dir = self.storage_dir / safe_id
         with open(inc_dir / "metadata.json", "w", encoding="utf-8") as f:
             json.dump(metadata, f, indent=2)
             
