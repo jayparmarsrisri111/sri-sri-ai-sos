@@ -151,14 +151,14 @@ async function loadIncidents() {
 
             rowsHtml += `
                 <tr>
-                    <td><strong>${safeId}</strong></td>
-                    <td>${safeName}</td>
-                    <td>${safePhone}</td>
-                    <td>${escapeHtml(timeFormatted)}</td>
-                    <td>${statusBadge}</td>
-                    <td>📸 ${photoCount} | 🎙️ ${audioCount}</td>
-                    <td><span class="badge-crypto-ok">🛡️ SHA-256 OK</span></td>
-                    <td class="table-actions">
+                    <td data-label="Incident ID"><strong>${safeId}</strong></td>
+                    <td data-label="Victim">${safeName}</td>
+                    <td data-label="Phone">${safePhone}</td>
+                    <td data-label="Started">${escapeHtml(timeFormatted)}</td>
+                    <td data-label="Status">${statusBadge}</td>
+                    <td data-label="Evidence">📸 ${photoCount} | 🎙️ ${audioCount}</td>
+                    <td data-label="Integrity"><span class="badge-crypto-ok">🛡️ SHA-256 OK</span></td>
+                    <td data-label="Actions" class="table-actions">
                         <a href="/api/incident/${safeId}/pdf" target="_blank" class="btn-tbl btn-tbl-pdf">📄 PDF</a>
                         <a href="/dashboard" class="btn-tbl btn-tbl-view">🖥️ ${escapeHtml(viewControlText)}</a>
                         <button class="btn-tbl btn-tbl-del" onclick="deleteIncident('${safeId}')" title="Delete Incident">🗑️</button>

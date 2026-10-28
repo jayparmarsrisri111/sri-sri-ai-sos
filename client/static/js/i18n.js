@@ -4032,6 +4032,9 @@ function setLanguage(lang) {
     // Apply translations to all DOM elements with data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
+        if (key === 'gpsFetching' && window.currentGpsLocked) {
+            return;
+        }
         const text = t(key);
         if (text) {
             if (el.tagName === 'INPUT' && (el.type === 'button' || el.type === 'submit')) {

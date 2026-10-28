@@ -1330,3 +1330,34 @@ html, body {
 
 
 
+
+
+/* Tactical Cockpit Mobile & Tablet Viewport Resizing */
+@media (max-width: 600px) {
+    .map-view {
+        height: 260px !important;
+    }
+    .evidence-card {
+        max-height: 400px;
+    }
+    .tactical-grid {
+        padding: 8px 10px;
+        gap: 12px;
+    }
+    .threat-gauge-card, .ai-profiler-card {
+        padding: 12px;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+    .map-view {
+        height: 340px !important;
+    }
+    .evidence-card {
+        max-height: 460px;
+    }
+    .tactical-grid {
+        padding: 12px 14px;
+        gap: 14px;
+    }
+}

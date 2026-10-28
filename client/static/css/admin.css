@@ -1129,3 +1129,89 @@ html, body {
 
 
 
+
+
+/* Responsive Mobile Card Layout for Incident Ledger */
+@media (max-width: 768px) {
+    .incidents-table-wrapper {
+        overflow-x: visible !important;
+        background: transparent !important;
+        border: none !important;
+    }
+    .incidents-table,
+    .incidents-table thead,
+    .incidents-table tbody,
+    .incidents-table th,
+    .incidents-table td,
+    .incidents-table tr {
+        display: block;
+    }
+    .incidents-table thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+        opacity: 0;
+        pointer-events: none;
+    }
+    .incidents-table tbody tr {
+        background: #111827;
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 14px;
+        margin-bottom: 14px;
+        padding: 12px 14px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+    .incidents-table td {
+        border: none;
+        padding: 7px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        white-space: normal !important;
+        word-break: break-word;
+        font-size: 13px;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+    .incidents-table td:last-child {
+        border-bottom: none;
+        padding-top: 10px;
+        justify-content: flex-end;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    .incidents-table td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #94a3b8;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-right: 12px;
+        flex-shrink: 0;
+    }
+    .incidents-table td[data-label="Actions"]::before {
+        display: none;
+    }
+    .status-summary-bar {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px;
+    }
+    .stat-card {
+        padding: 10px 12px;
+    }
+}
+
+/* Tablet Optimizations for Admin Portal (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .status-summary-bar {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 10px;
+    }
+    .admin-wrapper {
+        padding: 16px 16px 40px;
+    }
+    .incidents-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}

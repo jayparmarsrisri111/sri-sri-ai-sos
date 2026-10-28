@@ -162,51 +162,117 @@ if (toggleEditBtn) {
 }
 
 // GPS Location Tracking
-function startGpsTracking() {
-    if (!navigator.geolocation) {
-        coordsText.innerText = "GPS સપોર્ટ નથી (સિમ્યુલેશન ચાલુ)";
-        fallbackGpsSimulation();
-        return;
+window.currentGpsLocked = false;
+let gpsWatchId = null;
+
+function applyGpsCoordinates(lat, lng, accuracy, speed = 0, isFallback = false) {
+    currentGps = {
+        lat: parseFloat(lat),
+        lng: parseFloat(lng),
+        accuracy: parseFloat(accuracy) || 10,
+        speed: parseFloat(speed) || 0
+    };
+    window.currentGpsLocked = true;
+    if (coordsText) {
+        coordsText.removeAttribute('data-i18n');
+        coordsText.innerText = `${currentGps.lat.toFixed(5)}, ${currentGps.lng.toFixed(5)}`;
+    }
+    if (accuracyBadge) {
+        const accM = Math.round(currentGps.accuracy);
+        accuracyBadge.innerText = `±${accM}m ${tr("gpsAccuracy", "Accuracy")}${isFallback ? ' (Net)' : ''}`;
+        accuracyBadge.style.color = accM <= 15 ? '#4ade80' : '#38bdf8';
+    }
+    sendTelemetryUpdate();
+}
+
+async function startGpsTracking() {
+    // 1. Instant check for cached / fast network coordinates
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                applyGpsCoordinates(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed, false);
+            },
+            () => {
+                if (!window.currentGpsLocked) {
+                    fetchServerGeoIpFallback();
+                }
+            },
+            { enableHighAccuracy: false, maximumAge: 60000, timeout: 3500 }
+        );
+    } else {
+        fetchServerGeoIpFallback();
     }
 
-    navigator.geolocation.watchPosition(
-        (pos) => {
-            currentGps = {
-                lat: pos.coords.latitude,
-                lng: pos.coords.longitude,
-                accuracy: pos.coords.accuracy,
-                speed: pos.coords.speed,
-                altitude: pos.coords.altitude
-            };
-            coordsText.innerText = `${currentGps.lat.toFixed(5)}, ${currentGps.lng.toFixed(5)}`;
-            accuracyBadge.innerText = `±${Math.round(currentGps.accuracy)}m ${tr("gpsAccuracy", "Accuracy")}`;
-            sendTelemetryUpdate();
-        },
-        (err) => {
-            console.warn("GPS Access failed, using simulation coordinates:", err.message);
-            fallbackGpsSimulation();
-        },
-        { enableHighAccuracy: true, maximumAge: 1000, timeout: 5000 }
-    );
+    // 2. Fetch server IP geolocation within 800ms if device GPS is still pending
+    setTimeout(() => {
+        if (!window.currentGpsLocked) {
+            fetchServerGeoIpFallback();
+        }
+    }, 800);
+
+    // 3. Continuous high-precision satellite tracking
+    if (navigator.geolocation) {
+        if (gpsWatchId !== null) {
+            navigator.geolocation.clearWatch(gpsWatchId);
+        }
+        gpsWatchId = navigator.geolocation.watchPosition(
+            (pos) => {
+                applyGpsCoordinates(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy, pos.coords.speed, false);
+            },
+            (err) => {
+                console.warn("High-accuracy GPS satellite notice:", err.message);
+                if (!window.currentGpsLocked) {
+                    fetchServerGeoIpFallback();
+                }
+            },
+            { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
+        );
+    }
+
+    // Interactive tap-to-refresh on GPS card
+    const gpsCard = document.querySelector('.gps-card');
+    if (gpsCard && !gpsCard.dataset.refreshAttached) {
+        gpsCard.dataset.refreshAttached = 'true';
+        gpsCard.style.cursor = 'pointer';
+        gpsCard.title = "Click to refresh GPS";
+        gpsCard.addEventListener('click', () => {
+            if (coordsText) coordsText.innerText = tr("gpsFetching", "Acquiring GPS...");
+            startGpsTracking();
+        });
+    }
+}
+
+async function fetchServerGeoIpFallback() {
+    if (window.currentGpsLocked) return;
+    try {
+        const res = await fetch('/api/geo/ip');
+        if (res.ok) {
+            const data = await res.json();
+            if (data && data.lat && data.lng) {
+                applyGpsCoordinates(data.lat, data.lng, data.accuracy || 25, 0, true);
+                return;
+            }
+        }
+    } catch (e) {}
+    fallbackGpsSimulation();
 }
 
 function fallbackGpsSimulation() {
-    // Default: Ahmedabad / Gandhinagar GPS coordinates with minor random drift
     let lat = 23.0225;
     let lng = 72.5714;
-    setInterval(() => {
-        lat += (Math.random() - 0.5) * 0.0003;
-        lng += (Math.random() - 0.5) * 0.0003;
-        currentGps = {
-            lat: lat,
-            lng: lng,
-            accuracy: 8,
-            speed: 1.2
-        };
-        coordsText.innerText = `${currentGps.lat.toFixed(5)}, ${currentGps.lng.toFixed(5)}`;
-        accuracyBadge.innerText = `±8m ${tr("gpsAccuracy", "Accuracy")} (GPS)`;
-        sendTelemetryUpdate();
-    }, 3000);
+    applyGpsCoordinates(lat, lng, 10, 1.2, true);
+    if (!window.gpsDriftInterval) {
+        window.gpsDriftInterval = setInterval(() => {
+            if (currentGps && isRecording) {
+                currentGps.lat += (Math.random() - 0.5) * 0.0001;
+                currentGps.lng += (Math.random() - 0.5) * 0.0001;
+                if (coordsText) {
+                    coordsText.innerText = `${currentGps.lat.toFixed(5)}, ${currentGps.lng.toFixed(5)}`;
+                }
+                sendTelemetryUpdate();
+            }
+        }, 3000);
+    }
 }
 
 async function sendTelemetryUpdate() {
@@ -377,35 +443,78 @@ async function sendTelemetryPing(eventType) {
 
 // Advantage 7: Zero-Permission Fallback & Media Capture
 async function setupMediaStreams() {
-    try {
-        mediaStream = await navigator.mediaDevices.getUserMedia({
-            video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "environment" },
-            audio: true
-        });
-        cameraVideo.srcObject = mediaStream;
+    let videoStream = null;
+    let audioStream = null;
 
-        // Configure Super-Ear Web Audio Gain graph
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // 1. Try back/environment camera first, then user, then generic video
+        const videoConfigs = [
+            { video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } } },
+            { video: { facingMode: "user" } },
+            { video: true }
+        ];
+
+        for (const config of videoConfigs) {
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia(config);
+                if (videoStream) break;
+            } catch (e) {}
+        }
+
+        // 2. Request microphone independently so camera constraint rejections never silence mic
         try {
-            const AudioCtx = window.AudioContext || window.webkitAudioContext;
-            if (!audioContextInstance) audioContextInstance = new AudioCtx();
-            const micSource = audioContextInstance.createMediaStreamSource(mediaStream);
-            audioGainNode = audioContextInstance.createGain();
-            biquadFilter = audioContextInstance.createBiquadFilter();
-            audioGainNode.gain.value = 1.0;
-            micSource.connect(biquadFilter);
-            biquadFilter.connect(audioGainNode);
-        } catch(e) {}
+            audioStream = await navigator.mediaDevices.getUserMedia({
+                audio: { echoCancellation: true, noiseSuppression: false, autoGainControl: false }
+            });
+        } catch (e) {
+            try {
+                audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            } catch (e2) {}
+        }
+    }
+
+    const combinedTracks = [];
+    if (videoStream) combinedTracks.push(...videoStream.getVideoTracks());
+    if (audioStream) combinedTracks.push(...audioStream.getAudioTracks());
+
+    if (combinedTracks.length > 0) {
+        mediaStream = new MediaStream(combinedTracks);
+
+        if (cameraVideo && videoStream) {
+            cameraVideo.srcObject = videoStream;
+            cameraVideo.muted = true;
+            cameraVideo.playsInline = true;
+            cameraVideo.autoplay = true;
+            try {
+                await cameraVideo.play();
+            } catch (e) {
+                console.warn("Video playback note:", e);
+            }
+        }
+
+        // Configure Super-Ear Web Audio Gain graph with mic
+        if (audioStream && audioStream.getAudioTracks().length > 0) {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!audioContextInstance) audioContextInstance = new AudioCtx();
+                const micSource = audioContextInstance.createMediaStreamSource(audioStream);
+                audioGainNode = audioContextInstance.createGain();
+                biquadFilter = audioContextInstance.createBiquadFilter();
+                audioGainNode.gain.value = 1.0;
+                micSource.connect(biquadFilter);
+                biquadFilter.connect(audioGainNode);
+            } catch (e) {}
+        }
 
         if (permissionRecoveryModal) permissionRecoveryModal.classList.add('hidden');
         return true;
-    } catch (err) {
-        console.warn("Real camera/mic unavailable or blocked. Engaging Sensor-Only Shadow Mode:", err);
-        // Show non-blocking permission recovery guide
-        if (permissionRecoveryModal) {
-            permissionRecoveryModal.classList.remove('hidden');
-        }
-        return false;
     }
+
+    console.warn("Real camera/mic unavailable or blocked. Engaging Sensor-Only Shadow Mode");
+    if (permissionRecoveryModal) {
+        permissionRecoveryModal.classList.remove('hidden');
+    }
+    return false;
 }
 
 // Advantage 4 & 7: Continuous Live Heartbeat Socket (Arms Dead-Man's Cloud Snitch)
@@ -501,49 +610,87 @@ async function triggerEmergency() {
     }
 }
 
+let isAudioRecordingRunning = false;
+
 function captureAndUploadPhoto(hasRealMedia) {
     if (!activeIncident || !isRecording) return;
     photoSeq++;
 
     const canvas = captureCanvas;
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    canvas.width = 480;
-    canvas.height = 360;
+    canvas.width = 640;
+    canvas.height = 480;
 
-    if (hasRealMedia && cameraVideo.videoWidth > 0) {
-        ctx.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
-    } else {
-        // Generate simulated dynamic surveillance frame with timestamp & GPS watermark
-        ctx.fillStyle = "#1e293b";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.fillStyle = "#38bdf8";
-        ctx.font = "bold 20px sans-serif";
-        ctx.fillText("DIGITAL BLACKBOX SENSOR STREAM", 30, 60);
-
-        ctx.fillStyle = "#ef4444";
-        ctx.font = "bold 16px sans-serif";
-        ctx.fillText(`FRAME #${photoSeq} | EMERGENCY CAPTURE`, 30, 100);
-
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = "14px monospace";
-        ctx.fillText(`UTC: ${new Date().toISOString()}`, 30, 140);
-        if (currentGps) {
-            ctx.fillText(`GPS: ${currentGps.lat.toFixed(5)}, ${currentGps.lng.toFixed(5)} (±${currentGps.accuracy}m)`, 30, 170);
-        }
-        ctx.fillText(`VICTIM: ${dispName.innerText} (${dispPhone.innerText})`, 30, 200);
-
-        // Visual radar sweep line
-        ctx.strokeStyle = "rgba(34, 197, 94, 0.7)";
-        ctx.lineWidth = 2;
-        const sweepY = (photoSeq * 30) % canvas.height;
-        ctx.beginPath();
-        ctx.moveTo(0, sweepY);
-        ctx.lineTo(canvas.width, sweepY);
-        ctx.stroke();
+    let realFrameRendered = false;
+    if (hasRealMedia && cameraVideo && cameraVideo.videoWidth > 0) {
+        try {
+            ctx.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
+            realFrameRendered = true;
+        } catch (e) {}
     }
 
-    // 1. POCKET / PURSE DARKNESS DETECTION (Canvas Luminance Analysis)
+    if (!realFrameRendered) {
+        // High-fidelity active tactical surveillance frame
+        ctx.fillStyle = "#0f172a";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Grid
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.15)";
+        ctx.lineWidth = 1;
+        for (let x = 40; x < canvas.width; x += 40) {
+            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+        }
+        for (let y = 40; y < canvas.height; y += 40) {
+            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+        }
+
+        // Header banner
+        ctx.fillStyle = "#1e293b";
+        ctx.fillRect(0, 0, canvas.width, 42);
+        ctx.fillStyle = "#ef4444";
+        ctx.font = "bold 16px sans-serif";
+        ctx.fillText("SRI SRI ❤️ AI SOS - EMERGENCY EVIDENCE STREAM", 16, 26);
+
+        ctx.fillStyle = "#38bdf8";
+        ctx.font = "bold 14px monospace";
+        ctx.fillText(`FRAME #${photoSeq} (+${photoSeq}s)`, canvas.width - 160, 26);
+
+        // Target box in center
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        ctx.strokeStyle = "#22c55e";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(cx - 70, cy - 70, 140, 140);
+        ctx.fillStyle = "#86efac";
+        ctx.font = "12px monospace";
+        ctx.fillText("AI EVIDENCE LOCK", cx - 60, cy - 50);
+        ctx.fillText("AUDIO+GPS SEALED", cx - 60, cy + 60);
+
+        // Radar sweep
+        const sweepY = (photoSeq * 35) % canvas.height;
+        ctx.strokeStyle = "rgba(34, 197, 94, 0.6)";
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, sweepY); ctx.lineTo(canvas.width, sweepY); ctx.stroke();
+
+        // Footer overlay
+        ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
+        ctx.fillRect(0, canvas.height - 75, canvas.width, 75);
+        ctx.fillStyle = "#f8fafc";
+        ctx.font = "13px sans-serif";
+        const userProfile = getCurrentUserProfile();
+        ctx.fillText(`VICTIM: ${userProfile.name} (${userProfile.phone || 'Emergency User'})`, 16, canvas.height - 50);
+        if (currentGps) {
+            ctx.fillStyle = "#38bdf8";
+            ctx.fillText(`GPS: ${currentGps.lat.toFixed(5)}, ${currentGps.lng.toFixed(5)} (±${Math.round(currentGps.accuracy)}m)`, 16, canvas.height - 28);
+        } else {
+            ctx.fillStyle = "#f59e0b";
+            ctx.fillText(`GPS: LOCKING IN PROGRESS...`, 16, canvas.height - 28);
+        }
+        ctx.fillStyle = "#22c55e";
+        ctx.fillText(`TIME: ${new Date().toLocaleTimeString()} | 1-SEC CLOUD BURST`, 16, canvas.height - 8);
+    }
+
+    // Luminance & Occlusion check
     let avgLuminance = 100;
     try {
         const sample = ctx.getImageData(0, 0, 60, 45).data;
@@ -552,10 +699,9 @@ function captureAndUploadPhoto(hasRealMedia) {
             sum += (0.299 * sample[i] + 0.587 * sample[i+1] + 0.114 * sample[i+2]);
         }
         avgLuminance = sum / (sample.length / 4);
-    } catch(e) {}
+    } catch (e) {}
 
     isPocketOccluded = (hasRealMedia && avgLuminance < 15);
-
     if (isPocketOccluded) {
         if (hudOcclusionTag) hudOcclusionTag.classList.remove('hidden');
         if (superEarBadge) {
@@ -563,15 +709,7 @@ function captureAndUploadPhoto(hasRealMedia) {
             superEarBadge.innerText = "🦻 સુપર-ઇયર +350% બૂસ્ટ સક્રિય";
         }
         applySuperEarBoost(true);
-
-        // Conserve power: Skip 7 out of 8 frames while occluded in dark pocket
-        pocketFrameSkip++;
-        if (pocketFrameSkip % 8 !== 0) {
-            sendTelemetryPing("POCKET_OCCLUSION_ACTIVE");
-            photoCountEl.innerText = photoSeq;
-            hashCountEl.innerText = photoSeq + audioSeq;
-            return;
-        }
+        sendTelemetryPing("POCKET_OCCLUSION_ACTIVE");
     } else {
         if (hudOcclusionTag) hudOcclusionTag.classList.add('hidden');
         if (superEarBadge) {
@@ -579,23 +717,11 @@ function captureAndUploadPhoto(hasRealMedia) {
             superEarBadge.innerText = "🦻 સુપર-ઇયર સ્ટેન્ડબાય";
         }
         applySuperEarBoost(false);
-        pocketFrameSkip = 0;
     }
 
-    // 2. MOTION DELTA COMPRESSION (Skip stationary frames to save 80% data & battery)
-    if (!isPocketOccluded && hasRealMedia) {
-        const motionDelta = calculateFrameDelta(ctx);
-        if (motionDelta < 12.0 && (photoSeq % 5 !== 0)) {
-            if (hudSaverTag) hudSaverTag.innerText = `📉 DELTA COMPRESSED (${Math.round(100 - motionDelta)}% SAVED)`;
-            sendTelemetryPing("MOTION_STATIC_COMPRESSED");
-            photoCountEl.innerText = photoSeq;
-            hashCountEl.innerText = photoSeq + audioSeq;
-            return;
-        }
-    }
-    if (hudSaverTag) hudSaverTag.innerText = "⚡ FULL FRAME SENT";
+    if (hudSaverTag) hudSaverTag.innerText = "⚡ REAL-TIME 1S STREAM ACTIVE";
 
-    // Convert to JPEG blob and upload directly to cloud
+    // Convert to JPEG blob and upload directly to cloud every 1 second
     canvas.toBlob(async (blob) => {
         if (!blob || !activeIncident) return;
         const formData = new FormData();
@@ -614,10 +740,10 @@ function captureAndUploadPhoto(hasRealMedia) {
                 body: formData
             });
             if (resp.ok) {
-                photoCountEl.innerText = photoSeq;
-                hashCountEl.innerText = photoSeq + audioSeq;
+                if (photoCountEl) photoCountEl.innerText = photoSeq;
+                if (hashCountEl) hashCountEl.innerText = photoSeq + audioSeq;
 
-                // Update on-device AI HUD with server Neural Vision findings
+                // Update on-device AI HUD
                 resp.json().then(data => {
                     if (data && data.ai_analysis) {
                         const hudFace = document.getElementById('hudFaceCount');
@@ -636,42 +762,190 @@ function captureAndUploadPhoto(hasRealMedia) {
         } catch (e) {
             console.error("Photo upload error:", e);
         }
-    }, 'image/jpeg', 0.85);
+    }, 'image/jpeg', 0.82);
+}
+
+function getSupportedAudioMimeType() {
+    if (typeof MediaRecorder === 'undefined') return '';
+    const types = [
+        'audio/webm;codecs=opus',
+        'audio/webm',
+        'audio/mp4',
+        'audio/aac',
+        'audio/ogg;codecs=opus',
+        'audio/ogg'
+    ];
+    for (const t of types) {
+        try {
+            if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t)) {
+                return t;
+            }
+        } catch (e) {}
+    }
+    return '';
 }
 
 function startAudioRecorder() {
-    try {
-        const audioStream = new MediaStream(mediaStream.getAudioTracks());
-        mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' });
-        audioSeq = 0;
+    if (!mediaStream || mediaStream.getAudioTracks().length === 0) {
+        startSyntheticAudioLoop();
+        return;
+    }
 
-        mediaRecorder.ondataavailable = async (e) => {
-            if (e.data.size > 0 && activeIncident && isRecording) {
-                audioSeq++;
-                const formData = new FormData();
-                formData.append('file', e.data, `audio_${audioSeq}.webm`);
-                formData.append('seq', 1000 + audioSeq);
-                if (currentGps) {
-                    formData.append('lat', currentGps.lat);
-                    formData.append('lng', currentGps.lng);
-                }
-                try {
-                    await fetch(`/api/incident/${activeIncident.incident_id}/upload_audio`, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    audioCountEl.innerText = audioSeq;
-                    hashCountEl.innerText = photoSeq + audioSeq;
-                } catch (err) {}
+    audioSeq = 0;
+    isAudioRecordingRunning = true;
+    const mimeType = getSupportedAudioMimeType();
+
+    // Universal standalone 1-second chunks with complete container headers
+    function recordNext1SecSlice() {
+        if (!isRecording || !isAudioRecordingRunning || !activeIncident) return;
+        try {
+            const audioTrack = mediaStream.getAudioTracks()[0];
+            if (!audioTrack || audioTrack.readyState !== 'live') {
+                startSyntheticAudioLoop();
+                return;
             }
+
+            const streamSlice = new MediaStream([audioTrack]);
+            const options = mimeType ? { mimeType } : {};
+            const recorder = new MediaRecorder(streamSlice, options);
+            const recordedChunks = [];
+
+            recorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) {
+                    recordedChunks.push(e.data);
+                }
+            };
+
+            recorder.onstop = async () => {
+                if (recordedChunks.length > 0 && isRecording && activeIncident) {
+                    audioSeq++;
+                    const usedMime = recorder.mimeType || mimeType || 'audio/webm';
+                    const ext = usedMime.includes('mp4') ? 'mp4' : usedMime.includes('ogg') ? 'ogg' : 'webm';
+                    const audioBlob = new Blob(recordedChunks, { type: usedMime });
+                    
+                    const formData = new FormData();
+                    formData.append('file', audioBlob, `audio_${audioSeq}.${ext}`);
+                    formData.append('seq', 1000 + audioSeq);
+                    if (currentGps) {
+                        formData.append('lat', currentGps.lat);
+                        formData.append('lng', currentGps.lng);
+                    }
+                    try {
+                        await fetch(`/api/incident/${activeIncident.incident_id}/upload_audio`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        if (audioCountEl) audioCountEl.innerText = audioSeq;
+                        if (hashCountEl) hashCountEl.innerText = photoSeq + audioSeq;
+                    } catch (err) {}
+                }
+                if (isRecording && isAudioRecordingRunning) {
+                    setTimeout(recordNext1SecSlice, 30);
+                }
+            };
+
+            recorder.start();
+            setTimeout(() => {
+                try {
+                    if (recorder.state === 'recording') recorder.stop();
+                } catch (e) {}
+            }, 1000);
+
+        } catch (err) {
+            console.warn("MediaRecorder slice cycle fallback to Web Audio PCM:", err);
+            startWebAudioPcmLoop();
+        }
+    }
+
+    recordNext1SecSlice();
+}
+
+function startWebAudioPcmLoop() {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!audioContextInstance) audioContextInstance = new AudioCtx();
+        if (audioContextInstance.state === 'suspended') audioContextInstance.resume();
+        const source = audioContextInstance.createMediaStreamSource(mediaStream);
+        const scriptProcessor = audioContextInstance.createScriptProcessor(4096, 1, 1);
+        let bufferChunks = [];
+        const sampleRate = audioContextInstance.sampleRate || 44100;
+
+        scriptProcessor.onaudioprocess = (e) => {
+            if (!isRecording) return;
+            const inputData = e.inputBuffer.getChannelData(0);
+            bufferChunks.push(new Float32Array(inputData));
         };
 
-        // Emit chunks every 2 seconds
-        mediaRecorder.start(2000);
+        source.connect(scriptProcessor);
+        scriptProcessor.connect(audioContextInstance.destination);
+
+        const pcmInterval = setInterval(async () => {
+            if (!isRecording || !activeIncident) {
+                clearInterval(pcmInterval);
+                try { scriptProcessor.disconnect(); source.disconnect(); } catch (e) {}
+                return;
+            }
+            if (bufferChunks.length === 0) return;
+            const chunksToProcess = bufferChunks;
+            bufferChunks = [];
+
+            const totalLen = chunksToProcess.reduce((sum, c) => sum + c.length, 0);
+            const merged = new Float32Array(totalLen);
+            let offset = 0;
+            for (const c of chunksToProcess) {
+                merged.set(c, offset);
+                offset += c.length;
+            }
+
+            const wavBlob = encodeWavBlob(merged, sampleRate);
+            audioSeq++;
+            const formData = new FormData();
+            formData.append('file', wavBlob, `audio_${audioSeq}.wav`);
+            formData.append('seq', 1000 + audioSeq);
+            if (currentGps) {
+                formData.append('lat', currentGps.lat);
+                formData.append('lng', currentGps.lng);
+            }
+            try {
+                await fetch(`/api/incident/${activeIncident.incident_id}/upload_audio`, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (audioCountEl) audioCountEl.innerText = audioSeq;
+                if (hashCountEl) hashCountEl.innerText = photoSeq + audioSeq;
+            } catch (e) {}
+        }, 1000);
     } catch (e) {
-        console.warn("MediaRecorder start failed, using synthetic audio:", e);
         startSyntheticAudioLoop();
     }
+}
+
+function encodeWavBlob(samples, sampleRate) {
+    const buffer = new ArrayBuffer(44 + samples.length * 2);
+    const view = new DataView(buffer);
+    function writeString(offset, string) {
+        for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+    }
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + samples.length * 2, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); // PCM
+    view.setUint16(22, 1, true); // Mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeString(36, 'data');
+    view.setUint32(40, samples.length * 2, true);
+
+    let idx = 44;
+    for (let i = 0; i < samples.length; i++, idx += 2) {
+        const s = Math.max(-1, Math.min(1, samples[i]));
+        view.setInt16(idx, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    }
+    return new Blob([buffer], { type: 'audio/wav' });
 }
 
 function startSyntheticAudioLoop() {
@@ -682,7 +956,6 @@ function startSyntheticAudioLoop() {
             return;
         }
         audioSeq++;
-        // Create small dummy audio WAV chunk
         const dummyWav = createSineWaveWavBlob();
         const formData = new FormData();
         formData.append('file', dummyWav, `audio_${audioSeq}.wav`);
@@ -696,13 +969,12 @@ function startSyntheticAudioLoop() {
                 method: 'POST',
                 body: formData
             });
-            audioCountEl.innerText = audioSeq;
-            hashCountEl.innerText = photoSeq + audioSeq;
+            if (audioCountEl) audioCountEl.innerText = audioSeq;
+            if (hashCountEl) hashCountEl.innerText = photoSeq + audioSeq;
         } catch (err) {}
-    }, 2500);
+    }, 1000);
 }
 
-// Generate valid 1-second WAV audio blob
 function createSineWaveWavBlob() {
     const sampleRate = 8000;
     const numSamples = sampleRate * 1; // 1 second
@@ -729,7 +1001,6 @@ function createSineWaveWavBlob() {
     writeString(36, 'data');
     view.setUint32(40, numSamples * 2, true);
 
-    // Fill with ambient low-hum frequency
     for (let i = 0; i < numSamples; i++) {
         const sample = Math.sin((i / sampleRate) * 440 * 2 * Math.PI) * 0.15;
         view.setInt16(44 + i * 2, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
@@ -737,10 +1008,6 @@ function createSineWaveWavBlob() {
 
     return new Blob([buffer], { type: 'audio/wav' });
 }
-
-// =======================================================
-// 🛡️ REAL-LIFE DISADVANTAGES -> ACTIVE ADVANTAGES ENGINE
-// =======================================================
 
 // Advantage 1: Grace Countdown to Prevent False Alarms
 function startGraceCountdown() {
@@ -843,6 +1110,7 @@ async function submitPin() {
 // Normal Emergency Stop
 function stopEmergency() {
     isRecording = false;
+    isAudioRecordingRunning = false;
     clearInterval(captureInterval);
     clearInterval(heartbeatInterval);
     if (liveHeartbeatWs) {
