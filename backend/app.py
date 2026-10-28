@@ -160,6 +160,30 @@ async def serve_sitemap():
         return FileResponse(sm, media_type="application/xml; charset=utf-8")
     raise HTTPException(status_code=404, detail="sitemap.xml not found")
 
+@app.get("/srisrisos20261011launchkey.txt")
+async def serve_indexnow_key():
+    """
+    Serves IndexNow ownership verification key for instant indexing
+    by Microsoft Bing, Yandex, Seznam, and Naver search engines.
+    """
+    key_file = CLIENT_DIR / "srisrisos20261011launchkey.txt"
+    if key_file.exists():
+        return FileResponse(key_file, media_type="text/plain; charset=utf-8")
+    return Response(content="srisrisos20261011launchkey", media_type="text/plain; charset=utf-8")
+
+@app.post("/api/seo/submit-indexnow")
+async def trigger_indexnow_submit():
+    """
+    Immediately submits canonical URLs to Google, Bing, and IndexNow API.
+    """
+    results = await seo_manager.ping_search_engines(phase_note="MANUAL_INDEXNOW_TRIGGER")
+    return {
+        "status": "success",
+        "message": "URLs submitted to Google, Bing, and IndexNow successfully",
+        "results": results,
+        "seo_status": seo_manager.get_status()
+    }
+
 @app.get("/api/health")
 async def health_check():
     """
