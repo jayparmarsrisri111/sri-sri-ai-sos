@@ -57,11 +57,13 @@ def check_rate_limit(client_ip: str, max_requests: int = 240, window_seconds: fl
 # Security Headers & Abuse Prevention Middleware
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
-    # Enforce DoS Protection on API endpoints (exempt localhost / test environments if needed)
+    # Enforce DoS Protection on API endpoints (exempt localhost, test environments, and active emergency evidence streams)
     if request.url.path.startswith("/api/"):
         client_ip = request.headers.get("x-forwarded-for", "").split(",")[0].strip() or (request.client.host if request.client else "unknown")
-        if client_ip != "127.0.0.1" and client_ip != "testclient":
-            if not check_rate_limit(client_ip, max_requests=240, window_seconds=60.0):
+        is_local = client_ip in ("127.0.0.1", "::1", "localhost", "testclient") or client_ip.startswith("127.")
+        is_emergency_stream = any(endpoint in request.url.path for endpoint in ("upload_photo", "upload_audio", "telemetry", "dead_man_trigger"))
+        if not is_local and not is_emergency_stream:
+            if not check_rate_limit(client_ip, max_requests=300, window_seconds=60.0):
                 return JSONResponse(status_code=429, content={"error": "Rate limit exceeded. Too many requests. Please slow down."})
 
     response = await call_next(request)
@@ -613,19 +615,21 @@ async def get_client_geo_ip(request: Request):
     city = "Ahmedabad, Gujarat"
     
     # Check if client provided real IP and attempt quick geolookup if feasible
-    if client_ip and client_ip not in ("127.0.0.1", "localhost", "testclient"):
+    if client_ip and client_ip not in ("127.0.0.1", "localhost", "testclient", "::1", "unknown") and not client_ip.startswith("127."):
         try:
             import urllib.request
-            req = urllib.request.Request(
-                f"https://ipapi.co/{client_ip}/json/",
-                headers={"User-Agent": "SriSriSosAi-GeoResolver/1.0"}
-            )
-            with urllib.request.urlopen(req, timeout=1.5) as resp:
-                data = json.loads(resp.read().decode())
-                if "latitude" in data and "longitude" in data:
-                    lat = float(data["latitude"])
-                    lng = float(data["longitude"])
-                    city = f"{data.get('city', '')}, {data.get('region', '')}, {data.get('country_name', '')}".strip(", ")
+            def _fetch_ip_data():
+                req = urllib.request.Request(
+                    f"https://ipapi.co/{client_ip}/json/",
+                    headers={"User-Agent": "SriSriSosAi-GeoResolver/1.0"}
+                )
+                with urllib.request.urlopen(req, timeout=1.2) as resp:
+                    return json.loads(resp.read().decode())
+            data = await asyncio.to_thread(_fetch_ip_data)
+            if data and "latitude" in data and "longitude" in data:
+                lat = float(data["latitude"])
+                lng = float(data["longitude"])
+                city = f"{data.get('city', '')}, {data.get('region', '')}, {data.get('country_name', '')}".strip(", ")
         except Exception:
             pass
 
@@ -701,11 +705,28 @@ async def get_cap_alert_feed(status_filter: Optional[str] = "ACTIVE", format: Op
     }
 
 @app.post("/api/incident/{incident_id}/dispatch_police_erss")
-async def dispatch_police_erss(incident_id: str, priority: Optional[str] = Form("CRITICAL")):
+async def dispatch_police_erss(incident_id: str, request: Request):
     """
     Dispatches Police Rapid Response Team (PCR Van) under National ERSS 112 CAD Standard.
     Returns CAD Token, Assigned Patrol Unit, and ETA.
+    Accepts empty body, JSON, Form data, or query params seamlessly.
     """
+    priority = "CRITICAL"
+    try:
+        if "priority" in request.query_params:
+            priority = request.query_params["priority"]
+        else:
+            content_type = request.headers.get("content-type", "")
+            if "application/json" in content_type:
+                body = await request.json()
+                if isinstance(body, dict) and "priority" in body:
+                    priority = str(body["priority"])
+            elif "form" in content_type:
+                form = await request.form()
+                if "priority" in form:
+                    priority = str(form["priority"])
+    except Exception:
+        pass
     meta = evidence_mgr.get_metadata(incident_id)
     if not meta:
         raise HTTPException(status_code=404, detail="Incident not found")
@@ -888,26 +909,29 @@ async def geocode_destination(q: str):
         if q_lower in loc["name"].lower() or q_lower in loc["display_name"].lower():
             results.append(dict(loc))
 
-    # 2. If fewer than 5 results, query OpenStreetMap Nominatim API with 2.2s timeout
+    # 2. If fewer than 5 results, query OpenStreetMap Nominatim API in background thread
     if len(results) < 5:
         try:
-            headers = {"User-Agent": "SriSriSosAi-SafetyAudit/1.0 (Emergency Assistance App)"}
-            url = f"https://nominatim.openstreetmap.org/search?q={requests.utils.quote(query)}&format=json&limit=5&countrycodes=in"
-            resp = requests.get(url, headers=headers, timeout=2.2)
-            if resp.status_code == 200:
-                data = resp.json()
-                for item in data:
-                    lat_f = float(item["lat"])
-                    lng_f = float(item["lon"])
-                    disp = item.get("display_name", query)
-                    short_name = disp.split(",")[0]
-                    if not any(abs(r["lat"] - lat_f) < 0.001 and abs(r["lng"] - lng_f) < 0.001 for r in results):
-                        results.append({
-                            "name": short_name,
-                            "display_name": disp,
-                            "lat": round(lat_f, 6),
-                            "lng": round(lng_f, 6)
-                        })
+            def _fetch_nominatim():
+                headers = {"User-Agent": "SriSriSosAi-SafetyAudit/1.0 (Emergency Assistance App)"}
+                url = f"https://nominatim.openstreetmap.org/search?q={requests.utils.quote(query)}&format=json&limit=5&countrycodes=in"
+                resp = requests.get(url, headers=headers, timeout=1.8)
+                if resp.status_code == 200:
+                    return resp.json()
+                return []
+            data = await asyncio.to_thread(_fetch_nominatim)
+            for item in data:
+                lat_f = float(item["lat"])
+                lng_f = float(item["lon"])
+                disp = item.get("display_name", query)
+                short_name = disp.split(",")[0]
+                if not any(abs(r["lat"] - lat_f) < 0.001 and abs(r["lng"] - lng_f) < 0.001 for r in results):
+                    results.append({
+                        "name": short_name,
+                        "display_name": disp,
+                        "lat": round(lat_f, 6),
+                        "lng": round(lng_f, 6)
+                    })
         except Exception:
             pass
 

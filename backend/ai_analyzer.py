@@ -244,15 +244,21 @@ class HighPowerAIAnalyzer:
         # Autonomous Suspect Description Synthesizer
         colors = ctx["dominant_colors"]
         top_color = max(set(colors), key=colors.count) if colors else "Dark apparel"
-        suspect_desc = (
-            f"Visual analysis indicates suspect in close proximity with {top_color} attire. "
-            f"Faces recorded: {ctx['faces_detected_count']}. Screams flagged: {ctx['screams_detected_count']}."
-        )
+        if ctx["faces_detected_count"] > 0:
+            suspect_desc = (
+                f"Visual analysis indicates person/suspect in proximity with {top_color} attire. "
+                f"Faces recorded: {ctx['faces_detected_count']}. Screams flagged: {ctx['screams_detected_count']}."
+            )
+        else:
+            suspect_desc = (
+                f"Surveillance active. No intruder face identified in camera frames yet. "
+                f"Scene monitoring ongoing (Dominant tone: {top_color}). Screams flagged: {ctx['screams_detected_count']}."
+            )
 
         police_brief = (
             f"🚨 PRIORITY 1 INTERVENTION REQUIRED: Sri Sri ❤️SOS AI detected {level} threat level ({avg_threat}%). "
             f"Victim {user_name} ({phone}) at coordinates {coords}. "
-            f"AI Forensics detected: {suspect_desc} "
+            f"AI Forensics: {suspect_desc} "
             f"Tamper-proof Blackbox is streaming real-time cloud packets."
         )
 

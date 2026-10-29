@@ -279,6 +279,14 @@ class EvidenceManager:
             "audit_message": f"All {verified_count} evidence blocks verified with 100% cryptographic integrity."
         }
 
+    def verify_incident(self, incident_id: str) -> Dict[str, Any]:
+        """Convenience alias for verify_integrity."""
+        return self.verify_integrity(incident_id)
+
+    def verify_incident_integrity(self, incident_id: str) -> Dict[str, Any]:
+        """Convenience alias for verify_integrity."""
+        return self.verify_integrity(incident_id)
+
     def close_incident(self, incident_id: str, reason: str = "Resolved by user") -> Dict[str, Any]:
         safe_id = self.sanitize_id(incident_id)
         metadata = self.get_incident_metadata(safe_id)

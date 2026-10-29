@@ -241,14 +241,20 @@ Sitemap: {CANONICAL_DOMAIN}/sitemap.xml
                         url,
                         headers={"User-Agent": "SriSri-SOS-AI-Bot/1.0"}
                     )
-                with urllib.request.urlopen(req, timeout=5) as resp:
+                with urllib.request.urlopen(req, timeout=1.2) as resp:
                     return {"status": resp.status, "message": "Success"}
             except Exception as ex:
                 return {"status": "dispatched", "note": str(ex)}
 
-        for name, url in targets.items():
-            res = await loop.run_in_executor(None, do_ping, name, url)
-            ping_results[name] = res
+        # Run pings in parallel without blocking sequentially
+        async def ping_target(name, url):
+            return name, await loop.run_in_executor(None, do_ping, name, url)
+
+        ping_tasks = [ping_target(name, url) for name, url in targets.items()]
+        results_list = await asyncio.gather(*ping_tasks, return_exceptions=True)
+        for res in results_list:
+            if isinstance(res, tuple) and len(res) == 2:
+                ping_results[res[0]] = res[1]
 
         log_entry = {
             "timestamp": now_str,

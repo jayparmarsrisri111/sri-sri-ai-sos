@@ -183,6 +183,9 @@ function applyGpsCoordinates(lat, lng, accuracy, speed = 0, isFallback = false) 
         accuracyBadge.style.color = accM <= 15 ? '#4ade80' : '#38bdf8';
     }
     sendTelemetryUpdate();
+    if (!navigator.onLine) {
+        updateOfflineBanner(true);
+    }
 }
 
 async function startGpsTracking() {
@@ -270,6 +273,9 @@ function fallbackGpsSimulation() {
                     coordsText.innerText = `${currentGps.lat.toFixed(5)}, ${currentGps.lng.toFixed(5)}`;
                 }
                 sendTelemetryUpdate();
+    if (!navigator.onLine) {
+        updateOfflineBanner(true);
+    }
             }
         }, 3000);
     }
@@ -1178,12 +1184,21 @@ function updateOfflineBanner(isOffline) {
     if (!offlineBanner) return;
     if (isOffline || !navigator.onLine) {
         offlineBanner.classList.remove('hidden');
-        if (offlineSmsBtn && currentGps) {
-            const smsLat = currentGps.lat.toFixed(5);
-            const smsLng = currentGps.lng.toFixed(5);
-            const victimName = dispName ? dispName.innerText : "User";
-            const smsBody = encodeURIComponent(`🚨 EMERGENCY SOS: ${victimName} is in danger! Offline GPS: https://maps.google.com/?q=${smsLat},${smsLng}`);
-            offlineSmsBtn.href = `sms:112?body=${smsBody}`;
+        if (offlineSmsBtn) {
+            const profile = getCurrentUserProfile();
+            const victimName = profile.name || (dispName ? dispName.innerText : "User");
+            const targetPhone = (profile.contacts && profile.contacts.length > 0) ? profile.contacts[0] : "112";
+            const smsSep = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? '&' : '?';
+            
+            if (currentGps) {
+                const smsLat = currentGps.lat.toFixed(5);
+                const smsLng = currentGps.lng.toFixed(5);
+                const smsBody = encodeURIComponent(`🚨 EMERGENCY SOS: ${victimName} is in danger! Offline GPS: https://maps.google.com/?q=${smsLat},${smsLng} (±${Math.round(currentGps.accuracy)}m)`);
+                offlineSmsBtn.href = `sms:${targetPhone}${smsSep}body=${smsBody}`;
+            } else {
+                const smsBody = encodeURIComponent(`🚨 EMERGENCY SOS: ${victimName} is in danger! Immediate assistance required at last known area!`);
+                offlineSmsBtn.href = `sms:${targetPhone}${smsSep}body=${smsBody}`;
+            }
         }
     } else {
         offlineBanner.classList.add('hidden');
@@ -1249,6 +1264,7 @@ window.addEventListener('offline', () => {
 let calcCurrent = "0";
 let calcPrev = null;
 let calcOp = null;
+let calcJustCalculated = false;
 
 function initCalculator() {
     const calcBtns = document.querySelectorAll('.calc-btn');
@@ -1277,28 +1293,60 @@ function handleCalcInput(val) {
         calcCurrent = '0';
         calcPrev = null;
         calcOp = null;
+        calcJustCalculated = false;
     } else if (val === 'DEL') {
-        calcCurrent = calcCurrent.length > 1 ? calcCurrent.slice(0, -1) : '0';
+        if (calcCurrent === 'Error' || calcJustCalculated) {
+            calcCurrent = '0';
+            calcJustCalculated = false;
+        } else {
+            calcCurrent = calcCurrent.length > 1 ? calcCurrent.slice(0, -1) : '0';
+        }
     } else if (['+', '-', '*', '/', '%'].includes(val)) {
-        calcPrev = parseFloat(calcCurrent);
+        if (calcCurrent !== 'Error') {
+            if (calcPrev !== null && calcOp && !calcJustCalculated) {
+                // Chain operations
+                const cur = parseFloat(calcCurrent);
+                let res = calcPrev;
+                if (calcOp === '+') res = calcPrev + cur;
+                else if (calcOp === '-') res = calcPrev - cur;
+                else if (calcOp === '*') res = calcPrev * cur;
+                else if (calcOp === '/') res = cur !== 0 ? calcPrev / cur : 'Error';
+                else if (calcOp === '%') res = (calcPrev * cur) / 100;
+                calcPrev = res === 'Error' ? null : res;
+                calcCurrent = String(res);
+            } else {
+                calcPrev = parseFloat(calcCurrent);
+            }
+        }
         calcOp = val;
-        calcCurrent = '0';
+        calcJustCalculated = true;
     } else if (val === '=') {
-        if (calcPrev !== null && calcOp) {
+        if (calcPrev !== null && calcOp && calcCurrent !== 'Error') {
             const cur = parseFloat(calcCurrent);
             let res = 0;
             if (calcOp === '+') res = calcPrev + cur;
-            if (calcOp === '-') res = calcPrev - cur;
-            if (calcOp === '*') res = calcPrev * cur;
-            if (calcOp === '/') res = cur !== 0 ? calcPrev / cur : 'Error';
-            if (calcOp === '%') res = (calcPrev * cur) / 100;
+            else if (calcOp === '-') res = calcPrev - cur;
+            else if (calcOp === '*') res = calcPrev * cur;
+            else if (calcOp === '/') res = cur !== 0 ? Math.round((calcPrev / cur) * 1000000) / 1000000 : 'Error';
+            else if (calcOp === '%') res = Math.round(((calcPrev * cur) / 100) * 1000000) / 1000000;
+            
             calcCurrent = String(res);
             calcPrev = null;
             calcOp = null;
+            calcJustCalculated = true;
+        }
+    } else if (val === '.') {
+        if (calcJustCalculated) {
+            calcCurrent = '0.';
+            calcJustCalculated = false;
+        } else if (!calcCurrent.includes('.')) {
+            calcCurrent += '.';
         }
     } else {
-        if (calcCurrent === '0' && val !== '.') {
+        // Digits 0-9
+        if (calcCurrent === '0' || calcCurrent === 'Error' || calcJustCalculated) {
             calcCurrent = val;
+            calcJustCalculated = false;
         } else {
             calcCurrent += val;
         }
@@ -1359,7 +1407,23 @@ stealthOverlay.addEventListener('click', () => {
 
 function updateClock() {
     const now = new Date();
-    fakeClock.innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    if (fakeClock) {
+        fakeClock.innerText = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+    const fakeDateEl = document.getElementById('fakeDate');
+    if (fakeDateEl) {
+        const lang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'gu';
+        const localeCode = lang === 'gu' ? 'gu-IN' : lang === 'hi' ? 'hi-IN' : 'en-US';
+        try {
+            fakeDateEl.innerText = now.toLocaleDateString(localeCode, {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric'
+            });
+        } catch (e) {
+            fakeDateEl.innerText = now.toDateString();
+        }
+    }
 }
 setInterval(updateClock, 1000);
 
@@ -1437,10 +1501,54 @@ let callSeconds = 0;
 
 function getCallerDetails() {
     const val = callerTypeSelect ? callerTypeSelect.value : "Papa (પપ્પા)";
-    if (val.includes("Mom")) return { name: "Mom (મમ્મી)", avatar: "👩", voice: "હા બેટા, ક્યાં પહોંચી? હું બહાર જ ઊભી છું, જલ્દી આવ." };
-    if (val.includes("Brother")) return { name: "Brother (ભાઈ)", avatar: "👦", voice: "દીદી, ક્યાં છે તું? હું તને લેવા ગાડી લઈને બહાર આવ્યો છું, ફટાફટ આવ." };
-    if (val.includes("Police")) return { name: "Police Inspector", avatar: "👮", voice: "નમસ્તે, હું કંટ્રોલ રૂમમાંથી બોલું છું. તમારું લાઈવ લોકેશન મળી ગયું છે, પેટ્રોલિંગ વાન 2 મિનિટમાં પહોંચે છે." };
-    return { name: "Papa (પપ્પા)", avatar: "👨", voice: "હા બેટા, ક્યાં પહોંચી? હું બહાર જ ગાડી લઈને ઊભો છું, જલ્દી બહાર આવ." };
+    const lang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'gu';
+    
+    if (val.includes("Mom") || val.includes("મમ્મી")) {
+        return {
+            type: "mom",
+            name: lang === 'en' ? "Mom" : lang === 'hi' ? "मम्मी (Mom)" : "Mom (મમ્મી)",
+            avatar: "👩",
+            voice: lang === 'en'
+                ? "Hello dear, where are you? I am waiting outside with the car, come out quickly."
+                : lang === 'hi'
+                ? "हाँ बेटा, कहाँ पहुँची? मैं बाहर ही गाड़ी लेकर खड़ी हूँ, जल्दी बाहर आ जा।"
+                : "હા બેટા, ક્યાં પહોંચી? હું બહાર જ ગાડી લઈને ઊભી છું, જલ્દી બહાર આવ."
+        };
+    }
+    if (val.includes("Brother") || val.includes("ભાઈ")) {
+        return {
+            type: "brother",
+            name: lang === 'en' ? "Brother" : lang === 'hi' ? "भाई (Brother)" : "Brother (ભાઈ)",
+            avatar: "👦",
+            voice: lang === 'en'
+                ? "Hey, where are you? I came outside to pick you up, hurry up."
+                : lang === 'hi'
+                ? "दीदी, कहाँ हो आप? मैं बाहर गाड़ी लेके आ गया हूँ, फटाफट बाहर आओ।"
+                : "દીદી, ક્યાં છે તું? હું તને લેવા બહાર ગાડી લઈને ઊભો છું, ફટાફટ આવ."
+        };
+    }
+    if (val.includes("Police") || val.includes("પોલીસ")) {
+        return {
+            type: "police",
+            name: lang === 'en' ? "Police Inspector 112" : lang === 'hi' ? "पुलिस इंस्पेक्टर 112" : "Police Inspector (પોલીસ ૧૧૨)",
+            avatar: "👮",
+            voice: lang === 'en'
+                ? "Hello madam, ERSS 112 police control room here. Your live location is received, our patrol van arrives in 2 minutes."
+                : lang === 'hi'
+                ? "नमस्ते, ERSS 112 पुलिस कंट्रोल रूम से बोल रहे हैं। आपका लाइव लोकेशन मिल गया है, पेट्रोलिंग वैन 2 मिनट में पहुँच रही है।"
+                : "નમસ્તે બેન, ERSS 112 પોલીસ કંટ્રોલ રૂમથી બોલું છું. તમારું લાઈવ લોકેશન મળી ગયું છે, પેટ્રોલિંગ વાન ૨ મિનિટમાં પહોંચે છે."
+        };
+    }
+    return {
+        type: "papa",
+        name: lang === 'en' ? "Papa" : lang === 'hi' ? "पापा (Papa)" : "Papa (પપ્પા)",
+        avatar: "👨",
+        voice: lang === 'en'
+            ? "Yes beta, where are you? I am parked right outside with headlights on, walk straight out."
+            : lang === 'hi'
+            ? "हाँ बेटा, कहाँ पहुँची? मैं बाहर ही गाड़ी लेकर खड़ा हूँ, हेडलाइट ऑन है, जल्दी बाहर आ जा।"
+            : "હા બેટા, ક્યાં પહોંચી? હું બહાર જ ગાડી લઈને ઊભો છું, હેડલાઇટ ચાલુ છે, જલ્દી બહાર આવ."
+    };
 }
 
 function startPhoneRingtone() {
@@ -1544,12 +1652,15 @@ if (acceptCallBtn) {
 
         // Simulated caller speech voice
         const caller = getCallerDetails();
+        const curLang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'gu';
+        const targetVoiceLang = curLang === 'en' ? 'en-IN' : curLang === 'hi' ? 'hi-IN' : 'gu-IN';
+
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(caller.voice);
             utterance.rate = 0.95;
-            utterance.pitch = 1.0;
-            utterance.lang = 'hi-IN';
+            utterance.pitch = caller.type === 'mom' ? 1.15 : caller.type === 'brother' ? 1.05 : 0.95;
+            utterance.lang = targetVoiceLang;
             utterance.onend = () => {
                 // Once greeting finishes, start real-time conversational AI listening
                 startInteractiveVoiceDecoy(caller);
@@ -1571,19 +1682,122 @@ function startInteractiveVoiceDecoy(caller) {
         decoySpeechRecognition = new SpeechRecognition();
         decoySpeechRecognition.continuous = true;
         decoySpeechRecognition.interimResults = false;
-        decoySpeechRecognition.lang = 'gu-IN';
+        
+        const curLang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'gu';
+        decoySpeechRecognition.lang = curLang === 'en' ? 'en-IN' : curLang === 'hi' ? 'hi-IN' : 'gu-IN';
 
         decoySpeechRecognition.onresult = (event) => {
             const last = event.results.length - 1;
             const text = event.results[last][0].transcript.toLowerCase();
+            const cType = caller ? caller.type : "papa";
 
-            let aiReply = "હા બેટા, હું બહાર જ ઊભો છું, સામે લાઈટ છે ત્યાં જલ્દી ચાલતી આવ.";
-            if (text.includes("where") || text.includes("ક્યાં") || text.includes("kaha")) {
-                aiReply = "બેટા, હું ગલીના નાકે સફેદ સ્વિફ્ટ કાર લઈને ઊભો છું. ફોન ચાલુ રાખ અને સીધી આવ.";
-            } else if (text.includes("fast") || text.includes("જલ્દી") || text.includes("hurry")) {
-                aiReply = "હા બેટા, હું અને કાકા બંને ગાડીમાં છીએ, હેડલાઇટ ચાલુ છે, તું જરાય ડરીશ નહિ.";
-            } else if (text.includes("police") || text.includes("પોલીસ") || text.includes("man") || text.includes("માણસ") || text.includes("પીછો")) {
-                aiReply = "બેટા, 112 ની પોલીસ પેટ્રોલિંગ વાન હમણાં જ આપણી ગલીમાં વળી ગઈ છે, હું તેમને પણ હાથ બતાવું છું.";
+            let aiReply = "";
+
+            if (cType === "police") {
+                if (text.includes("where") || text.includes("ક્યાં") || text.includes("kaha") || text.includes("kidhar")) {
+                    aiReply = curLang === 'en'
+                        ? "Madam, our PCR unit is right at the corner of your street with flashing lights, walk towards the avenue."
+                        : curLang === 'hi'
+                        ? "मैडम, हमारी पीसीआर वैन आपकी गली के मोड़ पर ही नीली बत्ती ऑन करके खड़ी है, आप मुख्य सड़क की तरफ आइए।"
+                        : "બેન, અમારી PCR વાન તમારા રોડના છેડે જ છે, વાનની બ્લુ લાઈટ ઓન છે, તમે મેઈન રોડ તરફ આવો.";
+                } else if (text.includes("fast") || text.includes("જલ્દી") || text.includes("hurry") || text.includes("jaldi")) {
+                    aiReply = curLang === 'en'
+                        ? "Yes madam, our patrol car is approaching with sirens at high speed. Keep your call connected."
+                        : curLang === 'hi'
+                        ? "हाँ मैडम, सायरन के साथ वैन पूरी स्पीड में आपके पास आ रही है, 1 मिनट में पहुँच रहे हैं, फोन चालू रखिए।"
+                        : "હા બેન, સાયરન સાથે વાન ફૂલ સ્પીડમાં તમારી તરફ જ આવી રહી છે, ૧ મિનિટમાં પહોંચીએ છીએ, ફોન ચાલુ રાખો.";
+                } else if (text.includes("police") || text.includes("પોલીસ") || text.includes("man") || text.includes("માણસ") || text.includes("પીછો") || text.includes("dar") || text.includes("chasing")) {
+                    aiReply = curLang === 'en'
+                        ? "Do not panic at all. Smart City CCTV has locked onto your sector, tactical team is on site."
+                        : curLang === 'hi'
+                        ? "आप बिल्कुल मत घबराइए, स्मार्ट सिटी कैमरों में आपका इलाका कवर हो चुका है, ऑफिसर्स स्पॉट पर पहुँच गए हैं।"
+                        : "તમે જરાય ગભરાશો નહિ, કંટ્રોલ રૂમના સ્માર્ટ સીસીટીવીમાં તમારો વિસ્તાર કવર થઈ ગયો છે, ઓફિસર્સ પહોંચી ગયા છે.";
+                } else {
+                    aiReply = curLang === 'en'
+                        ? "Madam, ERSS 112 control room is live on the line with you. Walk towards the nearest light."
+                        : curLang === 'hi'
+                        ? "मैडम, 112 पुलिस टीम आपके साथ लगातार कनेक्टेड है, आप बस सामने लाइट की तरफ आगे बढ़िए।"
+                        : "બેન, ERSS 112 કંટ્રોલ રૂમ તમારી સાથે લાઈવ જોડાયેલું છે, સામે લાઈટ છે ત્યાં ચાલતા રહો.";
+                }
+            } else if (cType === "mom") {
+                if (text.includes("where") || text.includes("ક્યાં") || text.includes("kaha")) {
+                    aiReply = curLang === 'en'
+                        ? "Beta, I am waiting right on the main road at the end of the alley. Walk straight out."
+                        : curLang === 'hi'
+                        ? "बेटा, मैं गली के मुहाने पर ही खड़ी हूँ, तू बस सीधी चली आ।"
+                        : "બેટા, હું ગલીના છેડે મેઈન રોડ પર જ ઊભી છું, તું બસ સીધી ચાલતી આવ.";
+                } else if (text.includes("fast") || text.includes("જલ્દી") || text.includes("hurry")) {
+                    aiReply = curLang === 'en'
+                        ? "Yes beta, the car door is already open for you. Don't be afraid, hurry over."
+                        : curLang === 'hi'
+                        ? "हाँ बेटा, गाड़ी का दरवाजा खुला ही है, तू बिना डरे जल्दी आ जा।"
+                        : "હા બેટા, કારનો દરવાજો ખુલ્લો જ છે, તું ફટાફટ આવ, જરાય ડરીશ નહિ.";
+                } else if (text.includes("police") || text.includes("માણસ") || text.includes("man") || text.includes("પીછો")) {
+                    aiReply = curLang === 'en'
+                        ? "Beta, Papa and brother are right here with me watching the road. Come right here."
+                        : curLang === 'hi'
+                        ? "बेटा, तेरे पापा और भाई दोनों मेरे साथ ही हैं, हम सड़क पर ही देख रहे हैं, तू जल्दी आ।"
+                        : "બેટા, પપ્પા અને ભાઈ બંને મારી સાથે જ છે, અમે બંને રસ્તા પર જોઈ રહ્યા છીએ, તું સામે આવ.";
+                } else {
+                    aiReply = curLang === 'en'
+                        ? "Yes beta, keep talking to me. I see you coming, keep walking straight."
+                        : curLang === 'hi'
+                        ? "हाँ बेटा, फोन चालू ही रख, मैं सामने देख रही हूँ, सीधी आ।"
+                        : "હા બેટા, હું બહાર જ ઊભી છું, સામે લાઈટ છે ત્યાં જલ્દી ચાલતી આવ.";
+                }
+            } else if (cType === "brother") {
+                if (text.includes("where") || text.includes("ક્યાં") || text.includes("kaha")) {
+                    aiReply = curLang === 'en'
+                        ? "Didi, I am waiting right at the main gate on the vehicle, I am honking the horn."
+                        : curLang === 'hi'
+                        ? "दीदी, मैं मेन गेट पर ही गाड़ी लेके खड़ा हूँ, हॉर्न बजा रहा हूँ देखो।"
+                        : "દીદી, હું મેઈન ગેટ પર બાઈક લઈને ઊભો છું, હોર્ન વગાડું છું જો.";
+                } else if (text.includes("fast") || text.includes("જલ્દી") || text.includes("hurry")) {
+                    aiReply = curLang === 'en'
+                        ? "Yes didi, engine is running. Come out fast, I am right here."
+                        : curLang === 'hi'
+                        ? "हाँ दीदी, गाड़ी स्टार्ट ही है, दौड़ के बाहर आ जाओ।"
+                        : "હા દીદી, હું ગાડી સ્ટાર્ટ રાખીને જ ઊભો છું, દોડીને આવ.";
+                } else if (text.includes("police") || text.includes("માણસ") || text.includes("man") || text.includes("પીછો")) {
+                    aiReply = curLang === 'en'
+                        ? "Who is there? I am walking inside the alley right now, keep the phone on."
+                        : curLang === 'hi'
+                        ? "वहाँ कौन है? मैं अभी गली के अंदर आ रहा हूँ, फोन कट मत करना।"
+                        : "કોણ છે ત્યાં? હું હમણાં જ ગલીની અંદર આવું છું, તું ફોન કટ ના કરતી.";
+                } else {
+                    aiReply = curLang === 'en'
+                        ? "Didi, where are you? I am waiting right outside, come quickly."
+                        : curLang === 'hi'
+                        ? "दीदी, आप कहाँ पहुँचीं? मैं बाहर ही खड़ा हूँ, जल्दी आइए।"
+                        : "દીદી, તું ક્યાં પહોંચી? હું બહાર જ ઊભો છું, જલ્દી આવ.";
+                }
+            } else {
+                // Papa
+                if (text.includes("where") || text.includes("ક્યાં") || text.includes("kaha")) {
+                    aiReply = curLang === 'en'
+                        ? "Beta, I am parked at the alley corner in the white car with headlights on. Walk straight out."
+                        : curLang === 'hi'
+                        ? "बेटा, मैं मोड़ पर ही गाड़ी में हेडलाइट ऑन करके खड़ा हूँ, सीधी चली आ।"
+                        : "બેટા, હું ગલીના નાકે સફેદ સ્વિફ્ટ કાર લઈને ઊભો છું. ફોન ચાલુ રાખ અને સીધી આવ.";
+                } else if (text.includes("fast") || text.includes("જલ્દી") || text.includes("hurry")) {
+                    aiReply = curLang === 'en'
+                        ? "Yes beta, uncle and I are both in the car, don't worry at all, come out fast."
+                        : curLang === 'hi'
+                        ? "हाँ बेटा, मैं और चाचा दोनों गाड़ी में ही हैं, तू घबराना मत, जल्दी बाहर आ।"
+                        : "હા બેટા, હું અને કાકા બંને ગાડીમાં છીએ, હેડલાઇટ ચાલુ છે, તું જરાય ડરીશ નહિ.";
+                } else if (text.includes("police") || text.includes("પોલીસ") || text.includes("man") || text.includes("માણસ") || text.includes("પીછો")) {
+                    aiReply = curLang === 'en'
+                        ? "Beta, the 112 police patrol van is right next to my car too, I am waving to them."
+                        : curLang === 'hi'
+                        ? "बेटा, 112 की पुलिस वैन भी अपनी गाड़ी के पास ही है, मैंने उन्हें भी इशारा कर दिया है।"
+                        : "બેટા, 112 ની પોલીસ પેટ્રોલિંગ વાન હમણાં જ આપણી ગલી પાસે વળી છે, હું તેમને પણ હાથ બતાવું છું.";
+                } else {
+                    aiReply = curLang === 'en'
+                        ? "Yes beta, I am standing right outside where the street light is, walk towards me."
+                        : curLang === 'hi'
+                        ? "हाँ बेटा, मैं बाहर ही खड़ा हूँ, जहाँ लाइट है वहाँ जल्दी चलती हुई आ जा।"
+                        : "હા બેટા, હું બહાર જ ઊભો છું, સામે લાઈટ છે ત્યાં જલ્દી ચાલતી આવ.";
+                }
             }
 
             const dialogueEl = document.getElementById('activeCallDialogueText');
@@ -1595,7 +1809,8 @@ function startInteractiveVoiceDecoy(caller) {
                 window.speechSynthesis.cancel();
                 const utter = new SpeechSynthesisUtterance(aiReply);
                 utter.rate = 0.95;
-                utter.lang = 'hi-IN';
+                utter.pitch = cType === 'mom' ? 1.15 : cType === 'brother' ? 1.05 : 0.95;
+                utter.lang = curLang === 'en' ? 'en-IN' : curLang === 'hi' ? 'hi-IN' : 'gu-IN';
                 window.speechSynthesis.speak(utter);
             }
         };
@@ -1638,24 +1853,26 @@ let micAnimFrame = null;
 let screamCounter = 0;
 
 function setupVoiceAndScreamDetection() {
-    // A. Web Speech Recognition for "Help", "Bachao", "Save me", "બચાવો"
+    // A. Web Speech Recognition for "Help", "Bachao", "Save me", "બચાવો", "મદદ", "Police"
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = true;
-        recognition.lang = 'gu-IN'; // Also catches phonetic Indian English
+        const curLang = (typeof currentLang !== 'undefined' && currentLang) ? currentLang : 'gu';
+        recognition.lang = curLang === 'en' ? 'en-IN' : curLang === 'hi' ? 'hi-IN' : 'gu-IN';
 
         recognition.onresult = (event) => {
             for (let i = event.resultIndex; i < event.results.length; ++i) {
                 const transcript = event.results[i][0].transcript.toLowerCase();
-                console.log("Voice transcript:", transcript);
-                if (transcript.includes("help") || 
-                    transcript.includes("bachao") || 
-                    transcript.includes("save") || 
-                    transcript.includes("બચાવો") || 
-                    transcript.includes("મદદ")) {
-                    voiceStatusText.innerText = "🚨 ઇમરજન્સી શબ્દ પકડાયો: " + transcript;
+                console.log("Voice transcript detected:", transcript);
+                const emergencyKeywords = [
+                    "help", "bachao", "save", "બચાવો", "મદદ", "chor", "police", 
+                    "પકડો", "stop", "મુકો", "chodo", "જવા દો", "chhod", "danger", 
+                    "emergency", "112", "181", "बचाओ", "मदद", "पुलिस", "छोड़ो"
+                ];
+                if (emergencyKeywords.some(kw => transcript.includes(kw))) {
+                    if (voiceStatusText) voiceStatusText.innerText = "🚨 ઇમરજન્સી શબ્દ પકડાયો: " + transcript;
                     triggerEmergency();
                     break;
                 }
@@ -1663,17 +1880,17 @@ function setupVoiceAndScreamDetection() {
         };
 
         recognition.onerror = (e) => {
-            console.warn("Speech recognition error:", e.error);
+            console.warn("Speech recognition notice:", e.error);
         };
 
         recognition.onend = () => {
-            if (voiceListenToggle && voiceListenToggle.checked) {
+            if (voiceListenToggle && voiceListenToggle.checked && !isRecording) {
                 try { recognition.start(); } catch (err) {}
             }
         };
     }
 
-    // B. Decibel / Volume spike analyzer for physical screams
+    // B. Decibel / Volume spike analyzer for physical screams & shouting
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
         micAudioStream = stream;
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -1691,21 +1908,24 @@ function setupVoiceAndScreamDetection() {
             micAnalyser.getByteFrequencyData(dataArray);
 
             let sum = 0;
+            let maxVal = 0;
             for (let i = 0; i < dataArray.length; i++) {
                 sum += dataArray[i];
+                if (dataArray[i] > maxVal) maxVal = dataArray[i];
             }
             const average = sum / dataArray.length;
-            const percentage = Math.min(100, Math.round((average / 128) * 100));
+            const percentage = Math.min(100, Math.round((maxVal / 220) * 100));
 
             if (audioLevelBar) {
                 audioLevelBar.style.width = percentage + "%";
+                audioLevelBar.style.background = percentage > 75 ? "#ef4444" : percentage > 45 ? "#f59e0b" : "#22c55e";
             }
 
-            // High volume scream spike (> 75%)
-            if (percentage > 75) {
+            // High energy scream spike detection (Peak > 200 or Avg > 50)
+            if (maxVal >= 200 || average >= 50) {
                 screamCounter++;
-                if (screamCounter >= 8 && !isRecording) { // Sustained loud scream
-                    voiceStatusText.innerText = "🚨 જોરદાર ચીસ ડિટેક્ટ થઈ! SOS ટ્રિગર...";
+                if (screamCounter >= 4 && !isRecording) { // Sustained scream/distress
+                    if (voiceStatusText) voiceStatusText.innerText = "🚨 જોરદાર ચીસ ડિટેક્ટ થઈ! SOS ટ્રિગર...";
                     triggerEmergency();
                 }
             } else {
